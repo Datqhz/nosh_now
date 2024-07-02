@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "AE2y2Z7SngSeheXQTQFp+yRX9nkRlbwGe0uzfZkckJU=",
+  "Source": "nosh_now_apis",
+  "BasePath": "_content/nosh_now_apis",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\nosh_now_apis.props" />
+</Project>
