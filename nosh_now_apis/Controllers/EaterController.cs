@@ -1,8 +1,10 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
+using MyApp.Utils;
 
 namespace MyApp.Controllers
 {
@@ -23,7 +25,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetAll()
         {
             var data = await eaterRepository.GetAll();
-            return Ok(data);
+            return Ok(data.Select(eater => eater.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]
@@ -37,7 +39,7 @@ namespace MyApp.Controllers
                     error = $"Eater has id = {id} doesn't exist."
                 });
             }
-            return Ok(data);
+            return Ok(data.AsDto());
         }
 
         [HttpPost]
@@ -60,7 +62,7 @@ namespace MyApp.Controllers
                 AccountId = createEater.accountId
             }
             );
-            return CreatedAtAction(nameof(GetById), new { id = eaterCreated.Id }, eaterCreated);
+            return CreatedAtAction(nameof(GetById), new { id = eaterCreated.Id }, eaterCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(UpdateEaterOrManager updateEater)
@@ -83,14 +85,14 @@ namespace MyApp.Controllers
             {
                 var eaterUpdated = await eaterRepository.Update(eater);
                 scope.Complete();
-                return Ok(eaterUpdated);
+                return Ok(eaterUpdated.AsDto());
             }
         }
         [HttpGet("find")]
         public async Task<IActionResult> FindContainRegex([FromQuery] string regex)
         {
             var data = await eaterRepository.FindContainRegex(regex);
-            return Ok(data);
+            return Ok(data.Select(eater => eater.AsDto()).ToList());
         }
     }
 }

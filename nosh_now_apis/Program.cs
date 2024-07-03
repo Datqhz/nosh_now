@@ -15,6 +15,9 @@ builder.Services.AddTransient<IPaymentMethodRepository, PaymentMethodRepository>
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 builder.Services.AddTransient<IVehicleTypeRepository, VehicleTypeRepository>();
 builder.Services.AddTransient<IEaterRepository, EaterRepository>();
+builder.Services.AddTransient<IRepository<Manager>, ManagerRepository>();
+builder.Services.AddTransient<IMerchantRepository, MerchantRepository>();
+builder.Services.AddTransient<IShipperRepository, ShipperRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

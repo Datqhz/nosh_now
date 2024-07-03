@@ -17,13 +17,16 @@ namespace MyApp.Dtos.Request
     public record CreateMerchant(string displayName, string avatar, string email,
                                 string phone, string openingTime, string closingTime, 
                                 string coordinator, int accountId, int categoryId);
-    public record UpdateMerchant(int id, string displayName, string avatar, string email,
+    public record UpdateMerchant(int id, string displayName, string avatar,
                                 string phone, string openingTime, string closingTime, int categoryId ,
                                 string coordinator);
     public record CreateShipper(string displayName, string avatar, string email,
                                 string phone, string vehicleName, string momoPayment, 
                                 string coordinator, int accountId, int vehicleTypeId);
-    public record UpdateShipper(int id, string displayName, string avatar, string email,
+    public record UpdateShipper(int id, string displayName, string avatar,
                                 string phone, string vehicleName, string momoPayment, 
                                 string coordinator, int vehicleTypeId);
+
+
+    public record LoginRequest(string email, string password);
 }

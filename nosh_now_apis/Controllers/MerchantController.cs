@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -25,7 +26,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetAll()
         {
             var data = await merchantRepository.GetAll();
-            return Ok(data);
+            return Ok(data.Select(merchant => merchant.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]
@@ -39,7 +40,7 @@ namespace MyApp.Controllers
                     error = $"Merchant has id = {id} doesn't exist."
                 });
             }
-            return Ok(data);
+            return Ok(data.AsDto());
         }
 
         [HttpPost]
@@ -74,7 +75,7 @@ namespace MyApp.Controllers
                 CategoryId = createMerchant.categoryId
             }
             );
-            return CreatedAtAction(nameof(GetById), new { id = merchantCreated.Id }, merchantCreated);
+            return CreatedAtAction(nameof(GetById), new { id = merchantCreated.Id }, merchantCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(UpdateMerchant updateMerchant)
@@ -109,14 +110,14 @@ namespace MyApp.Controllers
             {
                 var merchantUpdated = await merchantRepository.Update(merchant);
                 scope.Complete();
-                return Ok(merchantUpdated);
+                return Ok(merchantUpdated.AsDto());
             }
         }
         [HttpGet("find")]
         public async Task<IActionResult> FindContainRegex([FromQuery] string regex)
         {
             var data = await merchantRepository.FindContainRegex(regex);
-            return Ok(data);
+            return Ok(data.Select(merchant => merchant.AsDto()).ToList());
         }
     }
 }

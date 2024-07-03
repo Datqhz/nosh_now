@@ -78,6 +78,28 @@ namespace MyApp.Controllers
                 return Ok(accountUpdated);
             }
         }
-        
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest loginDto)
+        {
+            var account = await accountRepository.FindByEmail(loginDto.email);
+            if (account == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Incorrect account or password"
+                });
+            }
+            var verify = BCrypt.Net.BCrypt.Verify(loginDto.password, account.Password);
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(loginDto.password);
+            if(verify)
+            {
+                return Ok(account);
+            }
+            return BadRequest(new
+            {
+                error = "Incorrect account or password"
+            });
+            
+        }
     }
 }

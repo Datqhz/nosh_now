@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -16,6 +17,7 @@ namespace MyApp.Controllers
         public ManagerController(IRepository<Manager> managerRepository, IAccountRepository accountRepository)
         {
             this.managerRepository = managerRepository;
+            this.accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -36,7 +38,7 @@ namespace MyApp.Controllers
                     error = $"Manager has id = {id} doesn't exist."
                 });
             }
-            return Ok(data);
+            return Ok(data.AsDto());
         }
 
         [HttpPost]
@@ -59,7 +61,7 @@ namespace MyApp.Controllers
                 AccountId = createManager.accountId
             }
             );
-            return CreatedAtAction(nameof(GetById), new { id = managerCreated.Id }, managerCreated);
+            return CreatedAtAction(nameof(GetById), new { id = managerCreated.Id }, managerCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(UpdateEaterOrManager updateManager)
@@ -82,7 +84,7 @@ namespace MyApp.Controllers
             {
                 var managerUpdated = await managerRepository.Update(manager);
                 scope.Complete();
-                return Ok(managerUpdated);
+                return Ok(managerUpdated.AsDto());
             }
         }
     }

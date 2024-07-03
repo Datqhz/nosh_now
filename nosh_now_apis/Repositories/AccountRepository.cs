@@ -43,7 +43,8 @@ namespace MyApp.Repositories
 
         public async Task<Account> FindByEmail(string email)
         {
-            return await _context.Account.Where(a => a.Email == email).FirstOrDefaultAsync();
+            return await _context.Account.Where(a => a.Email == email)
+            .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Account>> GetAll()

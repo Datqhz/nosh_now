@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -25,7 +26,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetAll()
         {
             var data = await shipperRepository.GetAll();
-            return Ok(data);
+            return Ok(data.Select(shipper => shipper.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]
@@ -39,7 +40,7 @@ namespace MyApp.Controllers
                     error = $"Shipper has id = {id} doesn't exist."
                 });
             }
-            return Ok(data);
+            return Ok(data.AsDto());
         }
 
         [HttpPost]
@@ -74,7 +75,7 @@ namespace MyApp.Controllers
                 VehicleTypeId = createShipper.vehicleTypeId
             }
             );
-            return CreatedAtAction(nameof(GetById), new { id = shipperCreated.Id }, shipperCreated);
+            return CreatedAtAction(nameof(GetById), new { id = shipperCreated.Id }, shipperCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(UpdateShipper updateShipper)
@@ -109,14 +110,14 @@ namespace MyApp.Controllers
             {
                 var shipperUpdated = await shipperRepository.Update(shipper);
                 scope.Complete();
-                return Ok(shipperUpdated);
+                return Ok(shipperUpdated.AsDto());
             }
         }
         [HttpGet("find")]
         public async Task<IActionResult> FindContainRegex([FromQuery] string regex)
         {
             var data = await shipperRepository.FindContainRegex(regex);
-            return Ok(data);
+            return Ok(data.Select(shipper => shipper.AsDto()).ToList());
         }
     }
 }
