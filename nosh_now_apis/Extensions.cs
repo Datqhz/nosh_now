@@ -41,6 +41,24 @@ namespace MyApp.Extensions
                 type.Icon
             );
         }
+        public static OrderStatusResponseDto AsDto(this OrderStatus status)
+        {
+            return new OrderStatusResponseDto
+            (
+                status.Id,
+                status.StatusName,
+                status.Step
+            );
+        }
+        public static PaymentMethodResponseDto AsDto(this PaymentMethod method)
+        {
+            return new PaymentMethodResponseDto
+            (
+                method.Id,
+                method.MethodName,
+                method.MethodImage
+            );
+        }
         public static ManagerResponseDto AsDto(this Manager manager)
         {
             return new ManagerResponseDto
@@ -97,6 +115,55 @@ namespace MyApp.Extensions
                 shipper.Status,
                 shipper.Account?.AsDto(),
                 shipper.VehicleType?.AsDto()
+            );
+        }
+        public static LocationResponseDto AsDto(this Location location)
+        {
+            return new LocationResponseDto
+            (
+                location.Id,
+                location.LocationName,
+                location.Coordinator,
+                location.Default,
+                location.Eater?.AsDto()
+            );
+        }
+        public static OrderResponseDto AsDto(this Order order)
+        {
+            return new OrderResponseDto
+            (
+                order.Id,
+                order.OrderedDate,
+                order.ShipmentFee,
+                order.Status?.AsDto(),
+                order.Merchant?.AsDto(),
+                order.Eater?.AsDto(),
+                order.Shipper?.AsDto(),
+                order.PaymentMethod?.AsDto()
+            );
+        }
+        public static FoodResponseDto AsDto(this Food food)
+        {
+            return new FoodResponseDto
+            (
+                food.Id,
+                food.FoodName,
+                food.FoodImage,
+                food.FoodDescribe,
+                food.Price,
+                food.Status,
+                food.Merchant?.AsDto()
+            );
+        }
+        public static OrderDetailResponseDto AsDto(this OrderDetail orderDetail)
+        {
+            return new OrderDetailResponseDto
+            (
+                orderDetail.Id,
+                orderDetail.OrderId,
+                orderDetail.Food?.AsDto(),
+                orderDetail.Price,
+                orderDetail.Quantity,
             );
         }
     }

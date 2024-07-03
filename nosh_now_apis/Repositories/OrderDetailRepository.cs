@@ -22,7 +22,7 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<OrderDetail>> FindByOrder(int orderId)
         {
-            return await _context.OrderDetail.Where(o => o.OrderId == orderId).ToListAsync();
+            return await _context.OrderDetail.Where(o => o.OrderId == orderId).Include(o => o.Food).ToListAsync();
         }
 
         public async Task<IEnumerable<OrderDetail>> GetAll()

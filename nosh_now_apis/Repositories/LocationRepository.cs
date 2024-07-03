@@ -36,7 +36,7 @@ namespace MyApp.Repositories
 
         public async Task<Location> GetDefaultByEater(int eaterId)
         {
-            return await _context.Location.Where(o => o.Default == true &&o.EaterId == eaterId).FirstOrDefaultAsync();
+            return await _context.Location.Where(o => o.Default == true && o.EaterId == eaterId).FirstOrDefaultAsync();
         }
 
         public async Task<Location> Insert(Location entity)
