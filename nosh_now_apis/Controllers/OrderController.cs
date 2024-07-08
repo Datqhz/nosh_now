@@ -1,10 +1,12 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Dtos.Response;
 using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories;
 using MyApp.Repositories.Interface;
+using MyApp.Utils;
 
 namespace MyApp.Controllers
 {
@@ -60,7 +62,7 @@ namespace MyApp.Controllers
                 ShipmentFee = 0,
                 MerchantId = createOrder.merchantId,
                 EaterId = createOrder.eaterId,
-                StatusId = 1
+                StatusId = 0
             }
             );
             return CreatedAtAction(nameof(GetById), new { id = orderCreated.Id }, orderCreated.AsDto());
@@ -76,7 +78,9 @@ namespace MyApp.Controllers
                 });
             }
             order.OrderedDate = DateTime.Now;
-            order.ShipmentFee = updateOrder.ShipmentFee;
+            order.ShipmentFee = updateOrder.shipmentFee;
+            order.Coordinator = updateOrder.coordinator;
+            order.Phone = updateOrder.phone;
             order.StatusId = updateOrder.statusId;
             if(updateOrder.shipperId != 0)
             {
@@ -90,6 +94,45 @@ namespace MyApp.Controllers
                 return Ok(orderUpdated.AsDto());
             }
         }
-        
+        [HttpGet("eater/{id}")]
+        public async Task<IActionResult> GetByEater(int id)
+        {
+            var data = await orderRepository.FindByEater(id);
+            return Ok(data.Select(order => order.AsDto()).ToList());
+        }
+        [HttpGet("merchant/{id}")]
+        public async Task<IActionResult> GetByMerchant(int id)
+        {
+            var data = await orderRepository.FindByMerchant(id);
+            return Ok(data.Select(order => order.AsDto()).ToList());
+        }
+        [HttpGet("merchant-eater")]
+        public async Task<IActionResult> GetByMerchant([FromQuery] int merchantId, [FromQuery] int eaterId)
+        {
+            var data = await orderRepository.FindByMerchantAndEater(merchantId, eaterId);
+            return Ok(data.AsDto());
+        }
+        [HttpGet("shipper/{id}")]
+        public async Task<IActionResult> GetByShipper(int id)
+        {
+            var data = await orderRepository.FindByShipper(id);
+            return Ok(data.Select(order => order.AsDto()).ToList());
+        }
+        [HttpGet("near-by")]
+        public async Task<IActionResult> GetOrderNearBy([FromQuery] string coordinator)
+        {
+            List<OrderAndDistanceResponseDto> orders = new List<OrderAndDistanceResponseDto>();
+            var data = await orderRepository.GetAllInitialize();
+            foreach (var orderItem in data)
+            {
+                double distance = DistanceUtil.CalculateDistance(coordinator, orderItem.Coordinator);
+                if(distance < 3)
+                {
+                    orders.Add(new OrderAndDistanceResponseDto(orderItem.AsDto(), distance));
+                }
+            }
+            SortUtil.SortOrderByDistance(orders, 0, orders.Count - 1);
+            return Ok(orders);
+        }
     }
 }

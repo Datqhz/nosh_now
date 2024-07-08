@@ -7,7 +7,7 @@ using MyApp.Repositories.Interface;
 namespace MyApp.Controllers
 {
     [ApiController]
-    [Route("api/paymentMethod")]
+    [Route("api/payment-method")]
     public class PaymentMethodController : ControllerBase
     {
 

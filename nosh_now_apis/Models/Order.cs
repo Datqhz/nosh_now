@@ -5,6 +5,8 @@ namespace MyApp.Models
         public int Id { get; set;}
         public DateTime OrderedDate { get; set;}
         public double ShipmentFee { get; set;}
+        public string Phone { get; set;}
+        public string Coordinator { get; set;}
         public int StatusId { get; set;}
         public int MerchantId { get; set;}
         public int EaterId { get; set;}
@@ -16,5 +18,16 @@ namespace MyApp.Models
         public virtual Shipper Shipper { get; set;}
         public virtual PaymentMethod PaymentMethod { get; set;}
         public virtual ICollection<OrderDetail> OrderDetails { get; set;}
+
+
+        public double CalcTotal()
+        {
+            double total = 0;
+            foreach (OrderDetail detail in OrderDetails)
+            {
+                total += detail.Price*detail.Quantity;
+            }
+            return total + ShipmentFee;
+        }
     }
 }

@@ -135,6 +135,9 @@ namespace MyApp.Extensions
                 order.Id,
                 order.OrderedDate,
                 order.ShipmentFee,
+                order.CalcTotal(),
+                order.Coordinator,
+                order.Phone,
                 order.Status?.AsDto(),
                 order.Merchant?.AsDto(),
                 order.Eater?.AsDto(),
@@ -163,7 +166,7 @@ namespace MyApp.Extensions
                 orderDetail.OrderId,
                 orderDetail.Food?.AsDto(),
                 orderDetail.Price,
-                orderDetail.Quantity,
+                orderDetail.Quantity
             );
         }
     }

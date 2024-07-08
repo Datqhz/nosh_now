@@ -33,7 +33,7 @@ namespace MyApp.Repositories
         public async Task<Order> FindByMerchantAndEater(int merchantId, int eaterId)
         {
             return await _context.Order
-            .Where(o => o.StatusId == 1 &&  o.MerchantId == merchantId && o.EaterId == eaterId)
+            .Where(o => o.StatusId == 0 &&  o.MerchantId == merchantId && o.EaterId == eaterId)
             .FirstOrDefaultAsync();
         }
 
@@ -46,6 +46,12 @@ namespace MyApp.Repositories
         {
             return await _context.Order.ToListAsync();
         }
+
+        public async Task<IEnumerable<Order>> GetAllInitialize()
+        {
+            return await _context.Order.Where(o => o.StatusId == 0).ToListAsync();
+        }
+
         public async Task<Order> GetById(int id)
         {
             return await _context.Order.FindAsync(id);

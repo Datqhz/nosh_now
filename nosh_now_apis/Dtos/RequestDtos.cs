@@ -32,8 +32,10 @@ namespace MyApp.Dtos.Request
     public record CreateLocation(string locationName, string coordinator, bool defaultLocation, int eaterId);
     public record UpdateLocation(int id, string locationName, string coordinator, bool defaultLocation);
     public record CreateOrder(int merchantId, int eaterId);
-    public record UpdateOrder(int id, double ShipmentFee, int statusId, int shipperId, int methodId);
+    public record UpdateOrder(int id, double shipmentFee, string coordinator, string phone, int statusId, int shipperId, int methodId);
     public record CreateOrderDetail(int foodId, int orderId, double price, int quantity);
     public record UpdateOrderDetail(int id, double price, int quantity);
+    public record CreateFood(string foodName, string foodImage, string foodDescribe, double price, int status, int merchantId);
+    public record UpdateFood(int id, string foodName, string foodImage, string foodDescribe, double price, int status);
 
 }

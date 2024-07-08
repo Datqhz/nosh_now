@@ -21,8 +21,10 @@ namespace MyApp.Dtos.Response
     public record LocationResponseDto(int id, string locationName, string coordinator, bool defaultLocation, EaterResponseDto eater);
     public record FoodResponseDto(int id, string foodName, byte[] foodImage, string foodDescribe, 
     double price, int status, MerchantResponseDto merchant);
-    public record OrderResponseDto(int id, DateTime orderedDate, double shipmentFee,
+    public record OrderResponseDto(int id, DateTime orderedDate, double shipmentFee, double totalPay, string coordinator, string phone,
     OrderStatusResponseDto status, MerchantResponseDto merchant,
     EaterResponseDto eater, ShipperResponseDto shipper, PaymentMethodResponseDto paymentMethod);
     public record OrderDetailResponseDto(int id, int orderId, FoodResponseDto food, double price, int quantity);
+    public record OrderAndDistanceResponseDto(OrderResponseDto order, double distance);
+    public record FoodRevenueDto(int foodId, string foodName, double revenue);
 }

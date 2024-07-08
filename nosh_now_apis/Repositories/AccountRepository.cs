@@ -13,26 +13,6 @@ namespace MyApp.Repositories
             this._context = context;
         }
 
-        public async Task<int> CountAccountByRoleAndDate(int roleId, DateTime? date = null, int? year = null, int? month = null)
-        {
-            var query = _context.Account.Where(f => f.RoleId == roleId);
-
-            if (year.HasValue)
-            {
-                query = query.Where(f => f.CreatedDate.Year == year.Value);
-                if (month.HasValue)
-                {
-                    query = query.Where(f => f.CreatedDate.Month == month.Value);
-                }
-            }
-            else if (date.HasValue)
-            {
-                query = query.Where(f => f.CreatedDate.Date == date.Value.Date);
-            }
-
-            return await query.CountAsync();
-        }
-
         public async Task<Account> Delete(int Id)
         {
             var acccount = await _context.Account.FindAsync(Id);
