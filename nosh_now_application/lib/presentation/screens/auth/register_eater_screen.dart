@@ -28,6 +28,25 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _displayNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    avatar.dispose();
+    coordinator.dispose();
+    _isObscure.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),

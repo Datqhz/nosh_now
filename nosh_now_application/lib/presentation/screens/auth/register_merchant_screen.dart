@@ -1,16 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
-import 'package:nosh_now_application/presentation/screens/onboarding_screen.dart';
 
 class RegisterMerchantStep1Screen extends StatefulWidget {
   const RegisterMerchantStep1Screen({super.key});
@@ -34,6 +31,23 @@ class _RegisterMerchantStep1ScreenState
   final List<String> _categories = ['Snacks', 'Fast food'];
   final ValueNotifier<String?> _categorySelected = ValueNotifier(null);
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
+  void dispose() {
+    _displayNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _openingTimeController.dispose();
+    _closingTimeController.dispose();
+    _isObscure.dispose();
+    _categorySelected.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

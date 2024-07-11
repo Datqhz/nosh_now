@@ -17,6 +17,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _isObscure.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),

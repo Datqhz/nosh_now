@@ -30,6 +30,25 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
   final ValueNotifier<String?> _typeSelected = ValueNotifier(null);
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _displayNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _vehicleNameController.dispose();
+    _avatar.dispose();
+    _isObscure.dispose();
+    _typeSelected.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
@@ -498,7 +517,11 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                                               _phoneController.text.trim();
                                           print(
                                               'display name: $displayName - email: $email - password: $password - phone: $phone');
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterSuccessScreen()));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const RegisterSuccessScreen()));
                                         }
                                       },
                                       style: TextButton.styleFrom(

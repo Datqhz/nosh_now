@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/presentation/screens/main_screen.dart';
 import 'package:nosh_now_application/presentation/screens/onboarding_screen.dart';
 
 class Wrapper extends StatelessWidget {
@@ -7,6 +8,6 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return const OnboardingScreen();
+    return MainScreen();
   }
 }
