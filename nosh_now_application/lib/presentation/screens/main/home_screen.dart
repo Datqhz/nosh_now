@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/presentation/screens/main/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
@@ -55,15 +56,30 @@ class HomeScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // list merchant 
+                // list merchant
                 ...List.generate(12, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: MerchantItem(
-                      imgPath: 'assets/images/store_avatar.jpg',
-                      categoryName: "Snacks",
-                      km: 2.4,
-                      merchantName: 'Pho 10 Ly Quoc Su',
+                  return GestureDetector(
+                    onTap: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MerchantDetailScreen(
+                                    avatar: 'assets/images/store_avatar.jpg',
+                                    merchantName: "Pho 10 Ly Quoc Su",
+                                    distance: 2.4,
+                                    address:
+                                        '97 Man Thien - Hiep Phu ward - Thu Duc city',
+                                    category: 'Snacks',
+                                  )))
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: MerchantItem(
+                        imgPath: 'assets/images/store_avatar.jpg',
+                        categoryName: "Snacks",
+                        km: 2.4,
+                        merchantName: 'Pho 10 Ly Quoc Su',
+                      ),
                     ),
                   );
                 }),
