@@ -16,7 +16,7 @@ namespace MyApp.Dtos.Response
     string email, string openingTime, string closingTime, string coordinator, 
     bool stauts, AccountResponseDto account, CategoryResponseDto category);
     public record ShipperResponseDto(int id, string displayName, byte[] avatar, string phone, 
-    string email, string openingTime, string closingTime, string coordinator, 
+    string email, string vehicleName, string momoPayment, string coordinator, 
     bool stauts, AccountResponseDto account, VehicleTypeResponseDto vehicleType);
     public record LocationResponseDto(int id, string locationName, string coordinator, bool defaultLocation, EaterResponseDto eater);
     public record FoodResponseDto(int id, string foodName, byte[] foodImage, string foodDescribe, 

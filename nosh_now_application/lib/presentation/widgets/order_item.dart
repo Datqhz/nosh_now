@@ -1,30 +1,46 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/core/utils/distance.dart';
-import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:intl/intl.dart';
+import 'package:nosh_now_application/core/utils/order.dart';
+import 'package:nosh_now_application/data/models/order.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 
-class MerchantItem extends StatelessWidget {
-  MerchantItem(
-      {super.key,
-      required this.merchant});
-  Merchant merchant;
+class OrderItem extends StatefulWidget {
+  OrderItem({super.key, required this.order});
+
+  Order order;
 
   @override
+  State<OrderItem> createState() => _OrderItemState();
+}
+
+class _OrderItemState extends State<OrderItem> {
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
+    return Container(
+      padding: const EdgeInsets.only(bottom: 8, top: 12),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Color.fromRGBO(159, 159, 159, 1),
+            width: 1,
+          ),
+        ),
+      ),
       child: Row(
         children: [
-          // merchant avatar
+          // food image
           Container(
-            height: 80,
-            width: 80,
+            height: 50,
+            width: 50,
             decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(merchant.avatar), fit: BoxFit.cover),
-              color: Colors.black,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              CupertinoIcons.news,
+              color: Colors.green,
+              size: 40,
             ),
           ),
           const SizedBox(
@@ -34,9 +50,9 @@ class MerchantItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // merchant name
+              // food name
               Text(
-                merchant.displayName,
+                widget.order.merchant.displayName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(
@@ -52,9 +68,10 @@ class MerchantItem extends StatelessWidget {
               ),
               Row(
                 children: [
-                  // distance to merchant
                   Text(
-                    '${calcDistanceInKm(coordinator1: merchant.coordinator, coordinator2: '234 - 232')} km',
+                    DateFormat.yMMMd("en_US")
+                        .format(widget.order.orderedDate!)
+                        .toString(),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(
@@ -76,9 +93,8 @@ class MerchantItem extends StatelessWidget {
                   const SizedBox(
                     width: 4,
                   ),
-                  // category name
                   Text(
-                    merchant.category!.categoryName,
+                    '${calcTotalPay(details, widget.order.shipmentFee!)}₫',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(
@@ -93,6 +109,35 @@ class MerchantItem extends StatelessWidget {
               )
             ],
           ),
+          const Expanded(
+              child: SizedBox(
+            width: 12,
+          )),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                CupertinoIcons.circle_fill,
+                size: 10,
+                color: pickColorForStatus(widget.order.orderStatus.step),
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Text(
+                widget.order.orderStatus.orderStatusName,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  color: Color.fromRGBO(49, 49, 49, 1),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

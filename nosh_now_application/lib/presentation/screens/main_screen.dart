@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/presentation/screens/main/home_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/manage_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/profile_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar_item.dart';
 
@@ -46,13 +48,21 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
       body: SafeArea(
         child: Stack(
           children: [
             ValueListenableBuilder(
               valueListenable: _bottomIdx,
               builder: (context, value, child) {
-                return HomeScreen();
+                if (value == 0) {
+                  return HomeScreen();
+                } else if (value == 1) {
+                  return ManageOrderScreen();
+                } else if (value == 2) {
+                  return ManageOrderScreen();
+                }
+                return ProfileScreen();
               },
             ),
             // Bottom bar

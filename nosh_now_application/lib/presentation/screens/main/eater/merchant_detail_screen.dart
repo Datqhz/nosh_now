@@ -1,28 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/presentation/screens/main/food_detail_screen.dart';
+import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/models/food.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/order.dart';
+import 'package:nosh_now_application/data/models/order_detail.dart';
+import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/food_detail_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 
 class MerchantDetailScreen extends StatefulWidget {
-  MerchantDetailScreen(
-      {super.key,
-      required this.avatar,
-      required this.merchantName,
-      required this.address,
-      required this.distance,
-      required this.category});
+  MerchantDetailScreen({super.key, required this.merchant});
 
-  String avatar;
-  String merchantName;
-  String address;
-  double distance;
-  String category;
+  Merchant merchant;
 
   @override
   State<MerchantDetailScreen> createState() => _MerchantDetailScreenState();
 }
 
 class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
+  Order? order;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +36,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                 children: [
                   // merchant avatar
                   Image(
-                    image: AssetImage(widget.avatar),
+                    image: AssetImage(widget.merchant.avatar),
                     width: MediaQuery.of(context).size.width,
                     height: 200,
                     fit: BoxFit.cover,
@@ -57,9 +58,9 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                       children: [
                         // merchant name
                         Text(
-                          widget.merchantName,
+                          widget.merchant.displayName,
                           maxLines: 1,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(49, 49, 49, 1),
@@ -77,7 +78,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                                   color: Color.fromRGBO(159, 159, 159, 1),
                                 )),
                           ),
-                          child: Row(
+                          child: const Row(
                             children: [
                               Icon(
                                 Icons.location_on_sharp,
@@ -86,7 +87,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                               ),
                               //address
                               Text(
-                                widget.address,
+                                '97 Man Thien, Hiep Phu ward, Thu Duc city',
                                 maxLines: 1,
                                 style: TextStyle(
                                     fontSize: 14.0,
@@ -101,7 +102,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                           children: [
                             // distance to merchant
                             Text(
-                              '${widget.distance} km',
+                              '${calcDistanceInKm(coordinator1: widget.merchant.coordinator, coordinator2: '324 - 323')} km',
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: const TextStyle(
@@ -125,7 +126,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                             ),
                             // category name
                             Text(
-                              widget.category,
+                              widget.merchant.category!.categoryName,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: const TextStyle(
@@ -154,22 +155,18 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                         children: List.generate(12, (index) {
                           return GestureDetector(
                             onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FoodDetailScreen(
-                                        foodImage:
-                                            'assets/images/store_avatar.jpg',
-                                        foodName: 'Pho',
-                                        describe:
-                                            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
-                                        price: 32000,
-                                        quantity: 4))),
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FoodDetailScreen(
+                                  food: foods[0],
+                                  orderDetail: details[0],
+                                ),
+                              ),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: FoodItem(
-                                imgPath: 'assets/images/store_avatar.jpg',
-                                foodName: "Snacks",
-                                price: 2.4,
+                                food: foods[0],
                               ),
                             ),
                           );
@@ -199,6 +196,52 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                   ),
                 ),
               ),
+            ),
+            // preview order
+            Positioned(
+              bottom: 80,
+              right: 20,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PrepareOrderScreen(
+                                order: orderData,
+                              )));
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: const Icon(
+                        CupertinoIcons.news,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                          height: 22,
+                          width: 22,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: const Color.fromRGBO(233, 163, 59, 1),
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Text(
+                            '${details.length}',
+                            style: const TextStyle(color: Colors.white),
+                          )),
+                    ),
+                  ],
+                ),
+              ),
             )
           ],
         ),
@@ -206,3 +249,32 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     );
   }
 }
+
+List<Food> foods = [
+  Food(
+      foodId: 1,
+      foodName: 'Pho',
+      foodImage: 'assets/images/store_avatar.jpg',
+      foodDescribe:
+          "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
+      price: 32000,
+      status: 1)
+];
+List<OrderDetail> details = [
+  OrderDetail(odId: 1, orderId: 1, price: 32000, quantity: 3, food: foods[0])
+];
+Order orderData = Order(
+    orderId: 1,
+    totalPay: 0,
+    shipmentFee: 20000,
+    orderStatus:
+        OrderStatus(orderStatusId: 1, orderStatusName: 'Initialize', step: 0),
+    eater: eater,
+    merchant: merchants[0]);
+Eater eater = Eater(
+  eaterId: 1,
+  displayName: 'Pho 10 Ly Quoc Su',
+  email: 'gatanai@gmail.com',
+  phone: '0983473223',
+  avatar: 'assets/images/store_avatar.jpg',
+);

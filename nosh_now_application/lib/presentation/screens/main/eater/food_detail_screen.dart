@@ -1,21 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/data/models/food.dart';
+import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   FoodDetailScreen(
       {super.key,
-      required this.foodImage,
-      required this.foodName,
-      required this.describe,
-      required this.price,
-      required this.quantity});
+      required this.food,
+      this.orderDetail
+      });
 
-  String foodImage;
-  String foodName;
-  String describe;
-  double price;
-  int quantity;
+  Food food;
+  OrderDetail? orderDetail;
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
@@ -33,7 +30,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             Column(
               children: [
                 Image(
-                  image: AssetImage(widget.foodImage),
+                  image: AssetImage(widget.food.foodImage),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 2.4,
                   fit: BoxFit.cover,
@@ -110,7 +107,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.foodName,
+                          widget.food.foodName,
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           style: const TextStyle(
@@ -122,7 +119,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                           ),
                         ),
                         Text(
-                          '${widget.price} ₫',
+                          '${widget.food.price} ₫',
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           style: const TextStyle(
@@ -139,7 +136,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       height: 12,
                     ),
                     Text(
-                      widget.describe,
+                      widget.food.foodDescribe,
                       textAlign: TextAlign.left,
                       maxLines: 10,
                       style: const TextStyle(
@@ -170,7 +167,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                               ),
                             ),
                             Text(
-                              '${widget.price * widget.quantity} ₫',
+                              '${widget.food.price * widget.orderDetail!.quantity} ₫',
                               textAlign: TextAlign.left,
                               maxLines: 10,
                               style: const TextStyle(

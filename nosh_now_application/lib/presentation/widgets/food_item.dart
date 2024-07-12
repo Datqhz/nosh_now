@@ -1,15 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/data/models/food.dart';
 
 class FoodItem extends StatelessWidget {
   FoodItem(
       {super.key,
-      required this.imgPath,
-      required this.foodName,
-      required this.price});
-  String imgPath;
-  String foodName;
-  double price;
+      required this.food});
+  Food food;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +24,7 @@ class FoodItem extends StatelessWidget {
           Image(
             height: 100,
             width: double.infinity,
-            image: AssetImage(imgPath),
+            image: AssetImage(food.foodImage),
             fit: BoxFit.cover,
           ),
           const SizedBox(
@@ -37,7 +34,7 @@ class FoodItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text(
-              foodName,
+              food.foodName,
               textAlign: TextAlign.center,
               maxLines: 1,
               style: const TextStyle(
@@ -54,7 +51,7 @@ class FoodItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text(
-              '$price ₫',
+              '${food.price} ₫',
               textAlign: TextAlign.center,
               maxLines: 1,
               style: const TextStyle(

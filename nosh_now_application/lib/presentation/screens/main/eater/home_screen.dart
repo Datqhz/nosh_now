@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/presentation/screens/main/merchant_detail_screen.dart';
+import 'package:nosh_now_application/data/models/category.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
@@ -38,8 +40,8 @@ class HomeScreen extends StatelessWidget {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) => CategoryItem(
-                        imgPath: 'assets/images/pho.png',
-                        categoryName: 'Pho - Chao - Hau'),
+                      category: categories[0],
+                    ),
                     itemCount: 12,
                   ),
                 ),
@@ -61,24 +63,18 @@ class HomeScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MerchantDetailScreen(
-                                    avatar: 'assets/images/store_avatar.jpg',
-                                    merchantName: "Pho 10 Ly Quoc Su",
-                                    distance: 2.4,
-                                    address:
-                                        '97 Man Thien - Hiep Phu ward - Thu Duc city',
-                                    category: 'Snacks',
-                                  )))
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MerchantDetailScreen(
+                            merchant: merchants[0],
+                          ),
+                        ),
+                      )
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: MerchantItem(
-                        imgPath: 'assets/images/store_avatar.jpg',
-                        categoryName: "Snacks",
-                        km: 2.4,
-                        merchantName: 'Pho 10 Ly Quoc Su',
+                        merchant: merchants[0],
                       ),
                     ),
                   );
@@ -131,3 +127,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+List<Merchant> merchants = [
+  Merchant(
+      merchantId: 1,
+      displayName: 'Pho 10 Ly Quoc Su',
+      email: 'gatanai@gmail.com',
+      phone: '0983473223',
+      avatar: 'assets/images/store_avatar.jpg',
+      openingTime: '7:30',
+      closingTime: '18:00',
+      coordinator: '322 - 455',
+      category: categories[0])
+];
+List<FoodCategory> categories = [
+  FoodCategory(
+      categoryId: 1,
+      categoryName: 'Pho - Chao - Hau',
+      categoryImage: 'assets/images/pho.png')
+];

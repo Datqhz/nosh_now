@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/data/models/category.dart';
 
 class CategoryItem extends StatelessWidget {
-  CategoryItem({super.key, required this.imgPath, required this.categoryName});
-  String imgPath;
-  String categoryName;
+  CategoryItem({super.key, required this.category});
+  FoodCategory category;
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +17,12 @@ class CategoryItem extends StatelessWidget {
           Image(
             height: 65,
             width: 65,
-            image: AssetImage(imgPath),
+            image: AssetImage(category.categoryImage),
             fit: BoxFit.cover,
           ),
           // category name
           Text(
-            categoryName,
+            category.categoryName,
             textAlign: TextAlign.center,
             maxLines: 2,
             style: const TextStyle(
