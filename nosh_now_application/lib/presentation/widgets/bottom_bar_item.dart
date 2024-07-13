@@ -4,12 +4,14 @@ class BottomBarItem extends StatefulWidget {
   BottomBarItem(
       {super.key,
       required this.idx,
-      required this.icon,
+      this.icon,
+      this.imgPath,
       required this.handleActive,
       this.isActivate = false});
 
   int idx;
-  IconData icon;
+  IconData? icon;
+  String? imgPath;
   Function handleActive;
   bool isActivate;
 
@@ -44,11 +46,11 @@ class BottomBarItemState extends State<BottomBarItem> {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Icon(
+        child: widget.icon != null ?Icon(
           widget.icon,
           size: 25,
           color: Colors.white,
-        ),
+        ): Image.asset(widget.imgPath!, width: 25,height: 25, fit: BoxFit.cover,),
       ),
     );
   }

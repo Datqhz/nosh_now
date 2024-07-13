@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/manage_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/merchant/food_management_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/merchant/merchant_dashboard_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/profile_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar_item.dart';
@@ -15,15 +18,28 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  // final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
+  //   4,
+  //   (index) => GlobalKey<BottomBarItemState>(),
+  // );
+
+  // List<IconData> items = [
+  //   CupertinoIcons.home,
+  //   CupertinoIcons.bell,
+  //   CupertinoIcons.layers_alt,
+  //   CupertinoIcons.person
+  // ];
+
   final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
-    4,
+    5,
     (index) => GlobalKey<BottomBarItemState>(),
   );
 
-  List<IconData> items = [
+  List<dynamic> items = [
     CupertinoIcons.home,
-    CupertinoIcons.bell,
     CupertinoIcons.layers_alt,
+    'assets/images/wok_100_white.png',
+    CupertinoIcons.chart_bar,
     CupertinoIcons.person
   ];
 
@@ -31,8 +47,8 @@ class _MainScreenState extends State<MainScreen> {
 
   void _activateBottomBarItem(int newIdx) {
     int temp = _bottomIdx.value;
-    _bottomIdx.value = newIdx;
     bottomBarItemKeys[temp].currentState!.unActive();
+    _bottomIdx.value = newIdx;
   }
 
   @override
@@ -55,12 +71,20 @@ class _MainScreenState extends State<MainScreen> {
             ValueListenableBuilder(
               valueListenable: _bottomIdx,
               builder: (context, value, child) {
+                // if (value == 0) {
+                //   return HomeScreen();
+                // } else if (value == 1) {
+                //   return ManageOrderScreen();
+                // } else if (value == 2) {
+                //   return ManageOrderScreen();
+                // }
+                // return ProfileScreen();
                 if (value == 0) {
-                  return HomeScreen();
+                  return MerchantDashboardScreen();
                 } else if (value == 1) {
                   return ManageOrderScreen();
                 } else if (value == 2) {
-                  return ManageOrderScreen();
+                  return FoodManagementScreen();
                 }
                 return ProfileScreen();
               },
@@ -73,11 +97,12 @@ class _MainScreenState extends State<MainScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
                 child: BottomBar(
-                  items: List.generate(4, (index) {
+                  items: List.generate(5, (index) {
                     return BottomBarItem(
                       key: bottomBarItemKeys[index],
                       idx: index,
-                      icon: items[index],
+                      icon: items[index] is IconData ? items[index] : null,
+                      imgPath: items[index] is! IconData ? items[index] : null,
                       isActivate: index == 0 ? true : false,
                       handleActive: _activateBottomBarItem,
                     );

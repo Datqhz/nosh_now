@@ -10,6 +10,7 @@ import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 import 'package:nosh_now_application/presentation/widgets/status_item.dart';
 
@@ -353,22 +354,58 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        width: double.infinity,
-                        height: 44,
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.red,
-                              textStyle: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(color: Colors.red),
-                                  borderRadius: BorderRadius.circular(8))),
-                          child: const Text('Cancel'),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              // width: double.infinity,
+                              height: 44,
+                              child: TextButton(
+                                onPressed: () {},
+                                style: TextButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.red,
+                                    textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.red),
+                                        borderRadius:
+                                            BorderRadius.circular(8))),
+                                child: const Text('Cancel'),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              // width: double.infinity,
+                              height: 44,
+                              child: TextButton(
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            OrderProcessScreen(
+                                                order: widget.order))),
+                                style: TextButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(8))),
+                                child: const Text('See process'),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                     const SizedBox(
@@ -442,7 +479,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ),
             ),
-            // substantial bill
           ],
         ),
       ),
