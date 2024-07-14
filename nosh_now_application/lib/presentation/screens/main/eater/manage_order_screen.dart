@@ -9,12 +9,26 @@ import 'package:nosh_now_application/presentation/screens/main/eater/home_screen
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/category_item.dart';
-import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 import 'package:nosh_now_application/presentation/widgets/order_item.dart';
 
-class ManageOrderScreen extends StatelessWidget {
-  const ManageOrderScreen({super.key});
+class ManageOrderScreen extends StatefulWidget {
+  ManageOrderScreen({super.key, required this.type});
+
+  int type;
+
+  @override
+  State<ManageOrderScreen> createState() => _ManageOrderScreenState();
+}
+
+class _ManageOrderScreenState extends State<ManageOrderScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,22 +44,22 @@ class ManageOrderScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 70,
+                  height: 100, // 70
                 ),
-                const Row(
+                Row(
                   children: [
                     Text(
-                      'Your orders',
+                      widget.type == 1 ? 'Your orders' : 'Order received',
                       maxLines: 1,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Color.fromRGBO(49, 49, 49, 1),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Expanded(child: SizedBox()),
-                    Text(
+                    const Expanded(child: SizedBox()),
+                    const Text(
                       'Newest',
                       maxLines: 1,
                       style: TextStyle(
@@ -55,7 +69,7 @@ class ManageOrderScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(
+                    const Icon(
                       CupertinoIcons.sort_down,
                       color: Color.fromRGBO(49, 49, 49, 1),
                     )
@@ -97,32 +111,73 @@ class ManageOrderScreen extends StatelessWidget {
           left: 0,
           right: 0,
           child: Container(
-            height: 50,
             color: const Color.fromRGBO(240, 240, 240, 1),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+            child: Column(
               children: [
-                // drawer
-                GestureDetector(
-                  onTap: () {
-                    // do something
-                  },
-                  child: const Icon(
-                    CupertinoIcons.bars,
-                    size: 20,
-                    color: Color.fromRGBO(49, 49, 49, 1),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // drawer
+                    GestureDetector(
+                      onTap: () {
+                        // do something
+                      },
+                      child: const Icon(
+                        CupertinoIcons.bars,
+                        size: 20,
+                        color: Color.fromRGBO(49, 49, 49, 1),
+                      ),
+                    ),
+                    // search merchant
+                    GestureDetector(
+                      onTap: () {
+                        // do something
+                      },
+                      child: const Icon(
+                        CupertinoIcons.search,
+                        size: 20,
+                        color: Color.fromRGBO(49, 49, 49, 1),
+                      ),
+                    )
+                  ],
                 ),
-                // search merchant
-                GestureDetector(
-                  onTap: () {
-                    // do something
-                  },
-                  child: const Icon(
-                    CupertinoIcons.search,
-                    size: 20,
-                    color: Color.fromRGBO(49, 49, 49, 1),
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                      border: Border(
+                          bottom: BorderSide(
+                              width: 0.14,
+                              color: Theme.of(context).dividerColor))),
+                  child: TabBar(
+                    unselectedLabelColor:
+                        const Color.fromRGBO(170, 184, 194, 1),
+                    indicatorSize: TabBarIndicatorSize.label,
+                    indicatorWeight: 3,
+                    controller: _tabController,
+                    tabs: const [
+                      Text(
+                        'Received',
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        'Near you',
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 )
               ],
