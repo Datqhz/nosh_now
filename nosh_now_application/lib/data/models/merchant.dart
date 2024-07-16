@@ -40,4 +40,16 @@ class Merchant {
           json['category'] != null ? FoodCategory.fromJson(json['category']) : null,
     );
   }
+   Map<String, dynamic> toJson() => {
+        'id': merchantId,
+        "displayName": displayName,
+        'email': email,
+        'phone': phone,
+        'avatar': avatar,
+        'openingTime': openingTime,
+        'closingTime': closingTime,
+        'coordinator': coordinator,
+        'account': account ?? account!.toJson(),
+        'category': category ?? category!.toJson()
+      };
 }

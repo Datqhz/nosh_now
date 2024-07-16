@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
+import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/repositories/account_repository.dart';
+import 'package:nosh_now_application/data/repositories/eater_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
 
@@ -23,7 +27,7 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  ValueNotifier<XFile?> avatar = ValueNotifier(null);
+  final ValueNotifier<XFile?> _avatar = ValueNotifier(null);
   ValueNotifier<String> coordinator = ValueNotifier('');
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
 
@@ -40,7 +44,7 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
     _passwordController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    avatar.dispose();
+    _avatar.dispose();
     coordinator.dispose();
     _isObscure.dispose();
     super.dispose();
@@ -73,14 +77,14 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                           GestureDetector(
                             onTap: () async {
                               XFile? img = await pickAnImageFromGallery();
-                              avatar.value = img;
+                              _avatar.value = img;
                             },
                             child: SizedBox(
                               height: 100,
                               child: Stack(
                                 children: [
                                   ValueListenableBuilder(
-                                      valueListenable: avatar,
+                                      valueListenable: _avatar,
                                       builder: (context, value, child) {
                                         return CircleAvatar(
                                           backgroundColor: Colors.black,
@@ -434,12 +438,12 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                     width: double.infinity,
                                     height: 44,
                                     child: TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           final displayName =
                                               _displayNameController.text
                                                   .trim();
-                                          final email = _displayNameController
+                                          final email = _emailController
                                               .text
                                               .trim();
                                           final password =
@@ -447,13 +451,38 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                           final phone = _displayNameController
                                               .text
                                               .trim();
-                                          print(
-                                              'display name: $displayName - email: $email - password: $password - phone: $phone - address: ${coordinator.value}');
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const RegisterSuccessScreen()));
+                                          int createdAccountResult =
+                                              await AccountRepository()
+                                                  .signUp(email, password, 2);
+                                          if (createdAccountResult != 0) {
+                                            String avatar = '';
+                                            if (_avatar.value != null) {
+                                              avatar = await convertToBase64(
+                                                  _avatar.value!);
+                                            } else {
+                                              avatar = defaultImage;
+                                            }
+                                            Eater eater = Eater(
+                                                eaterId: 0,
+                                                displayName: displayName,
+                                                email: email,
+                                                phone: phone,
+                                                avatar: avatar);
+                                            bool rs = await EaterRepository()
+                                                .create(eater,
+                                                    createdAccountResult);
+                                            if (rs) {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const RegisterSuccessScreen()));
+                                            }else {
+                                              showSnackBar(context, "Fail to register");
+                                            }
+                                          }else {
+                                             showSnackBar(context, "Email is used");
+                                          }
                                         }
                                       },
                                       style: TextButton.styleFrom(

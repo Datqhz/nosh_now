@@ -11,4 +11,9 @@ class Account {
         email: json['email'],
         role: json['role'] != null ? Role.fromJson(json['role']) : null);
   }
+  Map<String, dynamic> toJson() => {
+        'id': accountId,
+        'email': email,
+        'role': role ?? role!.toJson(),
+      };
 }

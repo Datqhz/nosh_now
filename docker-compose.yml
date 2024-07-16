@@ -16,6 +16,21 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  api:
+    build:
+      context: .
+      dockerfile: nosh_now_apis/Dockerfile
+    ports:
+      - "5000:80"
+    image: api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ISSUER=$ISSUER
+      - AUDIENCE=$AUDIENCE
+      - KEY=$KEY
+
 volumes:
   mydb:
     

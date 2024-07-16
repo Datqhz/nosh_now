@@ -2,10 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
+import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/models/shipper.dart';
+import 'package:nosh_now_application/data/models/vehicle_type.dart';
+import 'package:nosh_now_application/data/repositories/account_repository.dart';
+import 'package:nosh_now_application/data/repositories/eater_repository.dart';
+import 'package:nosh_now_application/data/repositories/shipper_repository.dart';
+import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
 
@@ -26,13 +33,13 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
   final ValueNotifier<XFile?> _avatar = ValueNotifier(null);
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
 
-  final List<String> _vehicleTypes = ['Motobikes', 'Car'];
+  List<VehicleType> _vehicleTypes = [];
   final ValueNotifier<String?> _typeSelected = ValueNotifier(null);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _fetchVehicleTypeData();
   }
 
   @override
@@ -46,6 +53,16 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
     _isObscure.dispose();
     _typeSelected.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchVehicleTypeData() async {
+    try {
+      List<VehicleType> types = await VehicleTypeRepository().getAll();
+      _vehicleTypes = types;
+      setState(() {});
+    } catch (e) {
+      print('Error converting image to base64: $e');
+    }
   }
 
   @override
@@ -424,9 +441,9 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                                     value: _typeSelected.value,
                                     items: _vehicleTypes
                                         .map((item) => DropdownMenuItem<String>(
-                                              value: item,
+                                              value: item.typeName,
                                               child: Text(
-                                                item,
+                                                item.typeName,
                                               ),
                                             ))
                                         .toList(),
@@ -504,7 +521,7 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                                     width: double.infinity,
                                     height: 44,
                                     child: TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           final displayName =
                                               _displayNameController.text
@@ -515,13 +532,55 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                                               _passwordController.text.trim();
                                           final phone =
                                               _phoneController.text.trim();
-                                          print(
-                                              'display name: $displayName - email: $email - password: $password - phone: $phone');
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const RegisterSuccessScreen()));
+                                          VehicleType? type = null;
+                                          _vehicleTypes.forEach((e) {
+                                            if (e.typeName ==
+                                                _typeSelected.value) {
+                                              type = e;
+                                            }
+                                          });
+                                          final vehicleName =
+                                              _vehicleNameController.text
+                                                  .trim();
+
+                                          int createdAccountResult =
+                                              await AccountRepository()
+                                                  .signUp(email, password, 4);
+                                          if (createdAccountResult != 0) {
+                                            String avatar = '';
+                                            if (_avatar.value != null) {
+                                              avatar = await convertToBase64(
+                                                  _avatar.value!);
+                                            } else {
+                                              avatar = defaultImage;
+                                            }
+                                            Shipper eater = Shipper(
+                                                shipperId: 0,
+                                                displayName: displayName,
+                                                email: email,
+                                                phone: phone,
+                                                avatar: avatar,
+                                                vehicleName: vehicleName,
+                                                coordinator: '0 - 0',
+                                                momoPayment: phone,
+                                                vehicleType: type);
+                                            bool rs = await ShipperRepository()
+                                                .create(eater,
+                                                    createdAccountResult);
+                                            if (rs) {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const RegisterSuccessScreen()));
+                                            } else {
+                                              showSnackBar(
+                                                  context, "Fail to register");
+                                            }
+                                          } else {
+                                            showSnackBar(
+                                                context, "Email is used");
+                                          }
                                         }
                                       },
                                       style: TextButton.styleFrom(

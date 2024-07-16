@@ -6,4 +6,9 @@ class FoodCategory {
   factory FoodCategory.fromJson(Map<String, dynamic> json) {
     return FoodCategory(categoryId: json['id'], categoryName: json['categoryName'], categoryImage: json['categoryImage']);
   }
+   Map<String, dynamic> toJson() => {
+        'id': categoryId,
+        "categoryName": categoryName,
+        'categoryImage': categoryImage,
+      };
 }

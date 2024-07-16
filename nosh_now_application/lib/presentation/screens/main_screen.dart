@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/manage_order_screen.dart';
@@ -26,55 +27,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
-  //   4,
-  //   (index) => GlobalKey<BottomBarItemState>(),
-  // );
+  late List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = [];
 
-  // List<IconData> items = [
-  //   CupertinoIcons.home,
-  //   CupertinoIcons.bell,
-  //   CupertinoIcons.layers_alt,
-  //   CupertinoIcons.person
-  // ];
-
-  // final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
-  //   5,
-  //   (index) => GlobalKey<BottomBarItemState>(),
-  // );
-
-  // List<dynamic> items = [
-  //   CupertinoIcons.home,
-  //   CupertinoIcons.layers_alt,
-  //   'assets/images/wok_100_white.png',
-  //   CupertinoIcons.chart_bar,
-  //   CupertinoIcons.person
-  // ];
-
-  // final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
-  //   4,
-  //   (index) => GlobalKey<BottomBarItemState>(),
-  // );
-
-  // List<dynamic> items = [
-  //   CupertinoIcons.home,
-  //   CupertinoIcons.layers_alt,
-  //   CupertinoIcons.chart_bar,
-  //   CupertinoIcons.person
-  // ];
-
-  final List<GlobalKey<BottomBarItemState>> bottomBarItemKeys = List.generate(
-    4,
-    (index) => GlobalKey<BottomBarItemState>(),
-  );
-
-  List<dynamic> items = [
-    CupertinoIcons.person_2,
-    CupertinoIcons.square_stack_3d_down_right,
-    Icons.motorcycle_outlined,
-    CupertinoIcons.chart_bar
-  ];
-
+  late List<dynamic> bottomBarItems = [];
   final ValueNotifier<int> _bottomIdx = ValueNotifier(0);
 
   void _activateBottomBarItem(int newIdx) {
@@ -85,9 +40,114 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  Widget _replaceScreenByBottomBarIndex(int idx) {
+    switch (GlobalVariable.roleName) {
+      case 'Manager':
+        if (idx == 0) {
+          return const UserManagementScreen();
+        } else if (idx == 1) {
+          return const CategoryManagementScreen();
+        } else if (idx == 2) {
+          return const VehicleTypeManagementScreen();
+        }
+        return const ManagerStatisticScreen();
+      case 'Eater':
+        if (idx == 0) {
+          return const HomeScreen();
+        } else if (idx == 1) {
+          return ManageOrderScreen(
+            type: 1,
+          );
+        } else if (idx == 2) {
+          return ManageOrderScreen(
+            type: 1,
+          );
+        }
+        return const ProfileScreen();
+      case 'Merchant':
+        if (idx == 0) {
+          return const MerchantDashboardScreen();
+        } else if (idx == 1) {
+          return ManageOrderScreen(
+            type: 2,
+          );
+        } else if (idx == 2) {
+          return const FoodManagementScreen();
+        } else if (idx == 3) {
+          return const MerchantStatisticScreen();
+        }
+        return const ProfileScreen();
+      case 'Shipper':
+        if (idx == 0) {
+          return const ShipperDashboardScreen();
+        } else if (idx == 1) {
+          return ManageOrderScreen(
+            type: 3,
+          );
+        } else if (idx == 2) {
+          return const ShipperStatisticScreen();
+        }
+        return const ProfileScreen();
+      default:
+        return const SizedBox();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    switch (GlobalVariable.roleName) {
+      case 'Manager':
+        bottomBarItemKeys = List.generate(
+          4,
+          (index) => GlobalKey<BottomBarItemState>(),
+        );
+        bottomBarItems = [
+          CupertinoIcons.person_2,
+          CupertinoIcons.square_stack_3d_down_right,
+          Icons.motorcycle_outlined,
+          CupertinoIcons.chart_bar
+        ];
+        break;
+      case 'Eater':
+        bottomBarItemKeys = List.generate(
+          4,
+          (index) => GlobalKey<BottomBarItemState>(),
+        );
+        bottomBarItems = [
+          CupertinoIcons.home,
+          CupertinoIcons.bell,
+          CupertinoIcons.layers_alt,
+          CupertinoIcons.person
+        ];
+        break;
+      case 'Merchant':
+        bottomBarItemKeys = List.generate(
+          5,
+          (index) => GlobalKey<BottomBarItemState>(),
+        );
+        bottomBarItems = [
+          CupertinoIcons.home,
+          CupertinoIcons.layers_alt,
+          'assets/images/wok_100_white.png',
+          CupertinoIcons.chart_bar,
+          CupertinoIcons.person
+        ];
+        break;
+      case 'Shipper':
+        bottomBarItemKeys = List.generate(
+          4,
+          (index) => GlobalKey<BottomBarItemState>(),
+        );
+        bottomBarItems = [
+          CupertinoIcons.home,
+          CupertinoIcons.layers_alt,
+          CupertinoIcons.chart_bar,
+          CupertinoIcons.person
+        ];
+        break;
+      default:
+    }
   }
 
   @override
@@ -105,48 +165,7 @@ class _MainScreenState extends State<MainScreen> {
             ValueListenableBuilder(
               valueListenable: _bottomIdx,
               builder: (context, value, child) {
-                // if (value == 0) {
-                //   return HomeScreen();
-                // } else if (value == 1) {
-                //   return ManageOrderScreen();
-                // } else if (value == 2) {
-                //   return ManageOrderScreen();
-                // }
-                // return ProfileScreen();
-
-                //merchant
-                // if (value == 0) {
-                //   return MerchantDashboardScreen();
-                // } else if (value == 1) {
-                //   return ManageOrderScreen();
-                // } else if (value == 2) {
-                //   return FoodManagementScreen();
-                // }else if(value == 3){
-                //   return MerchantStatisticScreen();
-                // }
-                // return ProfileScreen();
-
-                //shipper
-                // if (value == 0) {
-                //   return ShipperDashboardScreen();
-                // } else if (value == 1) {
-                //   return ManageOrderScreen(
-                //     type: 2,
-                //   );
-                // } else if (value == 2) {
-                //   return ShipperStatisticScreen();
-                // }
-                // return ProfileScreen();
-
-                // manager
-                if (value == 0) {
-                  return UserManagementScreen();
-                } else if (value == 1) {
-                  return CategoryManagementScreen();
-                } else if (value == 2) {
-                  return VehicleTypeManagementScreen();
-                }
-                return ManagerStatisticScreen();
+                return _replaceScreenByBottomBarIndex(value);
               },
             ),
             // Bottom bar
@@ -155,14 +174,18 @@ class _MainScreenState extends State<MainScreen> {
               left: 0,
               right: 0,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: BottomBar(
-                  items: List.generate(4, (index) {
+                  items: List.generate(GlobalVariable.roleName == "Merchant" ? 5 :4, (index) {
                     return BottomBarItem(
                       key: bottomBarItemKeys[index],
                       idx: index,
-                      icon: items[index] is IconData ? items[index] : null,
-                      imgPath: items[index] is! IconData ? items[index] : null,
+                      icon: bottomBarItems[index] is IconData
+                          ? bottomBarItems[index]
+                          : null,
+                      imgPath: bottomBarItems[index] is! IconData
+                          ? bottomBarItems[index]
+                          : null,
                       isActivate: index == 0 ? true : false,
                       handleActive: _activateBottomBarItem,
                     );

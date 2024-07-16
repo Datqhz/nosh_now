@@ -14,7 +14,7 @@ import 'package:nosh_now_application/presentation/widgets/order_item.dart';
 class ManageOrderScreen extends StatefulWidget {
   ManageOrderScreen({super.key, required this.type});
 
-  int type;
+  int type; // 1 is eater, 2 is merchant, 3 is shipper
 
   @override
   State<ManageOrderScreen> createState() => _ManageOrderScreenState();
@@ -49,7 +49,7 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                 Row(
                   children: [
                     Text(
-                      widget.type == 1 ? 'Your orders' : 'Order received',
+                      widget.type != 3 ? 'Your orders' : 'Order received',
                       maxLines: 1,
                       style: const TextStyle(
                         fontSize: 20.0,
@@ -95,6 +95,7 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                       padding: const EdgeInsets.only(bottom: 8),
                       child: OrderItem(
                         order: orderFull,
+                        type: widget.type,
                       ),
                     ),
                   );
@@ -142,44 +143,46 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                     )
                   ],
                 ),
-                Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                      border: Border(
-                          bottom: BorderSide(
-                              width: 0.14,
-                              color: Theme.of(context).dividerColor))),
-                  child: TabBar(
-                    unselectedLabelColor:
-                        const Color.fromRGBO(170, 184, 194, 1),
-                    indicatorSize: TabBarIndicatorSize.label,
-                    indicatorWeight: 3,
-                    controller: _tabController,
-                    tabs: const [
-                      Text(
-                        'Received',
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                          overflow: TextOverflow.ellipsis,
+                if (widget.type == 3) ...[
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(240, 240, 240, 1),
+                        border: Border(
+                            bottom: BorderSide(
+                                width: 0.14,
+                                color: Theme.of(context).dividerColor))),
+                    child: TabBar(
+                      unselectedLabelColor:
+                          const Color.fromRGBO(170, 184, 194, 1),
+                      indicatorSize: TabBarIndicatorSize.label,
+                      indicatorWeight: 3,
+                      controller: _tabController,
+                      tabs: const [
+                        Text(
+                          'Received',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Near you',
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                          overflow: TextOverflow.ellipsis,
+                        Text(
+                          'Near you',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
+                      ],
+                    ),
+                  )
+                ]
               ],
             ),
           ),

@@ -25,4 +25,12 @@ class Manager {
           json['account'] != null ? Account.fromJson(json['account']) : null,
     );
   }
+   Map<String, dynamic> toJson() => {
+        'id': managerId,
+        "displayName": displayName,
+        'email': email,
+        'phone': phone,
+        'avatar': avatar,
+        'account': account ?? account!.toJson()
+      };
 }

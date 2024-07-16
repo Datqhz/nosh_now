@@ -27,7 +27,7 @@ namespace MyApp.DbContexts
             if (!optionsBuilder.IsConfigured)
             {
                 string ROOT_PASSWORD = Environment.GetEnvironmentVariable("DATABASE_ROOT_PASSWORD");
-                optionsBuilder.UseMySQL($"server=127.0.0.1;port=3306;database=nosh_db;user=root;password=123456");
+                optionsBuilder.UseMySQL($"server=db;port=3306;database=nosh_db;user=root;password=123456");
                 optionsBuilder.EnableSensitiveDataLogging(true);
             }
         }

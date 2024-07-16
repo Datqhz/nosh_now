@@ -23,7 +23,15 @@ namespace MyApp.Repositories
 
         public async Task<Account> FindByEmail(string email)
         {
-            return await _context.Account.Where(a => a.Email == email)
+            return await _context.Account
+            .Where(a => a.Email == email)
+            .Include(a => a.Role)
+            .Include(a => a.Manager)
+            .Include(a => a.Eater)
+            .Include(a => a.Merchant)
+                .ThenInclude(m => m.Category)
+            .Include(a => a.Shipper)
+                .ThenInclude(s => s.VehicleType)
             .FirstOrDefaultAsync();
         }
 
@@ -33,7 +41,15 @@ namespace MyApp.Repositories
         }
         public async Task<Account> GetById(int id)
         {
-            return await _context.Account.FindAsync(id);
+            return await _context.Account.Where(a => a.Id == id)
+            .Include(a => a.Role)
+            .Include(a => a.Manager)
+            .Include(a => a.Eater)
+            .Include(a => a.Merchant)
+                .ThenInclude(m => m.Category)
+            .Include(a => a.Shipper)
+                .ThenInclude(s => s.VehicleType)
+            .FirstOrDefaultAsync();
         }
         public async Task<Account> Insert(Account entity)
         {

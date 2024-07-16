@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/streams/user_login_stream.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
+import 'package:nosh_now_application/data/repositories/account_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/question_screen.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -28,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _isObscure.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -235,14 +241,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: double.infinity,
                                     height: 44,
                                     child: TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           final email =
                                               _emailController.text.trim();
                                           final password =
                                               _passwordController.text.trim();
-                                          print(
-                                              "Email: $email - password: $password");
+                                          bool rs = await AccountRepository()
+                                              .signIn(email, password);
+                                          if (rs) {
+                                            Navigator.pop(context);
+                                            Provider.of<UserLogin>(context,
+                                                    listen: false)
+                                                .login();
+                                          } else {
+                                            showSnackBar(context,
+                                                "Email or password incorrect!");
+                                          }
                                         }
                                       },
                                       style: TextButton.styleFrom(

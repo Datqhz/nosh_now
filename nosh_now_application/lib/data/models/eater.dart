@@ -25,4 +25,12 @@ class Eater {
           json['account'] != null ? Account.fromJson(json['account']) : null,
     );
   }
+  Map<String, dynamic> toJson() => {
+        'id': eaterId,
+        "displayName": displayName,
+        'email': email,
+        'phone': phone,
+        'avatar': avatar,
+        'account': account ?? account!.toJson()
+      };
 }

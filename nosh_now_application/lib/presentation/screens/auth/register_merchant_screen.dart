@@ -4,8 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
+import 'package:nosh_now_application/data/models/account.dart';
+import 'package:nosh_now_application/data/models/category.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/repositories/account_repository.dart';
+import 'package:nosh_now_application/data/repositories/category_repository.dart';
+import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
 
@@ -28,14 +35,15 @@ class _RegisterMerchantStep1ScreenState
   final TextEditingController _closingTimeController = TextEditingController();
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
 
-  final List<String> _categories = ['Snacks', 'Fast food'];
+  List<FoodCategory> _categories = [];
   final ValueNotifier<String?> _categorySelected = ValueNotifier(null);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _fetchCategoryData();
   }
+
   @override
   void dispose() {
     _displayNameController.dispose();
@@ -48,6 +56,17 @@ class _RegisterMerchantStep1ScreenState
     _categorySelected.dispose();
     super.dispose();
   }
+
+  Future<void> _fetchCategoryData() async {
+    try {
+      List<FoodCategory> types = await CategoryRepository().getAll();
+      _categories = types;
+      setState(() {});
+    } catch (e) {
+      print('Error converting image to base64: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -387,9 +406,9 @@ class _RegisterMerchantStep1ScreenState
                                     value: _categorySelected.value,
                                     items: _categories
                                         .map((item) => DropdownMenuItem<String>(
-                                              value: item,
+                                              value: item.categoryName,
                                               child: Text(
-                                                item,
+                                                item.categoryName,
                                               ),
                                             ))
                                         .toList(),
@@ -613,13 +632,33 @@ class _RegisterMerchantStep1ScreenState
                                               _openingTimeController.text;
                                           final closingTime =
                                               _closingTimeController.text;
-                                          print(
-                                              'display name: $displayName - email: $email - password: $password - phone: $phone - category: ${_categorySelected.value} - opening time : $openingTime - closing time: $closingTime');
+                                          final address = '0 - 0';
+                                          FoodCategory? category = null;
+                                          _categories.forEach((e) {
+                                            if (e.categoryName ==
+                                                _categorySelected.value) {
+                                              category = e;
+                                            }
+                                          });
+                                          Merchant merchant = Merchant(
+                                              merchantId: 0,
+                                              displayName: displayName,
+                                              email: email,
+                                              phone: phone,
+                                              avatar: '',
+                                              openingTime: openingTime,
+                                              closingTime: closingTime,
+                                              coordinator: address,
+                                              category: category);
+
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const RegisterMerchantStep2Screen()));
+                                                      RegisterMerchantStep2Screen(
+                                                        merchant: merchant,
+                                                        password: password,
+                                                      )));
                                         }
                                       },
                                       style: TextButton.styleFrom(
@@ -728,7 +767,11 @@ class _RegisterMerchantStep1ScreenState
 }
 
 class RegisterMerchantStep2Screen extends StatefulWidget {
-  const RegisterMerchantStep2Screen({super.key});
+  RegisterMerchantStep2Screen(
+      {super.key, required this.merchant, required this.password});
+
+  Merchant merchant;
+  String password;
 
   @override
   State<RegisterMerchantStep2Screen> createState() =>
@@ -839,12 +882,45 @@ class _RegisterMerchantStep2ScreenState
                         ),
                         const Expanded(child: SizedBox()),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RegisterSuccessScreen()));
+                          onTap: () async {
+                            int createdAccountResult = await AccountRepository()
+                                .signUp(
+                                    widget.merchant.email, widget.password, 3);
+                            print(
+                                "create account result: $createdAccountResult");
+                            if (createdAccountResult != 0) {
+                              String avatar = '';
+                              if (_avatar.value != null) {
+                                avatar = await convertToBase64(_avatar.value!);
+                              } else {
+                                avatar = defaultImage;
+                              }
+                              print(widget.merchant.category!.categoryId);
+                              Merchant eater = Merchant(
+                                  merchantId: 0,
+                                  displayName: widget.merchant.displayName,
+                                  email: widget.merchant.email,
+                                  phone: widget.merchant.phone,
+                                  avatar: avatar,
+                                  openingTime: widget.merchant.openingTime,
+                                  closingTime: widget.merchant.closingTime,
+                                  coordinator: '0 - 0',
+                                  category: widget.merchant.category);
+                              bool rs = await MerchantRepository()
+                                  .create(eater, createdAccountResult);
+                              if (rs) {
+                                print("success");
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegisterSuccessScreen()));
+                              } else {
+                                showSnackBar(context, "Fail to register");
+                              }
+                            } else {
+                              showSnackBar(context, "Email is used");
+                            }
                           },
                           child: const Text(
                             'Done',

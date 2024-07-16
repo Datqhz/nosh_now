@@ -5,16 +5,12 @@ import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 
-class OrderItem extends StatefulWidget {
-  OrderItem({super.key, required this.order});
+class OrderItem extends StatelessWidget {
+  OrderItem({super.key, required this.order, required this.type});
 
   Order order;
+  int type; // 1 for eater, 2 for merchant, 3 shipper
 
-  @override
-  State<OrderItem> createState() => _OrderItemState();
-}
-
-class _OrderItemState extends State<OrderItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,7 +25,7 @@ class _OrderItemState extends State<OrderItem> {
       ),
       child: Row(
         children: [
-          // food image
+          // icon
           Container(
             height: 50,
             width: 50,
@@ -37,7 +33,7 @@ class _OrderItemState extends State<OrderItem> {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(
+            child: const Icon(
               CupertinoIcons.news,
               color: Colors.green,
               size: 40,
@@ -50,9 +46,9 @@ class _OrderItemState extends State<OrderItem> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // food name
+              // name
               Text(
-                widget.order.merchant.displayName,
+                type == 1 ? order.merchant.displayName : order.eater.displayName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(
@@ -70,7 +66,7 @@ class _OrderItemState extends State<OrderItem> {
                 children: [
                   Text(
                     DateFormat.yMMMd("en_US")
-                        .format(widget.order.orderedDate!)
+                        .format(order.orderedDate!)
                         .toString(),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -94,7 +90,7 @@ class _OrderItemState extends State<OrderItem> {
                     width: 4,
                   ),
                   Text(
-                    '${calcTotalPay(details, widget.order.shipmentFee!)}₫',
+                    '${calcTotalPay(details, order.shipmentFee!)}₫',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(
@@ -119,13 +115,13 @@ class _OrderItemState extends State<OrderItem> {
               Icon(
                 CupertinoIcons.circle_fill,
                 size: 10,
-                color: pickColorForStatus(widget.order.orderStatus.step),
+                color: pickColorForStatus(order.orderStatus.step),
               ),
               const SizedBox(
                 width: 6,
               ),
               Text(
-                widget.order.orderStatus.orderStatusName,
+                order.orderStatus.orderStatusName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(

@@ -1,20 +1,27 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.Authentication;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+
     [ApiController]
     [Route("api/account")]
     public class AccountController : ControllerBase
     {
-
+        private readonly AuthHandler authHandler;
         private readonly IAccountRepository accountRepository;
-        public AccountController(IAccountRepository accountRepository)
+        // private readonly IRoleRepository roleRepository;
+        public AccountController(IAccountRepository accountRepository, AuthHandler authHandler)
         {
             this.accountRepository = accountRepository;
+            this.authHandler = authHandler;
         }
 
         [HttpGet]
@@ -24,7 +31,9 @@ namespace MyApp.Controllers
             return Ok(data);
         }
 
+
         [HttpGet("{id}")]
+        [Authorize(IdentityData.ManagerPolicyName)]
         public async Task<IActionResult> GetById(int id)
         {
             var data = await accountRepository.GetById(id);
@@ -63,7 +72,8 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrderStatus(UpdateAccount updateAccount)
         {
             var account = await accountRepository.GetById(updateAccount.id);
-            if(account == null){
+            if (account == null)
+            {
                 return NotFound(new
                 {
                     error = "Account doesn't exits!"
@@ -89,17 +99,39 @@ namespace MyApp.Controllers
                     error = "Incorrect account or password"
                 });
             }
+
             var verify = BCrypt.Net.BCrypt.Verify(loginDto.password, account.Password);
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(loginDto.password);
-            if(verify)
+            if (verify)
             {
-                return Ok(account);
+                string token = authHandler.GenerateToken(account.Email, account.Id.ToString(), account.Role.RoleName);
+                var response = new Dictionary<string, object>
+                {
+                    { "token", token},
+                    { "user", "new_data" }
+                };
+                if (account.Role.RoleName == "Manager")
+                {
+                    response["user"] = account.Manager.AsDto();
+                }
+                else if (account.Role.RoleName == "Eater")
+                {
+                    response["user"] = account.Eater.AsDto();
+                }
+                else if (account.Role.RoleName == "Merchant")
+                {
+                    response["user"] = account.Merchant.AsDto();
+                }
+                else
+                {
+                    response["user"] = account.Shipper.AsDto();
+                }
+                return Ok(response);
             }
             return BadRequest(new
             {
                 error = "Incorrect account or password"
             });
-            
+
         }
     }
 }

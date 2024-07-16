@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/streams/user_login_stream.dart';
 import 'package:nosh_now_application/presentation/wrapper.dart';
+import 'package:provider/provider.dart';
 
 import 'presentation/themes/app_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => UserLogin(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

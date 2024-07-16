@@ -40,4 +40,16 @@ class Shipper {
           : null,
     );
   }
+  Map<String, dynamic> toJson() => {
+        'id': shipperId,
+        "displayName": displayName,
+        'email': email,
+        'phone': phone,
+        'avatar': avatar,
+        'vehicleName': vehicleName,
+        'momoPayment': momoPayment,
+        'coordinator': coordinator,
+        'account': account ?? account!.toJson(),
+        'vehicleType': vehicleType ?? vehicleType!.toJson()
+      };
 }
