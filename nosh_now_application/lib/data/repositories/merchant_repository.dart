@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 
 class MerchantRepository {
   Future<bool> create(Merchant merchant, int accountId) async {
@@ -32,6 +33,50 @@ class MerchantRepository {
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to register');
+    }
+  }
+
+  Future<List<MerchantWithDistance>> getAllMerchantNearby(
+      String coordinator) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse(
+              "${GlobalVariable.url}/api/merchant/near-by?coordinator=$coordinator"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return [];
+      }
+      List<dynamic> data = json.decode(response.body);
+      return data.map((e) => MerchantWithDistance.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<List<MerchantWithDistance>> getMerchantById(
+      String coordinator) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse(
+              "${GlobalVariable.url}/api/merchant/near-by?coordinator=$coordinator"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return [];
+      }
+      List<dynamic> data = json.decode(response.body);
+      return data.map((e) => MerchantWithDistance.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
     }
   }
 }

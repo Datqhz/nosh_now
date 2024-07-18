@@ -88,12 +88,17 @@ class OnboardingScreen extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
-              const Text(
-                'Forgot password?',
-                style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(40, 40, 40, 1)),
+              GestureDetector(
+                onTap: (){
+                  
+                },
+                child: const Text(
+                  'Forgot password?',
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(40, 40, 40, 1)),
+                ),
               ),
             ],
           ),

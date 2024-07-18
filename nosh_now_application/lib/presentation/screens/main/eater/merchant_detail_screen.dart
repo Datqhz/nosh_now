@@ -1,28 +1,121 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/repositories/food_repository.dart';
+import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
+import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/food_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
+import 'package:provider/provider.dart';
 
 class MerchantDetailScreen extends StatefulWidget {
   MerchantDetailScreen({super.key, required this.merchant});
 
-  Merchant merchant;
+  MerchantWithDistance merchant;
 
   @override
   State<MerchantDetailScreen> createState() => _MerchantDetailScreenState();
 }
 
 class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
-  Order? order;
+  ValueNotifier<Order?> order = ValueNotifier(null);
+  ValueNotifier<List<Food>> foods = ValueNotifier([]);
+  ValueNotifier<List<OrderDetail>> details = ValueNotifier([]);
+
+  Future<bool> _fetchAllData() async {
+    Eater eater = await getUser();
+    try {
+      foods.value = await FoodRepository()
+          .getAllByMerchantAndIsSelling(widget.merchant.merchant.merchantId);
+      print("food complete");
+      order.value = await OrderRepository().getAllByMerchantAndEater(
+          widget.merchant.merchant.merchantId, eater.eaterId);
+      print("order complete");
+      details.value =
+          await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
+      print("detail complete");
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> _fetchOrderDetailData(int orderId) async {
+    Eater eater = await getUser();
+    try {
+      details.value =
+          await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  OrderDetail? _checkHaveDetail(int foodId) {
+    for (OrderDetail detail in details.value) {
+      if (detail.food.foodId == foodId) {
+        return detail;
+      }
+    }
+    return null;
+  }
+
+  List<Widget> buildListFood() {
+    List<Widget> widgets = [];
+    for (var food in foods.value) {
+      widgets.add(ChangeNotifierProvider(
+        create: (context) {
+          OrderDetailNotifier notifier = OrderDetailNotifier();
+          notifier.init(_checkHaveDetail(food.foodId));
+          return notifier;
+        },
+        child: Consumer<OrderDetailNotifier>(
+          builder: (context, notifier, child) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FoodDetailScreen(
+                      food: food,
+                      notifier: notifier,
+                      orderId: order.value!.orderId,
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: FoodItem(
+                  food: food,
+                  detailNotifier: notifier,
+                ),
+              ),
+            );
+          },
+        ),
+      ));
+    }
+    return widgets;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +129,8 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                 children: [
                   // merchant avatar
                   Image(
-                    image: AssetImage(widget.merchant.avatar),
+                    image: MemoryImage(convertBase64ToUint8List(
+                        widget.merchant.merchant.avatar)),
                     width: MediaQuery.of(context).size.width,
                     height: 200,
                     fit: BoxFit.cover,
@@ -58,7 +152,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                       children: [
                         // merchant name
                         Text(
-                          widget.merchant.displayName,
+                          widget.merchant.merchant.displayName,
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 24.0,
@@ -102,7 +196,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                           children: [
                             // distance to merchant
                             Text(
-                              '${calcDistanceInKm(coordinator1: widget.merchant.coordinator, coordinator2: '324 - 323')} km',
+                              '${double.parse((widget.merchant.distance).toStringAsFixed(2))} km',
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: const TextStyle(
@@ -126,7 +220,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                             ),
                             // category name
                             Text(
-                              widget.merchant.category!.categoryName,
+                              widget.merchant.merchant.category!.categoryName,
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: const TextStyle(
@@ -142,36 +236,31 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GridView.count(
-                        primary: false,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 2,
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.9,
-                        children: List.generate(12, (index) {
-                          return GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FoodDetailScreen(
-                                  food: foods[0],
-                                  orderDetail: details[0],
-                                ),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: FoodItem(
-                                food: foods[0],
-                              ),
-                            ),
+                  FutureBuilder(
+                      future: _fetchAllData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: GridView.count(
+                                primary: false,
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 2,
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.9,
+                                children: buildListFood()),
                           );
-                        })),
-                  ),
+                        } else {
+                          return const Center(
+                              child: SpinKitCircle(
+                            color: Colors.black,
+                            size: 40,
+                          ));
+                        }
+                      }),
                 ],
               ),
             ),
@@ -224,21 +313,21 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                         size: 30,
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                          height: 22,
-                          width: 22,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: const Color.fromRGBO(233, 163, 59, 1),
-                              borderRadius: BorderRadius.circular(50)),
-                          child: Text(
-                            '${details.length}',
-                            style: const TextStyle(color: Colors.white),
-                          )),
-                    ),
+                    // Positioned(
+                    //   bottom: 0,
+                    //   right: 0,
+                    //   child: Container(
+                    //       height: 22,
+                    //       width: 22,
+                    //       alignment: Alignment.center,
+                    //       decoration: BoxDecoration(
+                    //           color: const Color.fromRGBO(233, 163, 59, 1),
+                    //           borderRadius: BorderRadius.circular(50)),
+                    //       child: Text(
+                    //         '${details.length}',
+                    //         style: const TextStyle(color: Colors.white),
+                    //       )),
+                    // ),
                   ],
                 ),
               ),

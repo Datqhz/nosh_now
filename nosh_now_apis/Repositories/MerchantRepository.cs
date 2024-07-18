@@ -56,6 +56,44 @@ namespace MyApp.Repositories
         {
             return await _context.Merchant.ToListAsync();
         }
+
+        public async Task<IEnumerable<Merchant>> GetAllMerchantIsOpening()
+        {
+            return await _context.Merchant
+                                .Where(m => m.Status == true)
+                                .Select(e => new Merchant
+                                {
+                                    Id = e.Id,
+                                    DisplayName = e.DisplayName,
+                                    Avatar = e.Avatar,
+                                    Phone = e.Phone,
+                                    Email = e.Email,
+                                    OpeningTime = e.OpeningTime,
+                                    ClosingTime = e.ClosingTime,
+                                    Coordinator = e.Coordinator,
+                                    Status = e.Status,
+                                    AccountId = e.AccountId,
+                                    CategoryId = e.CategoryId,
+                                    Account = new Account
+                                    {
+                                        Id = e.Account.Id,
+                                        Email = e.Account.Email,
+                                        CreatedDate = e.Account.CreatedDate,
+                                        Role = new Role{
+                                            Id = e.Account.Role.Id,
+                                            RoleName = e.Account.Role.RoleName,
+                                        }
+                                    },
+                                    Category = new Category
+                                    {
+                                        Id = e.Category.Id,
+                                        CategoryName = e.Category.CategoryName,
+                                        CategoryImage = e.Category.CategoryImage
+                                    }
+                                })
+                                .ToListAsync();
+        }
+
         public async Task<Merchant> GetById(int id)
         {
             return await _context.Merchant.FindAsync(id);

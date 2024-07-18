@@ -1,17 +1,41 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
+import 'package:nosh_now_application/data/repositories/category_repository.dart';
+import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  Future<List<FoodCategory>> _fetchCategoryData() async {
+    try {
+      List<FoodCategory> types = await CategoryRepository().getAll();
+      return types;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<List<MerchantWithDistance>> _fetchMerchantNearByData() async {
+    try {
+      List<MerchantWithDistance> merchants =
+          await MerchantRepository().getAllMerchantNearby('0-0');
+      return merchants;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    _fetchCategoryData();
     return Stack(
       children: [
         Container(
@@ -33,18 +57,31 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(49, 49, 49, 1)),
                 ),
-                // list category
-                SizedBox(
-                  height: 110,
-                  width: MediaQuery.of(context).size.width,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => CategoryItem(
-                      category: categories[0],
-                    ),
-                    itemCount: 12,
-                  ),
-                ),
+                FutureBuilder(
+                    future: _fetchCategoryData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return SizedBox(
+                          height: 110,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) => CategoryItem(
+                              category: snapshot.data![index],
+                            ),
+                            itemCount: snapshot.data!.length,
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: SpinKitCircle(
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                        );
+                      }
+                    }),
                 const SizedBox(
                   height: 12,
                 ),
@@ -59,26 +96,46 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 // list merchant
-                ...List.generate(12, (index) {
-                  return GestureDetector(
-                    onTap: () => {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MerchantDetailScreen(
-                            merchant: merchants[0],
-                          ),
-                        ),
-                      )
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: MerchantItem(
-                        merchant: merchants[0],
-                      ),
-                    ),
-                  );
-                }),
+                ...[
+                  FutureBuilder(
+                      future: _fetchMerchantNearByData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          return Column(
+                            children:
+                                List.generate(snapshot.data!.length, (index) {
+                              return GestureDetector(
+                                onTap: () => {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          MerchantDetailScreen(
+                                        merchant: snapshot.data![index],
+                                      ),
+                                    ),
+                                  )
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: MerchantItem(
+                                    merchant: snapshot.data![index],
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        } else {
+                          return const Center(
+                            child: SpinKitCircle(
+                              color: Colors.black,
+                              size: 40,
+                            ),
+                          );
+                        }
+                      })
+                ],
                 const SizedBox(
                   height: 70,
                 ),
@@ -104,7 +161,7 @@ class HomeScreen extends StatelessWidget {
                   },
                   child: const Icon(
                     CupertinoIcons.bars,
-                    size: 20,
+                    size: 22,
                     color: Color.fromRGBO(49, 49, 49, 1),
                   ),
                 ),
@@ -115,7 +172,7 @@ class HomeScreen extends StatelessWidget {
                   },
                   child: const Icon(
                     CupertinoIcons.search,
-                    size: 20,
+                    size: 22,
                     color: Color.fromRGBO(49, 49, 49, 1),
                   ),
                 )

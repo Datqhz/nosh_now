@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp.DbContexts;
 
@@ -10,9 +11,11 @@ using MyApp.DbContexts;
 namespace nosh_now_apis.Migrations
 {
     [DbContext(typeof(MyAppContext))]
-    partial class MyAppContextModelSnapshot : ModelSnapshot
+    [Migration("20240717144054_UpdateOrderEntity")]
+    partial class UpdateOrderEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,10 +161,6 @@ namespace nosh_now_apis.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EaterId");
@@ -264,6 +263,7 @@ namespace nosh_now_apis.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Coordinator")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("EaterId")
@@ -272,7 +272,7 @@ namespace nosh_now_apis.Migrations
                     b.Property<int>("MerchantId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MethodId")
+                    b.Property<int>("MethodId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("OrderedDate")
@@ -281,6 +281,7 @@ namespace nosh_now_apis.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<double>("ShipmentFee")
@@ -288,8 +289,7 @@ namespace nosh_now_apis.Migrations
                         .HasColumnType("double")
                         .HasDefaultValue(0.0);
 
-                    b.Property<int?>("ShipperId")
-                        .IsRequired()
+                    b.Property<int>("ShipperId")
                         .HasColumnType("int");
 
                     b.Property<int>("StatusId")
@@ -553,7 +553,9 @@ namespace nosh_now_apis.Migrations
 
                     b.HasOne("MyApp.Models.PaymentMethod", "PaymentMethod")
                         .WithMany("Orders")
-                        .HasForeignKey("MethodId");
+                        .HasForeignKey("MethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MyApp.Models.Shipper", "Shipper")
                         .WithMany("Orders")

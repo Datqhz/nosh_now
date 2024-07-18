@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 
 class CategoryItem extends StatelessWidget {
@@ -17,7 +18,7 @@ class CategoryItem extends StatelessWidget {
           Image(
             height: 65,
             width: 65,
-            image: AssetImage(category.categoryImage),
+            image: MemoryImage(convertBase64ToUint8List(category.categoryImage)),
             fit: BoxFit.cover,
           ),
           // category name

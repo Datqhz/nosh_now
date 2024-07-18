@@ -70,9 +70,81 @@ namespace MyApp.Repositories
             return await _context.Food.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Food>> GetByMerchant(int merchantId)
+        public async Task<IEnumerable<Food>> GetByMerchantAndIsSelling(int merchantId)
         {
-            return await _context.Food.Where(f => f.MerchantId == merchantId).ToListAsync();
+            return await _context.Food.Where(f => f.MerchantId == merchantId && f.Status != 3).Select(e => new Food
+            {
+                Id = e.Id,
+                FoodName = e.FoodName,
+                FoodImage = e.FoodImage,
+                FoodDescribe = e.FoodDescribe,
+                Price = e.Price,
+                Status = e.Status,
+                Merchant = new Merchant
+                {
+                    Id = e.Merchant.Id,
+                    DisplayName = e.Merchant.DisplayName,
+                    Avatar = e.Merchant.Avatar,
+                    Phone = e.Merchant.Phone,
+                    Email = e.Merchant.Email,
+                    OpeningTime = e.Merchant.OpeningTime,
+                    ClosingTime = e.Merchant.ClosingTime,
+                    Coordinator = e.Merchant.Coordinator,
+                    Status = e.Merchant.Status,
+                    AccountId = e.Merchant.AccountId,
+                    CategoryId = e.Merchant.CategoryId,
+                    Account = new Account
+                    {
+                        Id = e.Merchant.Account.Id,
+                        Email = e.Merchant.Account.Email,
+                        CreatedDate = e.Merchant.Account.CreatedDate
+                    },
+                    Category = new Category
+                    {
+                        Id = e.Merchant.Category.Id,
+                        CategoryName = e.Merchant.Category.CategoryName,
+                        CategoryImage = e.Merchant.Category.CategoryImage
+                    }
+                },
+            }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Food>> GetByMerchantWithoutCondition(int merchantId)
+        {
+            return await _context.Food.Where(f => f.MerchantId == merchantId).Select(e => new Food
+            {
+                Id = e.Id,
+                FoodName = e.FoodName,
+                FoodImage = e.FoodImage,
+                FoodDescribe = e.FoodDescribe,
+                Price = e.Price,
+                Status = e.Status,
+                Merchant = new Merchant
+                {
+                    Id = e.Merchant.Id,
+                    DisplayName = e.Merchant.DisplayName,
+                    Avatar = e.Merchant.Avatar,
+                    Phone = e.Merchant.Phone,
+                    Email = e.Merchant.Email,
+                    OpeningTime = e.Merchant.OpeningTime,
+                    ClosingTime = e.Merchant.ClosingTime,
+                    Coordinator = e.Merchant.Coordinator,
+                    Status = e.Merchant.Status,
+                    AccountId = e.Merchant.AccountId,
+                    CategoryId = e.Merchant.CategoryId,
+                    Account = new Account
+                    {
+                        Id = e.Merchant.Account.Id,
+                        Email = e.Merchant.Account.Email,
+                        CreatedDate = e.Merchant.Account.CreatedDate
+                    },
+                    Category = new Category
+                    {
+                        Id = e.Merchant.Category.Id,
+                        CategoryName = e.Merchant.Category.CategoryName,
+                    }
+                },
+            }).ToListAsync();
         }
 
         public async Task<Food> Insert(Food entity)

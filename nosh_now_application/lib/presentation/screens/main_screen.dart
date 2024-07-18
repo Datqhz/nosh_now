@@ -53,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
         return const ManagerStatisticScreen();
       case 'Eater':
         if (idx == 0) {
-          return const HomeScreen();
+          return HomeScreen();
         } else if (idx == 1) {
           return ManageOrderScreen(
             type: 1,

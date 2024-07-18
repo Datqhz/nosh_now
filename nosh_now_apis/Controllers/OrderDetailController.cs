@@ -10,7 +10,7 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/order-detail")]
-    public class OrderDetailController :ControllerBase
+    public class OrderDetailController : ControllerBase
     {
         private readonly IOrderRepository orderRepository;
         private readonly IFoodRepository foodRepository;
@@ -47,17 +47,17 @@ namespace MyApp.Controllers
         public async Task<IActionResult> CreateOrderDetail(CreateOrderDetail createOrderDetail)
         {
             var order = await orderRepository.GetById(createOrderDetail.orderId);
-            if(order == null)
+            if (order == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Order has id = {createOrderDetail.orderId} doesn't exist."
                 });
             }
             var food = await foodRepository.GetById(createOrderDetail.foodId);
-            if(food == null)
+            if (food == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Food has id = {createOrderDetail.foodId} doesn't exist."
                 });
@@ -76,13 +76,14 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrderDetail(UpdateOrderDetail updateOrderDetail)
         {
             var orderDetail = await orderDetailRepository.GetById(updateOrderDetail.id);
-            if(orderDetail == null){
+            if (orderDetail == null)
+            {
                 return NotFound(new
                 {
                     error = "Order doesn't exits!"
                 });
             }
-            if(updateOrderDetail.quantity > 0)
+            if (updateOrderDetail.quantity > 0)
             {
                 orderDetail.Quantity = updateOrderDetail.quantity;
                 orderDetail.Price = updateOrderDetail.price;
@@ -104,7 +105,7 @@ namespace MyApp.Controllers
             {
                 return NotFound(new
                 {
-                    error = $"Payment method has id = {id} doesn't exist."
+                    error = $"order detail has id = {id} doesn't exist."
                 });
             }
             await orderDetailRepository.Delete(id);
@@ -114,6 +115,20 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetByOrderId(int id)
         {
             var data = await orderDetailRepository.FindByOrder(id);
+            var order = await orderRepository.GetById(id);
+            if (order.Status.Id == 1)
+            {
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    foreach (var orderDetail in data)
+                    {
+                        orderDetail.Price = orderDetail.Food.Price;
+                        await orderDetailRepository.Update(orderDetail);
+                    }
+                    scope.Complete();
+                }
+
+            }
             return Ok(data.Select(orderDetail => orderDetail.AsDto()).ToList());
         }
     }

@@ -123,6 +123,7 @@ namespace MyApp.Extensions
             (
                 location.Id,
                 location.LocationName,
+                location.Phone,
                 location.Coordinator,
                 location.Default,
                 location.Eater?.AsDto()
@@ -135,7 +136,8 @@ namespace MyApp.Extensions
                 order.Id,
                 order.OrderedDate,
                 order.ShipmentFee,
-                order.CalcTotal(),
+                order.OrderDetails != null && order.OrderDetails.Count != 0 ? order.CalcTotal() : 0,
+                // 0,
                 order.Coordinator,
                 order.Phone,
                 order.Status?.AsDto(),

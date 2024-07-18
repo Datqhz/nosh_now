@@ -26,8 +26,8 @@ namespace MyApp.DbContexts
         {
             if (!optionsBuilder.IsConfigured)
             {
-                string ROOT_PASSWORD = Environment.GetEnvironmentVariable("DATABASE_ROOT_PASSWORD");
                 optionsBuilder.UseMySQL($"server=db;port=3306;database=nosh_db;user=root;password=123456");
+                // optionsBuilder.UseMySQL($"server=127.0.0.1;port=3306;database=nosh_db;user=root;password=123456");
                 optionsBuilder.EnableSensitiveDataLogging(true);
             }
         }
@@ -167,6 +167,7 @@ namespace MyApp.DbContexts
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 entity.Property(e => e.LocationName).IsRequired();
+                entity.Property(e => e.Phone).IsRequired();
                 entity.Property(e => e.Coordinator).IsRequired();
                 entity.Property(e => e.Default).HasDefaultValue(false);
                 entity.Property(e => e.EaterId).IsRequired();
@@ -190,7 +191,7 @@ namespace MyApp.DbContexts
                     .HasForeignKey(e => e.EaterId);
                 entity.HasOne(e => e.Status)
                     .WithMany(status => status.Orders)
-                    .HasForeignKey(e => e.EaterId);
+                    .HasForeignKey(e => e.StatusId);
                 entity.HasOne(e => e.Merchant)
                     .WithMany(merchant => merchant.Orders)
                     .HasForeignKey(e => e.MerchantId);

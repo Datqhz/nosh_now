@@ -57,6 +57,7 @@ namespace MyApp.Controllers
             {
                 LocationName = createLocation.locationName,
                 Coordinator = createLocation.coordinator,
+                Phone = createLocation.phone,
                 Default = createLocation.defaultLocation,
                 EaterId = createLocation.eaterId
             }
@@ -75,6 +76,7 @@ namespace MyApp.Controllers
             }
             location.LocationName = updateLocation.locationName;
             location.Coordinator = updateLocation.coordinator;
+            location.Phone = updateLocation.phone;
             location.Default = updateLocation.defaultLocation;
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {

@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 
 class MerchantItem extends StatelessWidget {
-  MerchantItem(
-      {super.key,
-      required this.merchant});
-  Merchant merchant;
+  MerchantItem({super.key, required this.merchant});
+  MerchantWithDistance merchant;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,9 @@ class MerchantItem extends StatelessWidget {
             width: 80,
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage(merchant.avatar), fit: BoxFit.cover),
+                  image: MemoryImage(
+                      convertBase64ToUint8List(merchant.merchant.avatar)),
+                  fit: BoxFit.cover),
               color: Colors.black,
               borderRadius: BorderRadius.circular(6),
             ),
@@ -36,7 +38,7 @@ class MerchantItem extends StatelessWidget {
             children: [
               // merchant name
               Text(
-                merchant.displayName,
+                merchant.merchant.displayName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(
@@ -54,7 +56,7 @@ class MerchantItem extends StatelessWidget {
                 children: [
                   // distance to merchant
                   Text(
-                    '${calcDistanceInKm(coordinator1: merchant.coordinator, coordinator2: '234 - 232')} km',
+                    '${double.parse((merchant.distance).toStringAsFixed(2))} km',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(
@@ -78,7 +80,7 @@ class MerchantItem extends StatelessWidget {
                   ),
                   // category name
                   Text(
-                    merchant.category!.categoryName,
+                    merchant.merchant.category!.categoryName,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(

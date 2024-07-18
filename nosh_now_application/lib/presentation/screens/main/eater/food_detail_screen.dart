@@ -1,24 +1,52 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
+import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 
 class FoodDetailScreen extends StatefulWidget {
   FoodDetailScreen(
       {super.key,
       required this.food,
-      this.orderDetail
-      });
+      required this.notifier,
+      required this.orderId});
 
   Food food;
-  OrderDetail? orderDetail;
+  OrderDetailNotifier notifier;
+  int orderId;
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
 }
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
+  ValueNotifier<int> quantity = ValueNotifier(0);
+
+  String _contentForButton(int value) {
+    if (widget.notifier.detail != null && value == 0) {
+      return "Remove from order";
+    } else if (widget.notifier.detail != null && value > 0) {
+      return "Update order";
+    } else {
+      return "Add to order";
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    int temp = 0;
+    if (widget.notifier.detail != null) {
+      temp = widget.notifier.detail!.quantity;
+    }
+    quantity = ValueNotifier(temp);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +58,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             Column(
               children: [
                 Image(
-                  image: AssetImage(widget.food.foodImage),
+                  image: MemoryImage(
+                      convertBase64ToUint8List(widget.food.foodImage)),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 2.4,
                   fit: BoxFit.cover,
@@ -44,7 +73,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               child: Container(
                 height: MediaQuery.of(context).size.height / 1.7,
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: const BoxDecoration(
                   color: Color.fromRGBO(240, 240, 240, 1),
                   borderRadius: BorderRadius.only(
@@ -53,6 +82,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   ),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Align(
                       alignment: Alignment.centerRight,
@@ -60,7 +90,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         height: 40,
                         width: 100,
                         transform: Matrix4.translationValues(-20, -20, 0),
-                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
@@ -73,28 +103,44 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             ],
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(50)),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(
-                              CupertinoIcons.minus,
-                              color: Color.fromRGBO(240, 240, 240, 1),
-                            ),
-                            Text(
-                              '3',
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w500,
-                                height: 1.2,
+                            GestureDetector(
+                              onTap: () {
+                                if (quantity.value > 0) {
+                                  quantity.value = quantity.value - 1;
+                                }
+                              },
+                              child: const Icon(
+                                CupertinoIcons.minus,
                                 color: Color.fromRGBO(240, 240, 240, 1),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Icon(
-                              CupertinoIcons.plus,
-                              color: Color.fromRGBO(240, 240, 240, 1),
+                            ValueListenableBuilder(
+                                valueListenable: quantity,
+                                builder: (context, value, child) {
+                                  return Text(
+                                    value.toString(),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.2,
+                                      color: Color.fromRGBO(240, 240, 240, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                }),
+                            GestureDetector(
+                              onTap: () {
+                                quantity.value = quantity.value + 1;
+                              },
+                              child: const Icon(
+                                CupertinoIcons.plus,
+                                color: Color.fromRGBO(240, 240, 240, 1),
+                              ),
                             ),
                           ],
                         ),
@@ -105,10 +151,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.food.foodName,
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.left,
                           maxLines: 1,
                           style: const TextStyle(
                             fontSize: 22.0,
@@ -119,7 +166,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                           ),
                         ),
                         Text(
-                          '${widget.food.price} ₫',
+                          '${double.parse((widget.food.price).toStringAsFixed(2))} ₫',
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           style: const TextStyle(
@@ -166,42 +213,95 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            Text(
-                              '${widget.food.price * widget.orderDetail!.quantity} ₫',
-                              textAlign: TextAlign.left,
-                              maxLines: 10,
-                              style: const TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w800,
-                                height: 1.2,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            ValueListenableBuilder(
+                                valueListenable: quantity,
+                                builder: (context, value, child) {
+                                  return Text(
+                                    '${double.parse((widget.food.price * value).toStringAsFixed(2))} ₫',
+                                    textAlign: TextAlign.left,
+                                    maxLines: 10,
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.2,
+                                      color: Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                }),
                           ],
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(
-                            CupertinoIcons.cart_fill,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Add to order',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.zero,
-                                      topRight: Radius.circular(10),
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10)))),
-                        )
+                        ValueListenableBuilder(
+                            valueListenable: quantity,
+                            builder: (context, value, child) {
+                              return ElevatedButton.icon(
+                                onPressed: () async {
+                                  bool rs = false;
+                                  if (widget.notifier.detail != null) {
+                                    if (quantity.value > 0 &&
+                                        quantity.value !=
+                                            widget.notifier.detail!.quantity) {
+                                      OrderDetail temp =
+                                          widget.notifier.detail!;
+                                      temp.quantity = quantity.value;
+                                      rs = await OrderDetailRepository()
+                                          .update(temp);
+                                      if (rs) widget.notifier.change(temp);
+                                    } else {
+                                      rs = await OrderDetailRepository()
+                                          .deleteDetail(
+                                              widget.notifier.detail!.odId);
+                                      if (rs) widget.notifier.change(null);
+                                    }
+                                  } else {
+                                    if (quantity.value > 0) {
+                                      OrderDetail temp = OrderDetail(
+                                          odId: 0,
+                                          orderId: widget.orderId,
+                                          price: widget.food.price,
+                                          quantity: quantity.value,
+                                          food: widget.food);
+                                      OrderDetail createRs =
+                                          await OrderDetailRepository()
+                                              .create(temp);
+                                      if (createRs != null) {
+                                        rs = true;
+                                        widget.notifier.change(createRs);
+                                      }
+                                    }
+                                  }
+
+                                  if (rs) {
+                                    showSnackBar(
+                                        context, "Update order successfully!");
+                                    Navigator.pop(context);
+                                  } else {
+                                    showSnackBar(
+                                        context, "Update order failed!");
+                                  }
+                                },
+                                icon: const Icon(
+                                  CupertinoIcons.cart_fill,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                label: Text(
+                                  _contentForButton(value),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.zero,
+                                            topRight: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10),
+                                            bottomRight: Radius.circular(10)))),
+                              );
+                            })
                       ],
                     ),
                     const SizedBox(

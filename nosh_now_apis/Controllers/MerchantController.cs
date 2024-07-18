@@ -1,9 +1,11 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Dtos.Response;
 using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
+using MyApp.Utils;
 
 namespace MyApp.Controllers
 {
@@ -47,17 +49,17 @@ namespace MyApp.Controllers
         public async Task<IActionResult> CreateMerchant(CreateMerchant createMerchant)
         {
             var category = await categoryRepository.GetById(createMerchant.categoryId);
-            if(category == null)
+            if (category == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Category has id = {createMerchant.categoryId} doesn't exist."
                 });
             }
             var account = await accountRepository.GetById(createMerchant.accountId);
-            if(account == null)
+            if (account == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Account has id = {createMerchant.accountId} doesn't exist."
                 });
@@ -81,21 +83,22 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrderStatus(UpdateMerchant updateMerchant)
         {
             var merchant = await merchantRepository.GetById(updateMerchant.id);
-            if(merchant == null){
+            if (merchant == null)
+            {
                 return NotFound(new
                 {
                     error = "Merchant doesn't exits!"
                 });
             }
             var category = await categoryRepository.GetById(updateMerchant.categoryId);
-            if(category == null)
+            if (category == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Category has id = {updateMerchant.categoryId} doesn't exist."
                 });
             }
-            if(!string.IsNullOrEmpty(updateMerchant.avatar))
+            if (!string.IsNullOrEmpty(updateMerchant.avatar))
             {
                 merchant.Avatar = Convert.FromBase64String(updateMerchant.avatar);
             }
@@ -118,6 +121,24 @@ namespace MyApp.Controllers
         {
             var data = await merchantRepository.FindContainRegex(regex);
             return Ok(data.Select(merchant => merchant.AsDto()).ToList());
+        }
+
+        [HttpGet("near-by")]
+        public async Task<IActionResult> GetMerchantNearBy([FromQuery] string coordinator)
+        {
+            var data = await merchantRepository.GetAllMerchantIsOpening();
+            List<MerchantAndDistanceResponseDto> merchants = new List<MerchantAndDistanceResponseDto>();
+            foreach (var merchant in data)
+            {
+                double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
+                Console.WriteLine($"distance {distance}");
+                if (distance < 10000)
+                {
+                    merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
+                }
+            }
+            SortUtil.SortOrderByDistance(merchants, 0, merchants.Count - 1);
+            return Ok(merchants);
         }
     }
 }

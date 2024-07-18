@@ -31,14 +31,14 @@ class Order {
   factory Order.fromJson(Map<dynamic, dynamic> json) {
     return Order(
         orderId: json['id'],
-        totalPay: json['totalPay'],
-        orderStatus: json['orderStatus'],
-        eater: json['eater'],
-        merchant: json['merchant'],
-        coordinator: json['coordinator'],
-        phone: json['phone'],
+        totalPay: json['totalPay'] / 1.0,
+        orderStatus: OrderStatus.fromJson(json['status']),
+        eater: Eater.fromJson(json['eater']),
+        merchant: Merchant.fromJson(json['merchant']),
+        coordinator: json['coordinator'] ?? json['coordinator'],
+        phone: json['phone'] ?? json['phone'],
         orderedDate: DateTime.parse(json['orderedDate']),
-        shipmentFee: json['shipmentFee'],
+        shipmentFee: json['shipmentFee'] / 1.0,
         paymentMethod: json['paymentMethod'] != null
             ? PaymentMethod.fromJson(json['paymentMethod'])
             : null,

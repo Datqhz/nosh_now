@@ -12,13 +12,13 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/order")]
-    public class OrderController :ControllerBase
+    public class OrderController : ControllerBase
     {
         private readonly IOrderRepository orderRepository;
         private readonly IEaterRepository eaterRepository;
         private readonly IMerchantRepository merchantRepository;
         private readonly IShipperRepository shipperRepository;
-        public OrderController(IOrderRepository orderRepository, IEaterRepository eaterRepository,MerchantRepository merchantRepository, IShipperRepository shipperRepository)
+        public OrderController(IOrderRepository orderRepository, IEaterRepository eaterRepository, IMerchantRepository merchantRepository, IShipperRepository shipperRepository)
         {
             this.orderRepository = orderRepository;
             this.eaterRepository = eaterRepository;
@@ -43,6 +43,7 @@ namespace MyApp.Controllers
                     error = $"Order has id = {id} doesn't exist."
                 });
             }
+            Console.WriteLine(data.ToString());
             return Ok(data.AsDto());
         }
 
@@ -50,9 +51,9 @@ namespace MyApp.Controllers
         public async Task<IActionResult> CreateOrder(CreateOrder createOrder)
         {
             var eater = await eaterRepository.GetById(createOrder.eaterId);
-            if(eater == null)
+            if (eater == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Account has id = {createOrder.eaterId} doesn't exist."
                 });
@@ -71,7 +72,8 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrder(UpdateOrder updateOrder)
         {
             var order = await orderRepository.GetById(updateOrder.id);
-            if(order == null){
+            if (order == null)
+            {
                 return NotFound(new
                 {
                     error = "Order doesn't exits!"
@@ -82,7 +84,7 @@ namespace MyApp.Controllers
             order.Coordinator = updateOrder.coordinator;
             order.Phone = updateOrder.phone;
             order.StatusId = updateOrder.statusId;
-            if(updateOrder.shipperId != 0)
+            if (updateOrder.shipperId != 0)
             {
                 order.ShipperId = updateOrder.shipperId;
             }
@@ -110,6 +112,17 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetByMerchant([FromQuery] int merchantId, [FromQuery] int eaterId)
         {
             var data = await orderRepository.FindByMerchantAndEater(merchantId, eaterId);
+            if (data == null)
+            {
+                data = await orderRepository.Insert(new Order
+                {
+                    MerchantId = merchantId,
+                    EaterId = eaterId,
+                    ShipmentFee = 0,
+                    StatusId = 1,
+                    OrderedDate = DateTime.Now
+                });
+            }
             return Ok(data.AsDto());
         }
         [HttpGet("shipper/{id}")]
@@ -126,7 +139,7 @@ namespace MyApp.Controllers
             foreach (var orderItem in data)
             {
                 double distance = DistanceUtil.CalculateDistance(coordinator, orderItem.Coordinator);
-                if(distance < 3)
+                if (distance < 3)
                 {
                     orders.Add(new OrderAndDistanceResponseDto(orderItem.AsDto(), distance));
                 }

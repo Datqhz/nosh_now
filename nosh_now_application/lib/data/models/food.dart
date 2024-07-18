@@ -22,7 +22,7 @@ class Food {
       foodName: json['foodName'],
       foodImage: json['foodImage'],
       foodDescribe: json['foodDescribe'],
-      price: json['price'],
+      price: json['price'] / 1.0,
       status: json['status'],
       merchant:
           json['merchant'] != null ? Merchant.fromJson(json['merchant']) : null,

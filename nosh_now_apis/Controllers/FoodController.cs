@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -23,7 +24,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetAll()
         {
             var data = await foodRepository.GetAll();
-            return Ok(data);
+            return Ok(data.Select(f => f.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]
@@ -37,7 +38,7 @@ namespace MyApp.Controllers
                     error = $"Food has id = {id} doesn't exist."
                 });
             }
-            return Ok(data);
+            return Ok(data.AsDto());
         }
         [HttpPost]
         public async Task<IActionResult> CreateFood(CreateFood createFood)
@@ -56,11 +57,11 @@ namespace MyApp.Controllers
                 FoodImage = Convert.FromBase64String(createFood.foodImage),
                 FoodDescribe = createFood.foodDescribe,
                 Price = createFood.price,
-                Status = 0,
+                Status = createFood.status,
                 MerchantId = createFood.merchantId
             }
             );
-            return CreatedAtAction(nameof(GetById), new { id = foodCreated.Id }, foodCreated);
+            return CreatedAtAction(nameof(GetById), new { id = foodCreated.Id }, foodCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateFood(UpdateFood updateFood)
@@ -84,7 +85,7 @@ namespace MyApp.Controllers
             {
                 var foodUpdated = await foodRepository.Update(food);
                 scope.Complete();
-                return Ok(foodUpdated);
+                return Ok(foodUpdated.AsDto());
             }
         }
         [HttpDelete("{id}")]
@@ -99,7 +100,20 @@ namespace MyApp.Controllers
                 });
             }
             await foodRepository.Delete(id);
-            return Ok(data);
+            return Ok(data.AsDto());
+        }
+
+        [HttpGet("sell/merchant/{id}")]
+        public async Task<IActionResult> GetAllByMerchantIdAndIsSelling(int id)
+        {
+            var data = await foodRepository.GetByMerchantAndIsSelling(id);
+            return Ok(data.Select(f => f.AsDto()).ToList());
+        }
+        [HttpGet("all/merchant/{id}")]
+        public async Task<IActionResult> GetAllByMerchantIdWithoutCondition(int id)
+        {
+            var data = await foodRepository.GetByMerchantWithoutCondition(id);
+            return Ok(data.Select(f => f.AsDto()).ToList());
         }
     }
 }

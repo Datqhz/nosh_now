@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/account.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 import 'package:nosh_now_application/data/models/manager.dart';
@@ -38,12 +39,11 @@ Future<dynamic> getUser() async {
     return null;
   }
   Map<String, dynamic> userMap = jsonDecode(userJson);
-  Role? role = await getRole();
-  if(role!.roleName == "Manager"){
+  if(GlobalVariable.roleName == "Manager"){
     return Manager.fromJson(userMap);
-  }else if(role!.roleName == "Eater"){
+  }else if(GlobalVariable.roleName == "Eater"){
     return Eater.fromJson(userMap);
-  }else if(role!.roleName == "Merchant"){
+  }else if(GlobalVariable.roleName == "Merchant"){
     return Merchant.fromJson(userMap);
   }
   return Shipper.fromJson(userMap);

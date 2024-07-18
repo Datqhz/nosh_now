@@ -61,7 +61,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                                 '${widget.currentPick.locationName} - ${widget.currentPick.phone}',
                                 maxLines: 1,
                                 style: const TextStyle(
-                                    fontSize: 16.0,
+                                    fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromRGBO(49, 49, 49, 1),
                                     overflow: TextOverflow.ellipsis),
@@ -70,7 +70,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                                 '97 Man Thien, Hiep Phu ward, Thu Duc city',
                                 maxLines: 1,
                                 style: const TextStyle(
-                                    fontSize: 14.0,
+                                    fontSize: 13.0,
                                     fontWeight: FontWeight.w400,
                                     color: Color.fromRGBO(49, 49, 49, 1),
                                     overflow: TextOverflow.ellipsis),
@@ -202,6 +202,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                       children: [
                         Icon(
                           CupertinoIcons.map,
+                          size: 18,
                           color: Color.fromRGBO(49, 49, 49, 1),
                         ),
                         const SizedBox(
@@ -211,7 +212,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                           'Pick from map',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 14.0,
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),

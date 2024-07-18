@@ -2,11 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 
-class SavedLocation extends StatelessWidget {
-  SavedLocation({super.key, required this.location, required this.isPicked});
+class LocationManagementItem extends StatelessWidget {
+  LocationManagementItem({super.key, required this.location});
 
   Location location;
-  bool isPicked;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,7 @@ class SavedLocation extends StatelessWidget {
                 '${location.locationName} - ${location.phone}',
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14.0,
                   fontWeight: FontWeight.w600,
                   height: 1.2,
@@ -55,10 +54,10 @@ class SavedLocation extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 6,
               ),
-              Text(
+              const Text(
                 '97 Man Thien, Hiep Phu ward, Thu Duc city',
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -76,13 +75,27 @@ class SavedLocation extends StatelessWidget {
               child: SizedBox(
             width: 12,
           )),
-          if (isPicked) ...[
-            const Icon(
-              CupertinoIcons.check_mark,
-              color: Colors.black,
-              size: 16,
-            )
-          ]
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {},
+                child: const Icon(
+                  CupertinoIcons.pencil,
+                  color: Colors.black,
+                  size: 24,
+                ),
+              ),
+              SizedBox(
+                height: 6,
+              ),
+              Icon(
+                CupertinoIcons.trash,
+                color: Colors.red,
+                size: 24,
+              ),
+            ],
+          )
         ],
       ),
     );

@@ -22,21 +22,21 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Location>> FindByEater(int eaterId)
         {
-            return await _context.Location.Where(o => o.EaterId == eaterId).ToListAsync();
+            return await _context.Location.Where(o => o.EaterId == eaterId).Include(o => o.Eater).ToListAsync();
         }
 
         public async Task<IEnumerable<Location>> GetAll()
         {
-            return await _context.Location.ToListAsync();
+            return await _context.Location.Include(o => o.Eater).ToListAsync();
         }
         public async Task<Location> GetById(int id)
         {
-            return await _context.Location.FindAsync(id);
+            return await _context.Location.Where(o => o.Id == id).Include(o => o.Eater).FirstOrDefaultAsync();
         }
 
         public async Task<Location> GetDefaultByEater(int eaterId)
         {
-            return await _context.Location.Where(o => o.Default == true && o.EaterId == eaterId).FirstOrDefaultAsync();
+            return await _context.Location.Where(o => o.Default == true && o.EaterId == eaterId).Include(o => o.Eater).FirstOrDefaultAsync();
         }
 
         public async Task<Location> Insert(Location entity)
