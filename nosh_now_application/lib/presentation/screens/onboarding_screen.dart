@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/question_screen.dart';
+import 'package:nosh_now_application/presentation/screens/pick_location_from_map.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -90,7 +91,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: (){
-                  
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => PickLocationFromMapScreen()));
                 },
                 child: const Text(
                   'Forgot password?',

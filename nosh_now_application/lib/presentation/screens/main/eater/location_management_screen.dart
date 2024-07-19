@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/streams/change_stream.dart';
+import 'package:nosh_now_application/core/streams/location_notifier.dart';
 import 'package:nosh_now_application/data/models/location.dart';
+import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/pick_location_from_map.dart';
 import 'package:nosh_now_application/presentation/widgets/location_management_item.dart';
 import 'package:nosh_now_application/presentation/widgets/saved_location.dart';
 
@@ -14,6 +20,8 @@ class LocationManagementScreen extends StatefulWidget {
 }
 
 class _LocationManagementScreenState extends State<LocationManagementScreen> {
+  ChangeStream notifier = ChangeStream();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,24 +34,38 @@ class _LocationManagementScreenState extends State<LocationManagementScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 66,
-                      ),
-
-                      // List detail item
-                      ...List.generate(20, (index) {
-                        return LocationManagementItem(
-                          location: location,
-                        );
+                  child: StreamBuilder(
+                      stream: notifier.stream,
+                      builder: (context, snapshot) {
+                        return FutureBuilder(
+                            future: LocationRepository()
+                                .getAllByEater(GlobalVariable.currentUid),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                      height: 66,
+                                    ),
+                                    ...List.generate(
+                                      snapshot.data!.length,
+                                      (index) => LocationManagementItem(
+                                          location: snapshot.data![index], notifier: notifier,),
+                                    )
+                                  ],
+                                );
+                              }
+                              return const Center(
+                                child: SpinKitCircle(
+                                  color: Colors.black,
+                                  size: 50,
+                                ),
+                              );
+                            });
                       }),
-                      const SizedBox(
-                        height: 70,
-                      )
-                    ],
-                  ),
                 ),
               ),
               //app bar
@@ -89,8 +111,13 @@ class _LocationManagementScreenState extends State<LocationManagementScreen> {
                 left: 0,
                 right: 0,
                 child: GestureDetector(
-                  onTap: (){
-                    
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PickLocationFromMapScreen(
+                                  notifier: notifier,
+                                )));
                   },
                   child: Container(
                       height: 50,

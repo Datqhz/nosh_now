@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
@@ -14,6 +15,7 @@ import 'package:nosh_now_application/data/repositories/account_repository.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
+import 'package:nosh_now_application/presentation/screens/auth/pick_location_register_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
 
 class RegisterMerchantStep1Screen extends StatefulWidget {
@@ -33,7 +35,10 @@ class _RegisterMerchantStep1ScreenState
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _openingTimeController = TextEditingController();
   final TextEditingController _closingTimeController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
   final ValueNotifier<bool> _isObscure = ValueNotifier(true);
+  final ValueNotifier<String> _coordinator = ValueNotifier('');
 
   List<FoodCategory> _categories = [];
   final ValueNotifier<String?> _categorySelected = ValueNotifier(null);
@@ -434,8 +439,20 @@ class _RegisterMerchantStep1ScreenState
                                   ),
                                   // address input
                                   TextFormField(
+                                    onTap: () async {
+                                      dynamic latlng = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const PickLocationRegisterScreen()));
+                                      String address =
+                                          await getAddressFromLatLng(latlng);
+                                      _addressController.text = address;
+                                      _coordinator.value =
+                                          '${latlng.latitude}-${latlng.longitude}';
+                                    },
+                                    controller: _addressController,
                                     readOnly: true,
-                                    initialValue: "d",
                                     decoration: const InputDecoration(
                                       suffixIcon:
                                           Icon(CupertinoIcons.map_pin_ellipse),
@@ -632,7 +649,6 @@ class _RegisterMerchantStep1ScreenState
                                               _openingTimeController.text;
                                           final closingTime =
                                               _closingTimeController.text;
-                                          final address = '0 - 0';
                                           FoodCategory? category = null;
                                           _categories.forEach((e) {
                                             if (e.categoryName ==
@@ -648,7 +664,7 @@ class _RegisterMerchantStep1ScreenState
                                               avatar: '',
                                               openingTime: openingTime,
                                               closingTime: closingTime,
-                                              coordinator: address,
+                                              coordinator: _coordinator.value,
                                               category: category);
 
                                           Navigator.push(
@@ -904,7 +920,7 @@ class _RegisterMerchantStep2ScreenState
                                   avatar: avatar,
                                   openingTime: widget.merchant.openingTime,
                                   closingTime: widget.merchant.closingTime,
-                                  coordinator: '0 - 0',
+                                  coordinator: widget.merchant.coordinator,
                                   category: widget.merchant.category);
                               bool rs = await MerchantRepository()
                                   .create(eater, createdAccountResult);

@@ -4,13 +4,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/repositories/account_repository.dart';
 import 'package:nosh_now_application/data/repositories/eater_repository.dart';
+import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
+import 'package:nosh_now_application/presentation/screens/auth/pick_location_register_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_success.dart';
 
 class RegisterEaterScreen extends StatefulWidget {
@@ -391,6 +396,18 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                   ),
                                   // address input
                                   TextFormField(
+                                    onTap: () async {
+                                      dynamic latlng = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const PickLocationRegisterScreen()));
+                                      String address =
+                                          await getAddressFromLatLng(latlng);
+                                      _addressController.text = address;
+                                      coordinator.value =
+                                          '${latlng.latitude}-${latlng.longitude}';
+                                    },
                                     controller: _addressController,
                                     readOnly: true,
                                     decoration: const InputDecoration(
@@ -443,14 +460,12 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                           final displayName =
                                               _displayNameController.text
                                                   .trim();
-                                          final email = _emailController
-                                              .text
-                                              .trim();
+                                          final email =
+                                              _emailController.text.trim();
                                           final password =
                                               _passwordController.text.trim();
-                                          final phone = _displayNameController
-                                              .text
-                                              .trim();
+                                          final phone =
+                                              _phoneController.text.trim();
                                           int createdAccountResult =
                                               await AccountRepository()
                                                   .signUp(email, password, 2);
@@ -468,20 +483,40 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                                 email: email,
                                                 phone: phone,
                                                 avatar: avatar);
-                                            bool rs = await EaterRepository()
+                                            Eater rs = await EaterRepository()
                                                 .create(eater,
                                                     createdAccountResult);
-                                            if (rs) {
+                                            if (rs != null) {
+                                              var locationRs =
+                                                  await LocationRepository()
+                                                      .create(
+                                                          Location(
+                                                              locationId: 0,
+                                                              locationName:
+                                                                  'Default',
+                                                              coordinator:
+                                                                  coordinator
+                                                                      .value,
+                                                              phone: phone,
+                                                              defaultLocation:
+                                                                  true),
+                                                          rs.eaterId);
+                                              if (!locationRs) {
+                                                showSnackBar(context,
+                                                    "Tried create default delivery location for you failed");
+                                              }
                                               Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           const RegisterSuccessScreen()));
-                                            }else {
-                                              showSnackBar(context, "Fail to register");
+                                            } else {
+                                              showSnackBar(
+                                                  context, "Fail to register");
                                             }
-                                          }else {
-                                             showSnackBar(context, "Email is used");
+                                          } else {
+                                            showSnackBar(
+                                                context, "Email is used");
                                           }
                                         }
                                       },

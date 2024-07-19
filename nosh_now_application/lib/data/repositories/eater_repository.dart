@@ -5,7 +5,7 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 
 class EaterRepository {
-  Future<bool> create(Eater eater, int accountId) async {
+  Future<Eater> create(Eater eater, int accountId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -22,9 +22,10 @@ class EaterRepository {
               }));
       int statusCode = response.statusCode;
       if (statusCode != 201) {
-        return false;
+        throw Exception();
       }
-      return true;
+      Map<String, dynamic> data = json.decode(response.body);
+      return Eater.fromJson(data);
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to register');

@@ -2,8 +2,11 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/streams/change_stream.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
@@ -12,6 +15,7 @@ import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/models/payment_method.dart';
 import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
+import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/pick_location.dart';
@@ -27,6 +31,8 @@ class PrepareOrderScreen extends StatefulWidget {
 }
 
 class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
+  ValueNotifier<PaymentMethod?> currentSelected = ValueNotifier(null);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,7 +185,6 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
               left: 0,
               right: 0,
               child: Container(
-                height: 260,
                 width: MediaQuery.of(context).size.width,
                 decoration: const BoxDecoration(
                     color: Colors.white,
@@ -190,7 +195,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
@@ -216,6 +221,9 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         )
                       ],
                     ),
+                    const SizedBox(
+                      height: 12,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -239,6 +247,9 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         )
                       ],
                     ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     CustomPaint(
                       size: const Size(double.infinity, 1),
                       painter: DashedLinePainter(
@@ -246,6 +257,9 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                           dashSpace: 3.0,
                           color: Colors.black,
                           strokeWidth: 1),
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,6 +283,75 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                               overflow: TextOverflow.ellipsis),
                         )
                       ],
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Container(
+                      child: const Text(
+                        'Payment',
+                        maxLines: 1,
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    FutureBuilder(
+                        future: PaymentMethodRepository().getAll(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            return Container(
+                              padding: EdgeInsets.only(bottom: 8),
+                              decoration: const BoxDecoration(
+                                  border: Border(
+                                bottom: BorderSide(
+                                    color: Color.fromRGBO(120, 120, 120, 1),
+                                    width: 0.6),
+                              )),
+                              child: Row(
+                                children: [
+                                  Image.memory(
+                                    convertBase64ToUint8List(
+                                        snapshot.data![0].methodImage),
+                                    height: 18,
+                                    width: 18,
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Text(
+                                    'Pay via ${snapshot.data![0].methodName}',
+                                    maxLines: 1,
+                                    textAlign: TextAlign.left,
+                                    style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color.fromRGBO(49, 49, 49, 1),
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                  const Expanded(child: SizedBox()),
+                                  const Icon(
+                                    CupertinoIcons.chevron_forward,
+                                    color: Colors.black,
+                                    size: 18,
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                          return Row(
+                            children: [],
+                          );
+                        }),
+                    const SizedBox(
+                      height: 20,
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),

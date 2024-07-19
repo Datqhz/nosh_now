@@ -46,9 +46,9 @@ namespace MyApp.Controllers
         public async Task<IActionResult> CreateLocation(CreateLocation createLocation)
         {
             var eater = await eaterRepository.GetById(createLocation.eaterId);
-            if(eater == null)
+            if (eater == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Eater has id = {createLocation.eaterId} doesn't exist."
                 });
@@ -68,7 +68,8 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrderStatus(UpdateLocation updateLocation)
         {
             var location = await locationRepository.GetById(updateLocation.id);
-            if(location == null){
+            if (location == null)
+            {
                 return NotFound(new
                 {
                     error = "Location doesn't exits!"
@@ -85,6 +86,22 @@ namespace MyApp.Controllers
                 return Ok(locationUpdated.AsDto());
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var data = await locationRepository.GetById(id);
+            if (data == null)
+            {
+                return NotFound(new
+                {
+                    error = $"Location has id = {id} doesn't exist."
+                });
+            }
+            await locationRepository.Delete(id);
+            return Ok(data);
+        }
+
         [HttpGet("user/{id}")]
         public async Task<IActionResult> FindContainRegex(int id)
         {
