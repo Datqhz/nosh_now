@@ -56,3 +56,30 @@ Future<String> getAddressFromLatLng(LatLng latlng) async {
     throw Exception();
   }
 }
+
+Future<LatLng> checkPermissions() async {
+    var status = await Permission.location.status;
+    if (status.isDenied || status.isPermanentlyDenied) {
+      if (await Permission.location.request().isGranted) {
+        return await _getCurrentLocation();
+      } else {
+        throw Exception();
+      }
+    } else {
+      return await _getCurrentLocation();
+    }
+  }
+
+  Future<LatLng> getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    // await _loadRoute(LatLng(position.latitude, position.longitude),
+    //     const LatLng(13.297841113632936, 109.06575986815542));
+    return LatLng(position.latitude, position.longitude);
+  }
+
+  Future<String> getCurrentAddress() async {
+    LatLng current = await checkPermissions();
+    return getAddressFromLatLng(current);
+  } 

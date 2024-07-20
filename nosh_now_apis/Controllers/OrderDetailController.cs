@@ -97,6 +97,29 @@ namespace MyApp.Controllers
             var orderDetailDeleted = await orderDetailRepository.Delete(orderDetail.Id);
             return Ok(orderDetailDeleted);
         }
+
+        [HttpPut("mutiple")]
+        public async Task<IActionResult> UpdateMultipleOrderDetail(List<UpdateOrderDetail> updateOrderDetails)
+        {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                foreach (var item in updateOrderDetails)
+                {
+                    if (item.quantity == 0)
+                    {
+                        await orderDetailRepository.Delete(item.id);
+                    }
+                    else
+                    {
+                        var detail = await orderDetailRepository.GetById(item.id);
+                        detail.Quantity = item.quantity;
+                        await orderDetailRepository.Update(detail);
+                    }
+                }
+                scope.Complete();
+                return Ok("Update successful!");
+            }
+        }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

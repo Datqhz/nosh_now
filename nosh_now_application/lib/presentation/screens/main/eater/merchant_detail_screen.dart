@@ -296,7 +296,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => PrepareOrderScreen(
-                                order: orderData,
+                                order: order.value!,
                               )));
                 },
                 child: Stack(

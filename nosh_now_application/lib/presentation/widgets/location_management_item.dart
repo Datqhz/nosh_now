@@ -70,9 +70,8 @@ class LocationManagementItem extends StatelessWidget {
                       height: 6,
                     ),
                     FutureBuilder(
-                        future: getAddressFromLatLng(LatLng(
-                            splitCoordinatorString(location.coordinator)[0],
-                            splitCoordinatorString(location.coordinator)[1])),
+                        future: getAddressFromLatLng(
+                            splitCoordinatorString(location.coordinator)),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                                   ConnectionState.done &&

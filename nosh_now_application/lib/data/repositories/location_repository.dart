@@ -6,8 +6,8 @@ import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 
-class LocationRepository{
-  Future<bool> create(Location location, int eaterId) async {
+class LocationRepository {
+  Future<Location> create(Location location, int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -25,16 +25,18 @@ class LocationRepository{
       int statusCode = response.statusCode;
       if (statusCode != 201) {
         print(response.body);
-        return false;
+        throw Exception();
       }
-      return true;
+      return Location.fromJson(json.decode(response.body));
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to save location');
     }
   }
 
-  Future<bool> update(Location location,) async {
+  Future<Location> update(
+    Location location,
+  ) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -51,23 +53,24 @@ class LocationRepository{
               }));
       int statusCode = response.statusCode;
       if (statusCode != 200) {
-        return false;
+        throw Exception();
       }
-      return true;
+      return Location.fromJson(json.decode(response.body));
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to save location');
     }
   }
+
   Future<bool> deleteSavedLocation(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     try {
-      Response response =
-          await delete(Uri.parse("${GlobalVariable.url}/api/location/$id"),
-              headers: headers,
-              );
+      Response response = await delete(
+        Uri.parse("${GlobalVariable.url}/api/location/$id"),
+        headers: headers,
+      );
       int statusCode = response.statusCode;
       if (statusCode != 200) {
         return false;
@@ -78,20 +81,41 @@ class LocationRepository{
       throw Exception('Fail to delete location');
     }
   }
+
   Future<List<Location>> getAllByEater(int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     try {
-      Response response =
-          await get(Uri.parse("${GlobalVariable.url}/api/location/user/$eaterId"),
-              headers: headers);
+      Response response = await get(
+          Uri.parse("${GlobalVariable.url}/api/location/user/$eaterId"),
+          headers: headers);
       int statusCode = response.statusCode;
       if (statusCode != 200) {
         return [];
       }
       List<dynamic> data = json.decode(response.body);
       return data.map((e) => Location.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<Location> getDefaultLocationByEater(int eaterId) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse("${GlobalVariable.url}/api/location/default/user/$eaterId"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        throw Exception();
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return Location.fromJson(data);
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to get data');

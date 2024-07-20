@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 
 class OrderRepository{
   Future<Order> getAllByMerchantAndEater(int merchantId, int eaterId) async {
@@ -24,6 +25,33 @@ class OrderRepository{
     } catch (e) {
       print(e.toString());
       throw Exception('Fail to get data');
+    }
+  }
+  Future<bool> update(Order order, {int shipperId = 0}) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response =
+          await put(Uri.parse("${GlobalVariable.url}/api/order"),
+              headers: headers,
+              body: jsonEncode(<String, dynamic>{
+                "id": order.orderId,
+                "quantity": order.shipmentFee,
+                "price":order.coordinator,
+                "phone": order.phone,
+                "statusId": order.orderStatus.orderStatusId,
+                "shipperId": shipperId,
+                "method": order.paymentMethod!.methodId
+              }));
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to save data');
     }
   }
 }

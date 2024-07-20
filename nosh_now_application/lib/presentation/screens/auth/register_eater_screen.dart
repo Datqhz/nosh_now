@@ -501,7 +501,7 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                                               defaultLocation:
                                                                   true),
                                                           rs.eaterId);
-                                              if (!locationRs) {
+                                              if (locationRs == null) {
                                                 showSnackBar(context,
                                                     "Tried create default delivery location for you failed");
                                               }

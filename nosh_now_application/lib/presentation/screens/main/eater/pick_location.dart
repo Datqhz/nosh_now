@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/data/models/location.dart';
+import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/pick_location_from_map.dart';
 import 'package:nosh_now_application/presentation/widgets/saved_location.dart';
 
 class PickLocationScreen extends StatefulWidget {
@@ -53,6 +59,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                           const SizedBox(
                             width: 8,
                           ),
+                          //current pick
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -66,15 +73,27 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                                     color: Color.fromRGBO(49, 49, 49, 1),
                                     overflow: TextOverflow.ellipsis),
                               ),
-                              const Text(
-                                '97 Man Thien, Hiep Phu ward, Thu Duc city',
-                                maxLines: 1,
-                                style: const TextStyle(
-                                    fontSize: 13.0,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color.fromRGBO(49, 49, 49, 1),
-                                    overflow: TextOverflow.ellipsis),
-                              ),
+                              FutureBuilder(
+                                  future: getAddressFromLatLng(
+                                      splitCoordinatorString(
+                                          widget.currentPick.coordinator)),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.done &&
+                                        snapshot.hasData) {
+                                      return Text(
+                                        snapshot.data!,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                            fontSize: 13.0,
+                                            fontWeight: FontWeight.w400,
+                                            color:
+                                                Color.fromRGBO(49, 49, 49, 1),
+                                            overflow: TextOverflow.ellipsis),
+                                      );
+                                    }
+                                    return const SizedBox();
+                                  }),
                             ],
                           ),
                           const Expanded(
@@ -111,13 +130,41 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                             color: Color.fromRGBO(49, 49, 49, 1),
                             overflow: TextOverflow.ellipsis),
                       ),
-                      // List detail item
-                      ...List.generate(20, (index) {
-                        return SavedLocation(
-                          location: location,
-                          isPicked: true,
-                        );
-                      }),
+                      FutureBuilder(
+                          future: LocationRepository()
+                              .getAllByEater(GlobalVariable.currentUid),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              return Column(
+                                children: List.generate(snapshot.data!.length,
+                                    (index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (snapshot.data![index].locationId !=
+                                          widget.currentPick.locationId) {
+                                        Navigator.pop(
+                                            context, snapshot.data![index]);
+                                      }
+                                    },
+                                    child: SavedLocation(
+                                      location: snapshot.data![index],
+                                      isPicked:
+                                          (snapshot.data![index].locationId ==
+                                              widget.currentPick.locationId),
+                                    ),
+                                  );
+                                }),
+                              );
+                            }
+                            return const Center(
+                              child: SpinKitCircle(
+                                color: Colors.black,
+                                size: 50,
+                              ),
+                            );
+                          }),
                       const SizedBox(
                         height: 70,
                       )
@@ -184,41 +231,50 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                            top: BorderSide(
-                                color: Color.fromRGBO(159, 159, 159, 1))),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        )),
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.map,
-                          size: 18,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          'Pick from map',
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    )),
+                child: GestureDetector(
+                  onTap: () async {
+                    var newLocation = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PickLocationFromMapScreen()));
+                    Navigator.pop(context, newLocation);
+                  },
+                  child: Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                              top: BorderSide(
+                                  color: Color.fromRGBO(159, 159, 159, 1))),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          )),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            CupertinoIcons.map,
+                            size: 18,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            'Pick from map',
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      )),
+                ),
               ),
             ],
           ),

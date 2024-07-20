@@ -14,10 +14,10 @@ import 'package:nosh_now_application/presentation/screens/main/eater/prepare_ord
 import 'package:permission_handler/permission_handler.dart';
 
 class PickLocationFromMapScreen extends StatefulWidget {
-  PickLocationFromMapScreen({super.key, this.location, required this.notifier});
+  PickLocationFromMapScreen({super.key, this.location, this.notifier});
 
   Location? location;
-  ChangeStream notifier;
+  ChangeStream? notifier;
 
   @override
   _PickLocationFromMapScreenState createState() =>
@@ -242,16 +242,18 @@ class _PickLocationFromMapScreenState extends State<PickLocationFromMapScreen> {
                                   '${marker.value.latitude}-${marker.value.longitude}',
                               phone: phone,
                               defaultLocation: false);
-                          bool rs = false;
+                          Location? rs = null;
                           if (widget.location != null) {
                             rs = await LocationRepository().update(location);
                           } else {
-                            rs = await LocationRepository().create(location, GlobalVariable.currentUid);
+                             rs = await LocationRepository().create(location, GlobalVariable.currentUid);
                           }
-                          if (rs) {
+                          if (rs != null) {
                             showSnackBar(context, "Save successfully");
-                            widget.notifier.notifyChange();
-                            Navigator.pop(context);
+                            if(widget.notifier != null) {
+                              widget.notifier!.notifyChange();
+                            }
+                            Navigator.pop(context, rs);
                           }
                         }
                       },

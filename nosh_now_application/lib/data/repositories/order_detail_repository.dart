@@ -77,6 +77,34 @@ class OrderDetailRepository {
     }
   }
 
+  Future<bool> updateMultiple(List<OrderDetail> orderDetails) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response =
+          await put(Uri.parse("${GlobalVariable.url}/api/order-detail/multiple"),
+              headers: headers,
+              body: jsonEncode({
+                orderDetails
+                  .map((detail) => {
+                        'id': detail.odId,
+                        'quantity': detail.quantity,
+                        'price': detail.price,
+                      })
+                  .toList()
+            }));
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to save data');
+    }
+  }
+
   Future<bool> deleteDetail(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -98,4 +126,6 @@ class OrderDetailRepository {
       throw Exception('Fail to delete data');
     }
   }
+
+  
 }
