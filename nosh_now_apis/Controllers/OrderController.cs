@@ -88,7 +88,13 @@ namespace MyApp.Controllers
             {
                 order.ShipperId = updateOrder.shipperId;
             }
+            else
+            {
+                order.ShipperId = null;
+            }
             order.MethodId = updateOrder.methodId;
+            Console.WriteLine(order.toString());
+
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var orderUpdated = await orderRepository.Update(order);
@@ -109,7 +115,7 @@ namespace MyApp.Controllers
             return Ok(data.Select(order => order.AsDto()).ToList());
         }
         [HttpGet("merchant-eater")]
-        public async Task<IActionResult> GetByMerchant([FromQuery] int merchantId, [FromQuery] int eaterId)
+        public async Task<IActionResult> GetByMerchantAndEater([FromQuery] int merchantId, [FromQuery] int eaterId)
         {
             var data = await orderRepository.FindByMerchantAndEater(merchantId, eaterId);
             if (data == null)

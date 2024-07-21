@@ -31,7 +31,7 @@ namespace MyApp.Models
             }
             return total + ShipmentFee;
         }
-        new public String ToString()
+        public string toString()
         {
             return $"Id: {Id}, OrderedDate: {OrderedDate}, ShipmentFee: {ShipmentFee},totalPay: {0} Phone: {Phone}, Coordinator: {Coordinator}, StatusId: {StatusId}, MerchantId: {MerchantId}, EaterId: {EaterId}, ShipperId: {ShipperId}, MethodID: {MethodId}";
         }

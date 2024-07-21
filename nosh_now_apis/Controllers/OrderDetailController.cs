@@ -98,7 +98,7 @@ namespace MyApp.Controllers
             return Ok(orderDetailDeleted);
         }
 
-        [HttpPut("mutiple")]
+        [HttpPut("multiple")]
         public async Task<IActionResult> UpdateMultipleOrderDetail(List<UpdateOrderDetail> updateOrderDetails)
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))

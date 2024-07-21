@@ -10,6 +10,7 @@ import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
@@ -19,8 +20,10 @@ import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
+import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/choose_payment_method_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/pick_location.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 
@@ -227,7 +230,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                                   }),
                             );
                           }
-                          return const SpinKitChasingDots(
+                          return const SpinKitThreeInOut(
                             color: Colors.black,
                             size: 30,
                           );
@@ -557,24 +560,40 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         width: double.infinity,
                         height: 44,
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             List<OrderDetail> list = getFinalDetails();
 
                             Order tempOrder = widget.order;
-                            tempOrder.coordinator = currentLocationPicked.value!.coordinator;
+                            tempOrder.coordinator =
+                                currentLocationPicked.value!.coordinator;
                             tempOrder.orderStatus = OrderStatus(
                                 orderStatusId: 2,
                                 orderStatusName: 'Wait shipper',
                                 step: 1);
                             tempOrder.totalPay = 0;
                             tempOrder.shipmentFee = 20000;
-                            tempOrder.phone = currentLocationPicked.value!.phone;
+                            tempOrder.phone =
+                                currentLocationPicked.value!.phone;
                             tempOrder.paymentMethod = currentSelected.value;
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             OrderProcessScreen(order: tempOrder)));
+                            bool updateDetailsRs = await OrderDetailRepository()
+                                .updateMultiple(list);
+                            if (updateDetailsRs) {
+                              bool updateOrder =
+                                  await OrderRepository().update(tempOrder);
+                              if (updateOrder) {
+                                Navigator.popUntil(
+                                    context, (route) => route.isFirst);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            OrderProcessScreen(
+                                                order: tempOrder)));
+                              } else {
+                                showSnackBar(context,
+                                    'Something error when order foods');
+                              }
+                            }
                           },
                           style: TextButton.styleFrom(
                               backgroundColor: Colors.black,

@@ -40,13 +40,10 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     try {
       foods.value = await FoodRepository()
           .getAllByMerchantAndIsSelling(widget.merchant.merchant.merchantId);
-      print("food complete");
       order.value = await OrderRepository().getAllByMerchantAndEater(
           widget.merchant.merchant.merchantId, eater.eaterId);
-      print("order complete");
       details.value =
           await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
-      print("detail complete");
       return true;
     } catch (e) {
       throw Exception(e.toString());

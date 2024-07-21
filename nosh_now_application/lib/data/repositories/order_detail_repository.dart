@@ -12,10 +12,12 @@ class OrderDetailRepository {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     try {
+      print("${GlobalVariable.url}/api/order-detail/order/$orderId");
       Response response = await get(
           Uri.parse("${GlobalVariable.url}/api/order-detail/order/$orderId"),
           headers: headers);
       int statusCode = response.statusCode;
+      print(response.body);
       if (statusCode != 200) {
         throw Exception();
       }
@@ -45,7 +47,7 @@ class OrderDetailRepository {
       if (statusCode != 201) {
         throw Exception();
       }
-      Map<String,dynamic> data = json.decode(response.body);
+      Map<String, dynamic> data = json.decode(response.body);
       return OrderDetail.fromJson(data);
     } catch (e) {
       print(e.toString());
@@ -82,18 +84,16 @@ class OrderDetailRepository {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     try {
-      Response response =
-          await put(Uri.parse("${GlobalVariable.url}/api/order-detail/multiple"),
-              headers: headers,
-              body: jsonEncode({
-                orderDetails
-                  .map((detail) => {
-                        'id': detail.odId,
-                        'quantity': detail.quantity,
-                        'price': detail.price,
-                      })
-                  .toList()
-            }));
+      Response response = await put(
+          Uri.parse("${GlobalVariable.url}/api/order-detail/multiple"),
+          headers: headers,
+          body: jsonEncode(orderDetails
+              .map((detail) => {
+                    'id': detail.odId,
+                    'quantity': detail.quantity,
+                    'price': detail.price,
+                  })
+              .toList()));
       int statusCode = response.statusCode;
       if (statusCode != 200) {
         return false;
@@ -111,11 +111,11 @@ class OrderDetailRepository {
     };
     try {
       Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-    Response response = await delete(
-        Uri.parse("${GlobalVariable.url}/api/study-set/$id"),
-        headers: headers);
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+      Response response = await delete(
+          Uri.parse("${GlobalVariable.url}/api/order-detail/$id"),
+          headers: headers);
       int statusCode = response.statusCode;
       if (statusCode != 200) {
         return false;
@@ -126,6 +126,4 @@ class OrderDetailRepository {
       throw Exception('Fail to delete data');
     }
   }
-
-  
 }

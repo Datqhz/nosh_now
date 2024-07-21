@@ -43,6 +43,10 @@ namespace MyApp.Repositories
                 ShipmentFee = o.ShipmentFee,
                 Phone = o.Phone,
                 Coordinator = o.Coordinator,
+                EaterId = o.EaterId,
+                MerchantId = o.MerchantId,
+                ShipperId = o.ShipperId,
+                MethodId = o.MethodId,
                 Status = new OrderStatus
                 {
                     Id = o.Status.Id,
@@ -123,6 +127,10 @@ namespace MyApp.Repositories
                 ShipmentFee = o.ShipmentFee,
                 Phone = o.Phone,
                 Coordinator = o.Coordinator,
+                EaterId = o.EaterId,
+                MerchantId = o.MerchantId,
+                ShipperId = o.ShipperId,
+                MethodId = o.MethodId,
                 Status = new OrderStatus
                 {
                     Id = o.Status.Id,

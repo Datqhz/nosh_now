@@ -2,12 +2,16 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
+import 'package:nosh_now_application/data/repositories/order_status_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 import 'package:nosh_now_application/presentation/widgets/status_item.dart';
@@ -22,6 +26,14 @@ class OrderProcessScreen extends StatefulWidget {
 }
 
 class _OrderProcessScreenState extends State<OrderProcessScreen> {
+
+  late ValueNotifier<Order> order;
+
+  @override
+  void initState() {
+    order = ValueNotifier(widget.order);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,50 +68,36 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                                 strokeWidth: 3),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            StatusItem(
-                              status: OrderStatus(
-                                  orderStatusId: 1,
-                                  orderStatusName: 'Waiting shipper',
-                                  step: 1),
-                              content: 'Eater orders',
-                              icon: CupertinoIcons.device_phone_portrait,
-                              isActive: true,
-                            ),
-                            StatusItem(
-                              status: OrderStatus(
-                                  orderStatusId: 2,
-                                  orderStatusName: 'Waiting shipper',
-                                  step: 2),
-                              content:
-                                  'Merchant start cooking without waiting for driver to arrives',
-                              icon: Icons.cookie_outlined,
-                              isActive: false,
-                            ),
-                            StatusItem(
-                              status: OrderStatus(
-                                  orderStatusId: 3,
-                                  orderStatusName: 'Waiting shipper',
-                                  step: 3),
-                              content:
-                                  'Driver pickup food and deliver to the eater',
-                              icon: Icons.delivery_dining_outlined,
-                              isActive: false,
-                            ),
-                            StatusItem(
-                              status: OrderStatus(
-                                  orderStatusId: 4,
-                                  orderStatusName: 'Waiting shipper',
-                                  step: 4),
-                              content: 'Eater receives and enjoy your food!',
-                              icon: CupertinoIcons.cube,
-                              isActive: false,
-                            )
-                          ],
-                        )
+                        FutureBuilder(
+                            future: OrderStatusRepository()
+                                .getAllWithoutInitStatus(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List.generate(
+                                    snapshot.data!.length,
+                                    (index) => StatusItem(
+                                      status: snapshot.data![index],
+                                      content:
+                                          snapshot.data![index].orderStatusName,
+                                      icon:
+                                          CupertinoIcons.device_phone_portrait,
+                                      isActive: snapshot.data![index].step <=
+                                          widget.order.orderStatus.step,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SpinKitThreeInOut(
+                                color: Colors.black,
+                                size: 30,
+                              );
+                            })
                       ],
                     ),
                     const SizedBox(
@@ -186,75 +184,92 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                           color: Color.fromRGBO(49, 49, 49, 1),
                           overflow: TextOverflow.ellipsis),
                     ),
-                    Row(
-                      children: [
-                        // shipper avatar
-                        Container(
-                          height: 80,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage(widget.order.shipper!.avatar),
-                                fit: BoxFit.cover),
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(6),
+                    if (widget.order.shipper != null)
+                      Row(
+                        children: [
+                          // shipper avatar
+                          Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: MemoryImage(convertBase64ToUint8List(
+                                      widget.order.shipper!.avatar)),
+                                  fit: BoxFit.cover),
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // shipper name
-                              Text(
-                                widget.order.shipper!.displayName,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2,
-                                  color: Color.fromRGBO(49, 49, 49, 1),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 6,
-                              ),
-                              //vehicle name
-                              Text(
-                                widget.order.shipper!.vehicleName,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2,
-                                  color: Color.fromRGBO(49, 49, 49, 1),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              )
-                            ],
+                          const SizedBox(
+                            width: 12,
                           ),
-                        ),
-                        const Expanded(
-                            child: SizedBox(
-                          width: 12,
-                        )),
-                      ],
-                    ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // shipper name
+                                Text(
+                                  widget.order.shipper!.displayName,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                    color: Color.fromRGBO(49, 49, 49, 1),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                //vehicle name
+                                Text(
+                                  widget.order.shipper!.vehicleName,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2,
+                                    color: Color.fromRGBO(49, 49, 49, 1),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Expanded(
+                              child: SizedBox(
+                            width: 12,
+                          )),
+                        ],
+                      ),
                     const Divider(
                       color: Color.fromRGBO(159, 159, 159, 1),
                     ),
                     // List detail item
-                    ...List.generate(7, (index) {
-                      return OrderDetailItem(detail: details[0]);
-                    }),
+                    FutureBuilder(
+                        future: OrderDetailRepository()
+                            .getAllByOrderId(widget.order.orderId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            return Column(
+                                children: List.generate(7, (index) {
+                              return OrderDetailItem(detail: details[0]);
+                            }));
+                          }
+                          return const SpinKitThreeInOut(
+                            color: Colors.black,
+                            size: 30,
+                          );
+                        }),
+
                     const SizedBox(
                       height: 270,
                     )
@@ -286,10 +301,10 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                     const SizedBox(
                       width: 12,
                     ),
-                    const Text(
-                      'Pho 10 Ly Quoc Su',
+                    Text(
+                      widget.order.merchant.displayName,
                       maxLines: 1,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(49, 49, 49, 1),
@@ -358,7 +373,7 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          '${calcSubtantial(details)}₫',
+                          '${widget.order.shipmentFee}₫',
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 16.0,
