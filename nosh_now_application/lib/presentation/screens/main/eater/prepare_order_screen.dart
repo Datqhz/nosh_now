@@ -43,7 +43,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   ValueNotifier<double> substantial = ValueNotifier(0);
   ValueNotifier<double> delivery = ValueNotifier(0);
   ValueNotifier<double> total = ValueNotifier(0);
-  ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null);
+  ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null); 
 
   void calcSubstantialOnChange() {
     double subs = 0;
@@ -561,39 +561,44 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         height: 44,
                         child: TextButton(
                           onPressed: () async {
-                            List<OrderDetail> list = getFinalDetails();
+                            // List<OrderDetail> list = getFinalDetails();
 
-                            Order tempOrder = widget.order;
-                            tempOrder.coordinator =
-                                currentLocationPicked.value!.coordinator;
-                            tempOrder.orderStatus = OrderStatus(
-                                orderStatusId: 2,
-                                orderStatusName: 'Wait shipper',
-                                step: 1);
-                            tempOrder.totalPay = 0;
-                            tempOrder.shipmentFee = 20000;
-                            tempOrder.phone =
-                                currentLocationPicked.value!.phone;
-                            tempOrder.paymentMethod = currentSelected.value;
-                            bool updateDetailsRs = await OrderDetailRepository()
-                                .updateMultiple(list);
-                            if (updateDetailsRs) {
-                              bool updateOrder =
-                                  await OrderRepository().update(tempOrder);
-                              if (updateOrder) {
-                                Navigator.popUntil(
-                                    context, (route) => route.isFirst);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            OrderProcessScreen(
-                                                order: tempOrder)));
-                              } else {
-                                showSnackBar(context,
-                                    'Something error when order foods');
-                              }
-                            }
+                            // Order tempOrder = widget.order;
+                            // tempOrder.coordinator =
+                            //     currentLocationPicked.value!.coordinator;
+                            // tempOrder.orderStatus = OrderStatus(
+                            //     orderStatusId: 2,
+                            //     orderStatusName: 'Wait shipper',
+                            //     step: 1);
+                            // tempOrder.totalPay = 0;
+                            // tempOrder.shipmentFee = 20000;
+                            // tempOrder.phone =
+                            //     currentLocationPicked.value!.phone;
+                            // tempOrder.paymentMethod = currentSelected.value;
+                            // bool updateDetailsRs = await OrderDetailRepository()
+                            //     .updateMultiple(list);
+                            // if (updateDetailsRs) {
+                            //   bool updateOrder =
+                            //       await OrderRepository().update(tempOrder);
+                            //   if (updateOrder) {
+                            //     Navigator.popUntil(
+                            //         context, (route) => route.isFirst);
+                            //     Navigator.push(
+                            //         context,
+                            //         MaterialPageRoute(
+                            //             builder: (context) =>
+                            //                 OrderProcessScreen(
+                            //                     order: widget.order)));
+                            //   } else {
+                            //     showSnackBar(context,
+                            //         'Something error when order foods');
+                            //   }
+                            // }
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => OrderProcessScreen(
+                                        order: widget.order)));
                           },
                           style: TextButton.styleFrom(
                               backgroundColor: Colors.black,

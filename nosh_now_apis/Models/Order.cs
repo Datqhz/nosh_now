@@ -17,8 +17,8 @@ namespace MyApp.Models
         public virtual Eater Eater { get; set; }
         public virtual OrderStatus Status { get; set; }
         public virtual Merchant Merchant { get; set; }
-        public virtual Shipper Shipper { get; set; }
-        public virtual PaymentMethod PaymentMethod { get; set; }
+        public virtual Shipper? Shipper { get; set; }
+        public virtual PaymentMethod? PaymentMethod { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
 

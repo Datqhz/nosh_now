@@ -36,6 +36,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var data = await orderRepository.GetById(id);
+            Console.WriteLine(data.toString());
             if (data == null)
             {
                 return NotFound(new
@@ -43,7 +44,6 @@ namespace MyApp.Controllers
                     error = $"Order has id = {id} doesn't exist."
                 });
             }
-            Console.WriteLine(data.ToString());
             return Ok(data.AsDto());
         }
 
@@ -84,6 +84,8 @@ namespace MyApp.Controllers
             order.Coordinator = updateOrder.coordinator;
             order.Phone = updateOrder.phone;
             order.StatusId = updateOrder.statusId;
+            order.EaterId = order.Eater.Id;
+            order.MerchantId = order.Merchant.Id;
             if (updateOrder.shipperId != 0)
             {
                 order.ShipperId = updateOrder.shipperId;
@@ -94,7 +96,6 @@ namespace MyApp.Controllers
             }
             order.MethodId = updateOrder.methodId;
             Console.WriteLine(order.toString());
-
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var orderUpdated = await orderRepository.Update(order);
@@ -120,7 +121,7 @@ namespace MyApp.Controllers
             var data = await orderRepository.FindByMerchantAndEater(merchantId, eaterId);
             if (data == null)
             {
-                data = await orderRepository.Insert(new Order
+                await orderRepository.Insert(new Order
                 {
                     MerchantId = merchantId,
                     EaterId = eaterId,
@@ -128,7 +129,9 @@ namespace MyApp.Controllers
                     StatusId = 1,
                     OrderedDate = DateTime.Now
                 });
+                data = await orderRepository.FindByMerchantAndEater(merchantId, eaterId);
             }
+
             return Ok(data.AsDto());
         }
         [HttpGet("shipper/{id}")]

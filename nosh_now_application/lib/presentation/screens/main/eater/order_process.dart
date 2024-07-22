@@ -26,7 +26,6 @@ class OrderProcessScreen extends StatefulWidget {
 }
 
 class _OrderProcessScreenState extends State<OrderProcessScreen> {
-
   late ValueNotifier<Order> order;
 
   @override
@@ -34,6 +33,7 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
     order = ValueNotifier(widget.order);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,10 +192,12 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                             height: 80,
                             width: 80,
                             decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: MemoryImage(convertBase64ToUint8List(
-                                      widget.order.shipper!.avatar)),
-                                  fit: BoxFit.cover),
+                              // image: DecorationImage(
+                              //     // image: MemoryImage(convertBase64ToUint8List(
+                              //     //     widget.order.shipper!.avatar)),
+                              //     image:
+                              //         AssetImage(widget.order.shipper!.avatar),
+                              //     fit: BoxFit.cover),
                               color: Colors.black,
                               borderRadius: BorderRadius.circular(6),
                             ),

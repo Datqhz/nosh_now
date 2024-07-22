@@ -31,75 +31,18 @@ namespace MyApp.Repositories
         }
 
         public async Task<Order> FindByMerchantAndEater(int merchantId, int eaterId)
-        {
+        {// Possible null reference return.
 #pragma warning disable CS8603 // Possible null reference return.
             return await _context.Order
-            .Where(o => o.StatusId == 1 && o.MerchantId == merchantId && o.EaterId == eaterId)
-            .Include(o => o.OrderDetails)
-            .Select(o => new Order
-            {
-                Id = o.Id,
-                OrderedDate = o.OrderedDate,
-                ShipmentFee = o.ShipmentFee,
-                Phone = o.Phone,
-                Coordinator = o.Coordinator,
-                EaterId = o.EaterId,
-                MerchantId = o.MerchantId,
-                ShipperId = o.ShipperId,
-                MethodId = o.MethodId,
-                Status = new OrderStatus
-                {
-                    Id = o.Status.Id,
-                    StatusName = o.Status.StatusName,
-                    Step = o.Status.Step
-                },
-                Eater = new Eater
-                {
-                    Id = o.Eater.Id,
-                    DisplayName = o.Eater.DisplayName,
-                    Avatar = o.Eater.Avatar,
-                    Phone = o.Eater.Phone,
-                    Email = o.Eater.Email,
-                    AccountId = o.Eater.AccountId,
-                    Account = new Account
-                    {
-                        Id = o.Eater.Account.Id,
-                        Email = o.Eater.Account.Email,
-                        CreatedDate = o.Eater.Account.CreatedDate
-                    }
-                },
-                Merchant = new Merchant
-                {
-                    Id = o.Merchant.Id,
-                    DisplayName = o.Merchant.DisplayName,
-                    Avatar = o.Merchant.Avatar,
-                    Phone = o.Merchant.Phone,
-                    Email = o.Merchant.Email,
-                    OpeningTime = o.Merchant.OpeningTime,
-                    ClosingTime = o.Merchant.ClosingTime,
-                    Coordinator = o.Merchant.Coordinator,
-                    Status = o.Merchant.Status,
-                    AccountId = o.Merchant.AccountId,
-                    CategoryId = o.Merchant.CategoryId,
-                    Account = new Account
-                    {
-                        Id = o.Merchant.Account.Id,
-                        Email = o.Merchant.Account.Email,
-                        CreatedDate = o.Merchant.Account.CreatedDate
-                    },
-                    Category = new Category
-                    {
-                        Id = o.Merchant.Category.Id,
-                        CategoryName = o.Merchant.Category.CategoryName,
-                        CategoryImage = o.Merchant.Category.CategoryImage
-                    }
-                },
-            })
-            .FirstOrDefaultAsync();
+                        .Where(o => o.StatusId == 1 && o.MerchantId == merchantId && o.EaterId == eaterId)
+                        .Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails)
+                        .FirstOrDefaultAsync();
 #pragma warning restore CS8603 // Possible null reference return.
-            // return await _context.Order
-            // .Where(o => o.StatusId == 1 && o.MerchantId == merchantId && o.EaterId == eaterId)
-            // .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Order>> FindByShipper(int shipperId)
@@ -119,69 +62,14 @@ namespace MyApp.Repositories
 
         public async Task<Order> GetById(int id)
         {
-#pragma warning disable CS8603 // Possible null reference return.
-            return await _context.Order.Where(o => o.Id == id).Include(o => o.OrderDetails).Select(o => new Order
-            {
-                Id = o.Id,
-                OrderedDate = o.OrderedDate,
-                ShipmentFee = o.ShipmentFee,
-                Phone = o.Phone,
-                Coordinator = o.Coordinator,
-                EaterId = o.EaterId,
-                MerchantId = o.MerchantId,
-                ShipperId = o.ShipperId,
-                MethodId = o.MethodId,
-                Status = new OrderStatus
-                {
-                    Id = o.Status.Id,
-                    StatusName = o.Status.StatusName,
-                    Step = o.Status.Step
-                },
-                Eater = new Eater
-                {
-                    Id = o.Eater.Id,
-                    DisplayName = o.Eater.DisplayName,
-                    Avatar = o.Eater.Avatar,
-                    Phone = o.Eater.Phone,
-                    Email = o.Eater.Email,
-                    AccountId = o.Eater.AccountId,
-                    Account = new Account
-                    {
-                        Id = o.Eater.Account.Id,
-                        Email = o.Eater.Account.Email,
-                        CreatedDate = o.Eater.Account.CreatedDate
-                    }
-                },
-                Merchant = new Merchant
-                {
-                    Id = o.Merchant.Id,
-                    DisplayName = o.Merchant.DisplayName,
-                    Avatar = o.Merchant.Avatar,
-                    Phone = o.Merchant.Phone,
-                    Email = o.Merchant.Email,
-                    OpeningTime = o.Merchant.OpeningTime,
-                    ClosingTime = o.Merchant.ClosingTime,
-                    Coordinator = o.Merchant.Coordinator,
-                    Status = o.Merchant.Status,
-                    AccountId = o.Merchant.AccountId,
-                    CategoryId = o.Merchant.CategoryId,
-                    Account = new Account
-                    {
-                        Id = o.Merchant.Account.Id,
-                        Email = o.Merchant.Account.Email,
-                        CreatedDate = o.Merchant.Account.CreatedDate
-                    },
-                    Category = new Category
-                    {
-                        Id = o.Merchant.Category.Id,
-                        CategoryName = o.Merchant.Category.CategoryName,
-                        CategoryImage = o.Merchant.Category.CategoryImage
-                    }
-                }
-
-            }).FirstOrDefaultAsync();
-#pragma warning restore CS8603 // Possible null reference return.
-            // return await _context.Order.FindAsync(id);
+            return await _context.Order
+                        .Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails)
+                        .FirstOrDefaultAsync(o => o.Id == id);
         }
         public async Task<Order> Insert(Order entity)
         {
