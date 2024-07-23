@@ -1,6 +1,7 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Extensions;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -96,6 +97,13 @@ namespace MyApp.Controllers
             }
             await orderStatusRepository.Delete(id);
             return Ok(data);
+        }
+
+        [HttpGet("order-process")]
+        public async Task<IActionResult> GetAllWithoutInitAndCancelStatus()
+        {
+            var data = await orderStatusRepository.GetAllStatusWithoutInitAndCancelStatus();
+            return Ok(data.Select(s => s.AsDto()).ToList());
         }
     }
 }

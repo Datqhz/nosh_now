@@ -2,13 +2,17 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
+import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
@@ -24,6 +28,19 @@ class OrderDetailScreen extends StatefulWidget {
 }
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  ValueNotifier<List<OrderDetail>> details = ValueNotifier([]);
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrderDetailData();
+  }
+
+  Future<void> fetchOrderDetailData() async {
+    details.value =
+        await OrderDetailRepository().getAllByOrderId(widget.order.orderId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +64,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       'Eater',
                       maxLines: 1,
                       style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(49, 49, 49, 1),
                           overflow: TextOverflow.ellipsis),
@@ -58,7 +75,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           'Food orderer: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
@@ -67,7 +84,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           widget.order.eater.displayName,
                           maxLines: 1,
                           style: const TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
@@ -80,7 +97,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           'Order date: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
@@ -91,34 +108,45 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               .toString(),
                           maxLines: 1,
                           style: const TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       children: [
-                        Text(
+                        const Text(
                           'Delivery address: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
                         Expanded(
-                          child: Text(
-                            '97 Man Thien, Hiep Phu ward, Thu Duc city',
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis),
-                          ),
+                          child: FutureBuilder(
+                              future: getAddressFromLatLng(
+                                  splitCoordinatorString(
+                                      widget.order.coordinator!)),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.hasData) {
+                                  return Text(
+                                    snapshot.data!,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color.fromRGBO(49, 49, 49, 1),
+                                        overflow: TextOverflow.ellipsis),
+                                  );
+                                }
+                                return const SizedBox();
+                              }),
                         ),
                       ],
                     ),
@@ -128,7 +156,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           'Phone: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
@@ -138,7 +166,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             widget.order.phone!,
                             maxLines: 1,
                             style: const TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.w400,
                                 color: Color.fromRGBO(49, 49, 49, 1),
                                 overflow: TextOverflow.ellipsis),
@@ -153,7 +181,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       'Merchant',
                       maxLines: 1,
                       style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(49, 49, 49, 1),
                           overflow: TextOverflow.ellipsis),
@@ -164,16 +192,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           'Name: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 12.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          widget.order.eater.displayName,
+                          widget.order.merchant.displayName,
                           maxLines: 1,
                           style: const TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
@@ -181,96 +209,121 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ],
                     ),
 
-                    const Row(
+                    Row(
                       children: [
-                        Text(
+                        const Text(
                           'Address: ',
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 13.0,
                               fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
                         Expanded(
-                          child: Text(
-                            '97 Man Thien, Hiep Phu ward, Thu Duc city',
+                          child: FutureBuilder(
+                              future: getAddressFromLatLng(
+                                  splitCoordinatorString(
+                                      widget.order.merchant.coordinator)),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.hasData) {
+                                  return Text(
+                                    snapshot.data!,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color.fromRGBO(49, 49, 49, 1),
+                                        overflow: TextOverflow.ellipsis),
+                                  );
+                                }
+                                return const SizedBox();
+                              }),
+                        ),
+                      ],
+                    ),
+                    if (widget.order.shipper != null) ...[
+                      const Divider(
+                        color: Color.fromRGBO(159, 159, 159, 1),
+                      ),
+                      const Text(
+                        'Shipper',
+                        maxLines: 1,
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      Row(
+                        children: [
+                          const Text(
+                            'Name: ',
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                          Text(
+                            widget.order.shipper!.displayName,
                             maxLines: 1,
                             style: const TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.w400,
                                 color: Color.fromRGBO(49, 49, 49, 1),
                                 overflow: TextOverflow.ellipsis),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Text(
+                            'Vehicle: ',
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                          Expanded(
+                            child: Text(
+                              widget.order.shipper!.vehicleName,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const Divider(
+                      color: Color.fromRGBO(159, 159, 159, 1),
                     ),
+                    ValueListenableBuilder(
+                        valueListenable: details,
+                        builder: (context, value, child) {
+                          if (value.isNotEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: List.generate(value.length, (index) {
+                                return OrderDetailItem(detail: value[index]);
+                              }),
+                            );
+                          }
+                          return const SpinKitCircle(
+                            color: Colors.black,
+                            size: 50,
+                          );
+                        }),
 
-                    const Divider(
-                      color: Color.fromRGBO(159, 159, 159, 1),
-                    ),
-                    const Text(
-                      'Merchant',
-                      maxLines: 1,
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    Row(
-                      children: [
-                        const Text(
-                          'Name: ',
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                        Text(
-                          widget.order.eater.displayName,
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Text(
-                          'Vehicle: ',
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                        Expanded(
-                          child: Text(
-                            widget.order.shipper!.vehicleName,
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w400,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      color: Color.fromRGBO(159, 159, 159, 1),
-                    ),
-                    // List detail item
-                    ...List.generate(7, (index) {
-                      return OrderDetailItem(detail: details[0]);
-                    }),
                     const SizedBox(
                       height: 20,
                     ),
@@ -286,15 +339,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               color: Color.fromRGBO(120, 120, 120, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
-                        Text(
-                          '${calcSubtantial(details)}₫',
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(120, 120, 120, 1),
-                              overflow: TextOverflow.ellipsis),
-                        )
+                        ValueListenableBuilder(
+                            valueListenable: details,
+                            builder: (context, value, child) {
+                              if (value.isNotEmpty) {
+                                return Text(
+                                  '${calcSubtantial(value)}₫',
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(120, 120, 120, 1),
+                                      overflow: TextOverflow.ellipsis),
+                                );
+                              }
+                              return const SizedBox();
+                            })
                       ],
                     ),
                     const SizedBox(
@@ -313,7 +373,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          '${calcSubtantial(details)}₫',
+                          '${widget.order.shipmentFee}₫',
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 16.0,
@@ -339,7 +399,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          '${calcTotalPay(details, widget.order.shipmentFee!)}₫',
+                          '${widget.order.totalPay}₫',
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 20.0,
@@ -371,13 +431,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.red),
+                                        side:
+                                            const BorderSide(color: Colors.red),
                                         borderRadius:
                                             BorderRadius.circular(8))),
                                 child: const Text('Cancel'),
                               ),
                             ),
                           ),
+                          //see proccess
                           Expanded(
                             child: Container(
                               padding:
@@ -390,7 +452,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             OrderProcessScreen(
-                                                order: widget.order))),
+                                              order: widget.order,
+                                              type: 1,
+                                            ))),
                                 style: TextButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: Colors.black,
@@ -439,10 +503,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     const SizedBox(
                       width: 12,
                     ),
-                    const Text(
-                      'Pho 10 Ly Quoc Su',
+                    Text(
+                      widget.order.merchant.displayName,
                       maxLines: 1,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(49, 49, 49, 1),

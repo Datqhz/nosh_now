@@ -47,7 +47,6 @@ Future<dynamic> getUser() async {
     return Merchant.fromJson(userMap);
   }
   return Shipper.fromJson(userMap);
-  
 }
 
 Future<void> storeToken(String token) async

@@ -79,6 +79,13 @@ namespace MyApp.Controllers
                     error = "Order doesn't exits!"
                 });
             }
+            if(order.Status.Id == 6){
+                return BadRequest(new {error= "Can't revceive this order"});
+            }else if(order.Status.Id == 3 && updateOrder.statusId == 6){
+                return BadRequest(new {error= "Can't cancle this order"});
+            }else if(order.Status.Id == updateOrder.statusId ){
+                return BadRequest(new {error= "Can't revceive this order"});
+            }
             order.OrderedDate = DateTime.Now;
             order.ShipmentFee = updateOrder.shipmentFee;
             order.Coordinator = updateOrder.coordinator;
@@ -144,7 +151,7 @@ namespace MyApp.Controllers
         public async Task<IActionResult> GetOrderNearBy([FromQuery] string coordinator)
         {
             List<OrderAndDistanceResponseDto> orders = new List<OrderAndDistanceResponseDto>();
-            var data = await orderRepository.GetAllInitialize();
+            var data = await orderRepository.GetAllWaitingToPickedUp();
             foreach (var orderItem in data)
             {
                 double distance = DistanceUtil.CalculateDistance(coordinator, orderItem.Coordinator);
@@ -153,6 +160,7 @@ namespace MyApp.Controllers
                     orders.Add(new OrderAndDistanceResponseDto(orderItem.AsDto(), distance));
                 }
             }
+            
             SortUtil.SortOrderByDistance(orders, 0, orders.Count - 1);
             return Ok(orders);
         }

@@ -22,12 +22,26 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Order>> FindByEater(int eaterId)
         {
-            return await _context.Order.Where(o => o.EaterId == eaterId).ToListAsync();
+            return await _context.Order.Where(o => o.EaterId == eaterId && o.StatusId != 1).Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails)
+                        .OrderByDescending(o => o.OrderedDate)
+                        .ToListAsync();
         }
 
         public async Task<IEnumerable<Order>> FindByMerchant(int merchantId)
         {
-            return await _context.Order.Where(o => o.MerchantId == merchantId).ToListAsync();
+            return await _context.Order.Where(o => o.MerchantId == merchantId && o.StatusId != 1).Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails)
+                        .OrderByDescending(o => o.OrderedDate)
+                        .ToListAsync();
         }
 
         public async Task<Order> FindByMerchantAndEater(int merchantId, int eaterId)
@@ -47,7 +61,15 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Order>> FindByShipper(int shipperId)
         {
-            return await _context.Order.Where(o => o.ShipperId == shipperId).ToListAsync();
+            return await _context.Order.Where(o => o.ShipperId == shipperId && o.StatusId != 1)
+                        .Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails)
+                        .OrderByDescending(o => o.OrderedDate)
+                        .ToListAsync();
         }
 
         public async Task<IEnumerable<Order>> GetAll()
@@ -55,9 +77,14 @@ namespace MyApp.Repositories
             return await _context.Order.ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetAllInitialize()
+        public async Task<IEnumerable<Order>> GetAllWaitingToPickedUp()
         {
-            return await _context.Order.Where(o => o.StatusId == 1).ToListAsync();
+            return await _context.Order.Where(o => o.StatusId == 2).Include(o => o.Eater)
+                        .Include(o => o.Status)
+                        .Include(o => o.Merchant)
+                        .Include(o => o.Shipper)
+                        .Include(o => o.PaymentMethod)
+                        .Include(o => o.OrderDetails).ToListAsync();
         }
 
         public async Task<Order> GetById(int id)

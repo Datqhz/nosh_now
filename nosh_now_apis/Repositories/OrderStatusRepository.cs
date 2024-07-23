@@ -25,6 +25,11 @@ namespace MyApp.Repositories
             return await _context.OrderStatus.Where(c => c.StatusName == name).ToListAsync();
         }
 
+        public async Task<IEnumerable<OrderStatus>> GetAllStatusWithoutInitAndCancelStatus()
+        {
+            return await _context.OrderStatus.Where(c => c.Step != 0 && c.Step!=5).ToListAsync();
+        }
+
         public async Task<IEnumerable<OrderStatus>> GetAll()
         {
             return await _context.OrderStatus.ToListAsync();

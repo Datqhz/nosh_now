@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 
 class OrderDetailItem extends StatefulWidget {
-  OrderDetailItem({super.key, required this.detail, this.isEdit = false, this.onChange});
+  OrderDetailItem(
+      {super.key, required this.detail, this.isEdit = false, this.onChange});
 
   OrderDetail detail;
   bool? isEdit;
@@ -27,11 +26,12 @@ class OrderDetailItemState extends State<OrderDetailItem> {
   int getQuantity() {
     return quantity.value;
   }
-  double calcTotal(){
+
+  double calcTotal() {
     return widget.detail.price * quantity.value;
   }
 
-  OrderDetail getCurrentDetail(){
+  OrderDetail getCurrentDetail() {
     OrderDetail temp = widget.detail;
     temp.quantity = quantity.value;
     return temp;

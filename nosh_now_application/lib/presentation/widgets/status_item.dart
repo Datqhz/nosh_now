@@ -34,7 +34,7 @@ class StatusItem extends StatelessWidget {
             child: Icon(
               icon,
               color: Colors.black,
-              size: 22,
+              size: 26,
             ),
           ),
           const SizedBox(

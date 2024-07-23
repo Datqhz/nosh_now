@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_detail_screen.dart';
@@ -23,11 +28,120 @@ class ManageOrderScreen extends StatefulWidget {
 class _ManageOrderScreenState extends State<ManageOrderScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  ValueNotifier<List<Order>> orders = ValueNotifier([]);
+  ValueNotifier<Widget> header = ValueNotifier(const SizedBox());
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      orders.value = [];
+      header.value = buildHeader();
+      if (_tabController.index == 0) {
+        fetchData();
+      } else {
+        fetchOrderNearbyData();
+      }
+    });
+    fetchData();
+    header.value = buildHeader();
+  }
+
+  Future<void> fetchData() async {
+    if (widget.type == 1) {
+      orders.value =
+          await OrderRepository().getByEater(GlobalVariable.currentUid);
+    } else if (widget.type == 2) {
+      orders.value =
+          await OrderRepository().getByMerchant(GlobalVariable.currentUid);
+    } else {
+      orders.value =
+          await OrderRepository().getByShipper(GlobalVariable.currentUid);
+    }
+  }
+
+  Future<void> fetchOrderNearbyData() async {
+    LatLng currentLocation = await getCurrentLocation();
+    orders.value = await OrderRepository().getAllNearBy(
+        "${currentLocation.latitude}-${currentLocation.longitude}");
+  }
+
+  Widget buildHeader() {
+    if (widget.type == 3) {
+      if (_tabController.index == 0) {
+        return const Row(
+          children: [
+            Text(
+              'Order received',
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(49, 49, 49, 1),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Expanded(child: SizedBox()),
+            Text(
+              'Newest',
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w400,
+                color: Color.fromRGBO(49, 49, 49, 1),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(
+              CupertinoIcons.sort_down,
+              color: Color.fromRGBO(49, 49, 49, 1),
+            )
+          ],
+        );
+      } else {
+        return const Text(
+          'Near your',
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            color: Color.fromRGBO(49, 49, 49, 1),
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }
+    } else {
+      return const Row(
+        children: [
+          Text(
+            'Your orders',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(49, 49, 49, 1),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(child: SizedBox()),
+          Text(
+            'Newest',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w400,
+              color: Color.fromRGBO(49, 49, 49, 1),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Icon(
+            CupertinoIcons.sort_down,
+            color: Color.fromRGBO(49, 49, 49, 1),
+          )
+        ],
+      );
+    }
   }
 
   @override
@@ -43,63 +157,62 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 100, // 70
+                SizedBox(
+                  height: widget.type == 3 ? 100 : 70, // 70
                 ),
-                Row(
-                  children: [
-                    Text(
-                      widget.type != 3 ? 'Your orders' : 'Order received',
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    const Text(
-                      'Newest',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const Icon(
-                      CupertinoIcons.sort_down,
-                      color: Color.fromRGBO(49, 49, 49, 1),
-                    )
-                  ],
-                ),
+                ValueListenableBuilder(
+                    valueListenable: header,
+                    builder: (context, value, child) {
+                      return value;
+                    }),
                 const SizedBox(
                   height: 12,
                 ),
-                // list merchant
-                ...List.generate(12, (index) {
-                  return GestureDetector(
-                    onTap: () => {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailScreen(
-                            order: orderFull,
+                // list order
+                ValueListenableBuilder(
+                    valueListenable: orders,
+                    builder: (context, value, child) {
+                      if (value.isEmpty) {
+                        return Center(
+                          child: Text(
+                            _tabController.index == 0
+                                ? "You don't have any order."
+                                : "Don't have any order near your in 3km.",
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w500,
+                              color: Color.fromRGBO(49, 49, 49, 1),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      )
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: OrderItem(
-                        order: orderFull,
-                        type: widget.type,
-                      ),
-                    ),
-                  );
-                }),
+                        );
+                      } else {
+                        return Column(
+                          children: List.generate(value.length, (index) {
+                            return GestureDetector(
+                              onTap: () => {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OrderDetailScreen(
+                                      order: value[index],
+                                    ),
+                                  ),
+                                )
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: OrderItem(
+                                  order: value[index],
+                                  type: widget.type,
+                                ),
+                              ),
+                            );
+                          }),
+                        );
+                      }
+                    }),
                 const SizedBox(
                   height: 70,
                 ),

@@ -23,6 +23,8 @@ import 'package:nosh_now_application/data/repositories/order_detail_repository.d
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/choose_payment_method_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/pick_location.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
@@ -43,7 +45,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   ValueNotifier<double> substantial = ValueNotifier(0);
   ValueNotifier<double> delivery = ValueNotifier(0);
   ValueNotifier<double> total = ValueNotifier(0);
-  ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null); 
+  ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null);
 
   void calcSubstantialOnChange() {
     double subs = 0;
@@ -525,7 +527,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                                               width: 12,
                                             ),
                                             Text(
-                                              'Pay via ${value!.methodName}',
+                                              'Pay via ${value.methodName}',
                                               maxLines: 1,
                                               textAlign: TextAlign.left,
                                               style: const TextStyle(
@@ -597,8 +599,8 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => OrderProcessScreen(
-                                        order: widget.order)));
+                                    builder: (context) =>
+                                        OrderProcessScreen(order: tempOrder, type: 1,)));
                           },
                           style: TextButton.styleFrom(
                               backgroundColor: Colors.black,
@@ -646,3 +648,11 @@ List<PaymentMethod> methods = [
   PaymentMethod(
       methodId: 2, methodName: 'Momo', methodImage: 'assets/images/momo.webp')
 ];
+
+Order tempOrder = Order(
+    orderId: 9,
+    totalPay: 8000,
+    orderStatus:
+        OrderStatus(orderStatusId: 1, orderStatusName: "test", step: 2),
+    eater: eater,
+    merchant: merchants[0]);
