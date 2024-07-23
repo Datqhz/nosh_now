@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
@@ -18,6 +21,20 @@ class FoodManagementScreen extends StatefulWidget {
 class _FoodManagementScreenState extends State<FoodManagementScreen> {
   final TextEditingController _nameController = TextEditingController();
   final ValueNotifier _isShowSeachBar = ValueNotifier(false);
+  ValueNotifier<List<Food>?> foods = ValueNotifier(null);
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    foods.value =
+        await FoodRepository().getAllByMerchant(GlobalVariable.currentUid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -103,14 +120,45 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                   height: 12,
                 ),
                 // list merchant
-                ...List.generate(12, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: FoodManagementItem(
-                      food: dataTest,
-                    ),
-                  );
-                }),
+                ValueListenableBuilder(
+                  valueListenable: foods,
+                  builder: (context, value, child) {
+                    if (value == null) {
+                      return const Center(
+                        child: SpinKitCircle(
+                          color: Colors.black,
+                          size: 50,
+                        ),
+                      );
+                    } else if (value.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "You don't have any food",
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: List.generate(
+                        value.length,
+                        (index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: FoodManagementItem(
+                              food: value[index],
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(
                   height: 70,
                 ),

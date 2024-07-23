@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/streams/change_stream.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
@@ -20,10 +21,12 @@ import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart
 import 'package:nosh_now_application/presentation/widgets/status_item.dart';
 
 class OrderProcessScreen extends StatefulWidget {
-  OrderProcessScreen({super.key, required this.order, required this.type});
+  OrderProcessScreen(
+      {super.key, required this.order, required this.type, this.callback});
 
   Order order;
   int type; // 1 is eater, 2 is shipper
+  Function? callback;
 
   @override
   State<OrderProcessScreen> createState() => _OrderProcessScreenState();
@@ -62,6 +65,16 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
       default:
         return CupertinoIcons.device_phone_portrait;
     }
+  }
+
+  Future<void> reload() async {
+    if (widget.callback != null) {
+      print("step 1");
+      widget.callback!();
+    }
+    print("step 2");
+    await fetchOrderData();
+    print("done");
   }
 
   @override
@@ -129,9 +142,13 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                                                   icon: pickItemForStatus(
                                                       snapshot
                                                           .data![index].step),
-                                                  isActive: snapshot
-                                                          .data![index].step <=
-                                                      value.orderStatus.step,
+                                                  isActive: (snapshot
+                                                              .data![index]
+                                                              .step <=
+                                                          value.orderStatus
+                                                              .step &&
+                                                      value.orderStatus.step !=
+                                                          5),
                                                 ),
                                               ),
                                             );
@@ -224,20 +241,26 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                                                   splitCoordinatorString(
                                                       value.coordinator!)),
                                               builder: (context, snapshot) {
-                                                return Text(
-                                                  snapshot.data!,
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 1,
-                                                  style: const TextStyle(
-                                                    fontSize: 14.0,
-                                                    fontWeight: FontWeight.w400,
-                                                    height: 1.2,
-                                                    color: Color.fromRGBO(
-                                                        49, 49, 49, 1),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                );
+                                                if (snapshot.connectionState ==
+                                                        ConnectionState.done &&
+                                                    snapshot.hasData) {
+                                                  return Text(
+                                                    snapshot.data!,
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      height: 1.2,
+                                                      color: Color.fromRGBO(
+                                                          49, 49, 49, 1),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  );
+                                                }
+                                                return const SizedBox();
                                               })
                                         ],
                                       ),
@@ -551,6 +574,7 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                                       bool rs =
                                           await OrderRepository().update(temp);
                                       if (rs) {
+                                        reload();
                                         showSnackBar(
                                             context, "Update successful");
                                       } else {
@@ -564,6 +588,9 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                                       bool rs =
                                           await OrderRepository().update(temp);
                                       if (rs) {
+                                        print("begin reload");
+                                        reload();
+                                        print("done reload");
                                         showSnackBar(
                                             context, "Update successful");
                                       } else {

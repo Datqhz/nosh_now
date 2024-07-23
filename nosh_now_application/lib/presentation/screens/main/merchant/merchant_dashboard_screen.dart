@@ -1,14 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 
 class MerchantDashboardScreen extends StatelessWidget {
-  const MerchantDashboardScreen({super.key});
+  MerchantDashboardScreen({super.key});
+  ValueNotifier<int> orderCount = ValueNotifier(0);
+
+  Future<void> getNumOfOrder() async {
+    orderCount.value = await StatisticRepository()
+        .getTotalOrderOfUserByTimeAndRole(
+            GlobalVariable.currentUid, GlobalVariable.roleId, 1,
+            date: DateTime.now());
+  }
 
   @override
   Widget build(BuildContext context) {
+    getNumOfOrder();
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
       body: SafeArea(
@@ -47,15 +59,24 @@ class MerchantDashboardScreen extends StatelessWidget {
                             color: Colors.white,
                             overflow: TextOverflow.ellipsis),
                       ),
-                      Text(
-                        merchantData.displayName,
-                        maxLines: 1,
-                        style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            overflow: TextOverflow.ellipsis),
-                      ),
+                      FutureBuilder(
+                          future: getUser(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              return Text(
+                                snapshot.data!.displayName,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    overflow: TextOverflow.ellipsis),
+                              );
+                            }
+                            return const SizedBox();
+                          }),
                     ],
                   ),
                   const Text(
@@ -108,32 +129,45 @@ class MerchantDashboardScreen extends StatelessWidget {
                                   color: Color.fromRGBO(159, 159, 159, 1),
                                   overflow: TextOverflow.ellipsis),
                             ),
-                            Text(
-                              '$revenue ₫',
-                              maxLines: 1,
-                              style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  overflow: TextOverflow.ellipsis),
-                            ),
+                            FutureBuilder(
+                                future: StatisticRepository()
+                                    .getRevenueOfMerchantByTime(
+                                        GlobalVariable.currentUid, 2,
+                                        month: DateTime.now().month,
+                                        year: DateTime.now().year),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
+                                    return Text(
+                                      '${snapshot.data} ₫',
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          overflow: TextOverflow.ellipsis),
+                                    );
+                                  }
+                                  return const SizedBox();
+                                }),
                           ],
                         ),
                         const Expanded(child: SizedBox()),
                         TextButton(
                           onPressed: () {},
-                          child: Text(
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: const Text(
                             'More',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          style: TextButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10))),
                         )
                       ],
                     ),
@@ -185,15 +219,28 @@ class MerchantDashboardScreen extends StatelessWidget {
                                               Color.fromRGBO(159, 159, 159, 1),
                                           overflow: TextOverflow.ellipsis),
                                     ),
-                                    Text(
-                                      '$revenue ₫',
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                          overflow: TextOverflow.ellipsis),
-                                    ),
+                                    FutureBuilder(
+                                        future: StatisticRepository()
+                                            .getRevenueOfMerchantByTime(
+                                                GlobalVariable.currentUid, 1,
+                                                date: DateTime.now()),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                                  ConnectionState.done &&
+                                              snapshot.hasData) {
+                                            return Text(
+                                              '${snapshot.data!} ₫',
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            );
+                                          }
+                                          return const SizedBox();
+                                        }),
                                   ],
                                 ),
                               ],
@@ -232,30 +279,39 @@ class MerchantDashboardScreen extends StatelessWidget {
                               SizedBox(
                                 height: 100,
                                 width: 100,
-                                child: CircularProgressIndicator(
-                                  backgroundColor:
-                                      const Color.fromRGBO(66, 36, 250, 0.2),
-                                  strokeWidth: 6,
-                                  value: numOfOrder / 10,
-                                  valueColor:
-                                      const AlwaysStoppedAnimation<Color>(
-                                          Colors.blue),
-                                ),
+                                child: ValueListenableBuilder(
+                                    valueListenable: orderCount,
+                                    builder: (context, value, child) {
+                                      return CircularProgressIndicator(
+                                        backgroundColor: const Color.fromRGBO(
+                                            66, 36, 250, 0.2),
+                                        strokeWidth: 6,
+                                        value: value / 10,
+                                        valueColor:
+                                            const AlwaysStoppedAnimation<Color>(
+                                                Colors.blue),
+                                      );
+                                    }),
                               ),
                               Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      numOfOrder.toString(),
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                          overflow: TextOverflow.ellipsis),
-                                    ),
+                                    ValueListenableBuilder(
+                                        valueListenable: orderCount,
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            value.toString(),
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          );
+                                        }),
                                     const Text(
                                       '/10 Orders',
                                       maxLines: 1,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/food_detail_management_screen.dart';
@@ -42,7 +43,7 @@ class FoodManagementItem extends StatelessWidget {
                   width: 80,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage(food.foodImage), fit: BoxFit.cover),
+                        image: MemoryImage(convertBase64ToUint8List(food.foodImage)), fit: BoxFit.cover),
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(6),
                   ),

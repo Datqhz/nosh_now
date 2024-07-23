@@ -563,44 +563,46 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         height: 44,
                         child: TextButton(
                           onPressed: () async {
-                            // List<OrderDetail> list = getFinalDetails();
+                            List<OrderDetail> list = getFinalDetails();
 
-                            // Order tempOrder = widget.order;
-                            // tempOrder.coordinator =
-                            //     currentLocationPicked.value!.coordinator;
-                            // tempOrder.orderStatus = OrderStatus(
-                            //     orderStatusId: 2,
-                            //     orderStatusName: 'Wait shipper',
-                            //     step: 1);
-                            // tempOrder.totalPay = 0;
-                            // tempOrder.shipmentFee = 20000;
-                            // tempOrder.phone =
-                            //     currentLocationPicked.value!.phone;
-                            // tempOrder.paymentMethod = currentSelected.value;
-                            // bool updateDetailsRs = await OrderDetailRepository()
-                            //     .updateMultiple(list);
-                            // if (updateDetailsRs) {
-                            //   bool updateOrder =
-                            //       await OrderRepository().update(tempOrder);
-                            //   if (updateOrder) {
-                            //     Navigator.popUntil(
-                            //         context, (route) => route.isFirst);
-                            //     Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //             builder: (context) =>
-                            //                 OrderProcessScreen(
-                            //                     order: widget.order)));
-                            //   } else {
-                            //     showSnackBar(context,
-                            //         'Something error when order foods');
-                            //   }
-                            // }
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        OrderProcessScreen(order: tempOrder, type: 1,)));
+                            Order tempOrder = widget.order;
+                            tempOrder.coordinator =
+                                currentLocationPicked.value!.coordinator;
+                            tempOrder.orderStatus = OrderStatus(
+                                orderStatusId: 2,
+                                orderStatusName: 'Wait shipper',
+                                step: 1);
+                            tempOrder.totalPay = 0;
+                            tempOrder.shipmentFee = 20000;
+                            tempOrder.phone =
+                                currentLocationPicked.value!.phone;
+                            tempOrder.paymentMethod = currentSelected.value;
+                            bool updateDetailsRs = await OrderDetailRepository()
+                                .updateMultiple(list);
+                            if (updateDetailsRs) {
+                              bool updateOrder =
+                                  await OrderRepository().update(tempOrder);
+                              if (updateOrder) {
+                                Navigator.popUntil(
+                                    context, (route) => route.isFirst);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            OrderProcessScreen(
+                                              order: widget.order,
+                                              type: 1,
+                                            )));
+                              } else {
+                                showSnackBar(context,
+                                    'Something error when order foods');
+                              }
+                            }
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             OrderProcessScreen(order: tempOrder, type: 1,)));
                           },
                           style: TextButton.styleFrom(
                               backgroundColor: Colors.black,

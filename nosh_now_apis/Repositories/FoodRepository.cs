@@ -55,6 +55,7 @@ namespace MyApp.Repositories
                                         {
                                             Id = e.Merchant.Category.Id,
                                             CategoryName = e.Merchant.Category.CategoryName,
+                                            CategoryImage = e.Merchant.Category.CategoryImage,
                                         }
                                     },
                                 })
@@ -142,6 +143,7 @@ namespace MyApp.Repositories
                     {
                         Id = e.Merchant.Category.Id,
                         CategoryName = e.Merchant.Category.CategoryName,
+                        CategoryImage = e.Merchant.Category.CategoryImage,
                     }
                 },
             }).ToListAsync();

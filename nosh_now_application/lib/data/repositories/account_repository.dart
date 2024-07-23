@@ -44,6 +44,7 @@ class AccountRepository {
       await storeToken(data['token']);
       GlobalVariable.currentUid = data['user']['id'];
       GlobalVariable.roleName = data['user']['account']['role']['roleName'];
+      GlobalVariable.roleId = data['user']['account']['role']['id'];
       return true;
     } catch (e) {
       print(e.toString());

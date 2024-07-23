@@ -61,6 +61,11 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
     }
   }
 
+  void reload() {
+    print("call to get data");
+    fetchData();
+  }
+
   Future<void> fetchOrderNearbyData() async {
     LatLng currentLocation = await getCurrentLocation();
     orders.value = await OrderRepository().getAllNearBy(
@@ -197,6 +202,7 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                                   MaterialPageRoute(
                                     builder: (context) => OrderDetailScreen(
                                       order: value[index],
+                                      callback: fetchData,
                                     ),
                                   ),
                                 )

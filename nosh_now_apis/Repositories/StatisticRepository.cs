@@ -41,7 +41,7 @@ namespace MyApp.Repositories
 
         public async Task<double> CalcTotalRevenueOfMerchantByDate(int merchantId, DateTime? date = null, int? year = null, int? month = null)
         {
-            var query = _context.Order.Where(order => order.StatusId == 4 && order.MerchantId == merchantId);
+            var query = _context.Order.Where(order => order.StatusId == 5 && order.MerchantId == merchantId);
 
             if (year.HasValue)
             {
@@ -111,7 +111,7 @@ namespace MyApp.Repositories
 
         public async Task<int> CountOrderByDate(DateTime? date = null, int? year = null, int? month = null)
         {
-            var query = _context.Order.Where(order => order.StatusId == 4);
+            var query = _context.Order.Where(order => order.StatusId == 5);
 
             if (year.HasValue)
             {
@@ -133,9 +133,9 @@ namespace MyApp.Repositories
         {
             IQueryable<Order> query;
             if(roleId == 3){
-                query = _context.Order.Where(order => order.StatusId == 4 && order.MerchantId == userId);
+                query = _context.Order.Where(order => order.StatusId == 5 && order.MerchantId == userId);
             }else {
-                query = _context.Order.Where(order => order.StatusId == 4 && order.ShipperId == userId);
+                query = _context.Order.Where(order => order.StatusId == 5 && order.ShipperId == userId);
             }
             if (year.HasValue)
             {
@@ -149,7 +149,7 @@ namespace MyApp.Repositories
             {
                 query = query.Where(f => f.OrderedDate.Date == date.Value.Date);
             }
-
+            Console.WriteLine(query);
             return await query.CountAsync();
         }
 

@@ -8,20 +8,23 @@ import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
+import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 import 'package:nosh_now_application/presentation/widgets/status_item.dart';
 
 class OrderDetailScreen extends StatefulWidget {
-  OrderDetailScreen({super.key, required this.order});
+  OrderDetailScreen({super.key, required this.order, required this.callback});
 
   Order order;
+  Function callback;
 
   @override
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
@@ -29,16 +32,27 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   ValueNotifier<List<OrderDetail>> details = ValueNotifier([]);
+  late ValueNotifier<Order> order;
 
   @override
   void initState() {
     super.initState();
+    order = ValueNotifier(widget.order);
     fetchOrderDetailData();
   }
 
   Future<void> fetchOrderDetailData() async {
     details.value =
         await OrderDetailRepository().getAllByOrderId(widget.order.orderId);
+  }
+
+  Future<void> fetchOrderData() async {
+    order.value = await OrderRepository().getById(widget.order.orderId);
+  }
+
+  void reload() {
+    widget.callback();
+    fetchOrderData();
   }
 
   @override
@@ -409,69 +423,88 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         )
                       ],
                     ),
-                    if (widget.order.orderStatus.step == 1 ||
-                        widget.order.orderStatus.step == 2) ...[
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              // width: double.infinity,
-                              height: 44,
-                              child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.red,
-                                    textStyle: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                    shape: RoundedRectangleBorder(
-                                        side:
-                                            const BorderSide(color: Colors.red),
-                                        borderRadius:
-                                            BorderRadius.circular(8))),
-                                child: const Text('Cancel'),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable: order,
+                        builder: (context, value, child) {
+                          return Row(
+                            children: [
+                              if (value.orderStatus.orderStatusId == 2)
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    // width: double.infinity,
+                                    height: 44,
+                                    child: TextButton(
+                                      onPressed: () async {
+                                        Order temp = widget.order;
+                                        temp.orderStatus.orderStatusId = 6;
+                                        bool rs = await OrderRepository()
+                                            .update(temp);
+                                        if (rs) {
+                                          if (widget.callback != null) {
+                                            reload();
+                                          }
+                                          showSnackBar(
+                                              context, "Update successful");
+                                        } else {
+                                          showSnackBar(
+                                              context, "Something is wrong");
+                                        }
+                                      },
+                                      style: TextButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          foregroundColor: Colors.red,
+                                          textStyle: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                          shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.red),
+                                              borderRadius:
+                                                  BorderRadius.circular(8))),
+                                      child: const Text('Cancel'),
+                                    ),
+                                  ),
+                                ),
+                              //see proccess
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  // width: double.infinity,
+                                  height: 44,
+                                  child: TextButton(
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                OrderProcessScreen(
+                                                  order: widget.order,
+                                                  type: 1,
+                                                  callback: reload,
+                                                ))),
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        textStyle: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                        shape: RoundedRectangleBorder(
+                                            side:
+                                                BorderSide(color: Colors.black),
+                                            borderRadius:
+                                                BorderRadius.circular(8))),
+                                    child: const Text('See process'),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          //see proccess
-                          Expanded(
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              // width: double.infinity,
-                              height: 44,
-                              child: TextButton(
-                                onPressed: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            OrderProcessScreen(
-                                              order: widget.order,
-                                              type: 1,
-                                            ))),
-                                style: TextButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                    textStyle: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.black),
-                                        borderRadius:
-                                            BorderRadius.circular(8))),
-                                child: const Text('See process'),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            ],
+                          );
+                        }),
                     const SizedBox(
                       height: 50,
                     )
@@ -513,32 +546,36 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           overflow: TextOverflow.ellipsis),
                     ),
                     const Expanded(child: SizedBox()),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.circle_fill,
-                          size: 10,
-                          color:
-                              pickColorForStatus(widget.order.orderStatus.step),
-                        ),
-                        const SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          widget.order.orderStatus.orderStatusName,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                            color: Color.fromRGBO(49, 49, 49, 1),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
+                    ValueListenableBuilder(
+                        valueListenable: order,
+                        builder: (context, value, child) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                CupertinoIcons.circle_fill,
+                                size: 10,
+                                color:
+                                    pickColorForStatus(value.orderStatus.step),
+                              ),
+                              const SizedBox(
+                                width: 6,
+                              ),
+                              Text(
+                                value.orderStatus.orderStatusName,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          );
+                        })
                   ],
                 ),
               ),

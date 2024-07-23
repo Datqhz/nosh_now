@@ -66,7 +66,7 @@ class _MainScreenState extends State<MainScreen> {
         return const ProfileScreen();
       case 'Merchant':
         if (idx == 0) {
-          return const MerchantDashboardScreen();
+          return MerchantDashboardScreen();
         } else if (idx == 1) {
           return ManageOrderScreen(
             type: 2,
