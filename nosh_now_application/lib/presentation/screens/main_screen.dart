@@ -3,8 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/providers/food_list_provider.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/manage_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/manage_order_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/manager/category_management_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/manager/manager_statistic_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/manager/user_management_screen.dart';
@@ -18,6 +19,7 @@ import 'package:nosh_now_application/presentation/screens/main/shipper/shipper_s
 import 'package:nosh_now_application/presentation/widgets/bottom_bar.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar_item.dart';
 import 'package:nosh_now_application/presentation/widgets/vehicle_type_managemet_item.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({super.key});
@@ -79,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
         return const ProfileScreen();
       case 'Shipper':
         if (idx == 0) {
-          return const ShipperDashboardScreen();
+          return ShipperDashboardScreen();
         } else if (idx == 1) {
           return ManageOrderScreen(
             type: 3,
@@ -176,7 +178,8 @@ class _MainScreenState extends State<MainScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: BottomBar(
-                  items: List.generate(GlobalVariable.roleName == "Merchant" ? 5 :4, (index) {
+                  items: List.generate(
+                      GlobalVariable.roleName == "Merchant" ? 5 : 4, (index) {
                     return BottomBarItem(
                       key: bottomBarItemKeys[index],
                       idx: index,

@@ -14,8 +14,7 @@ class MerchantDashboardScreen extends StatelessWidget {
   Future<void> getNumOfOrder() async {
     orderCount.value = await StatisticRepository()
         .getTotalOrderOfUserByTimeAndRole(
-            GlobalVariable.currentUid, GlobalVariable.roleId, 1,
-            date: DateTime.now());
+            GlobalVariable.currentUid, GlobalVariable.roleId, 1, DateTime.now());
   }
 
   @override
@@ -133,8 +132,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                                 future: StatisticRepository()
                                     .getRevenueOfMerchantByTime(
                                         GlobalVariable.currentUid, 2,
-                                        month: DateTime.now().month,
-                                        year: DateTime.now().year),
+                                       DateTime.now()),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                           ConnectionState.done &&
@@ -223,7 +221,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                                         future: StatisticRepository()
                                             .getRevenueOfMerchantByTime(
                                                 GlobalVariable.currentUid, 1,
-                                                date: DateTime.now()),
+                                                DateTime.now()),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                                   ConnectionState.done &&

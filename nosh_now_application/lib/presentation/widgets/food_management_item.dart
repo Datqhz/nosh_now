@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
+import 'package:nosh_now_application/data/providers/food_list_provider.dart';
+import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/food_detail_management_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
+import 'package:provider/provider.dart';
 
 class FoodManagementItem extends StatelessWidget {
   FoodManagementItem({super.key, required this.food});
@@ -93,11 +98,15 @@ class FoodManagementItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                Food? temp = await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => ModifyFoodScreen(food: food)));
+                        if(temp!=null){
+                          // ignore: use_build_context_synchronously
+                          Provider.of<FoodListProvider>(context, listen: false).updateFood(food.foodId, temp);
+                        }
               },
               child: const Icon(
                 CupertinoIcons.pencil,
@@ -105,13 +114,23 @@ class FoodManagementItem extends StatelessWidget {
                 size: 24,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 6,
             ),
-            Icon(
-              CupertinoIcons.trash,
-              color: Colors.red,
-              size: 24,
+            GestureDetector(
+              onTap: () async {
+                bool rs = await FoodRepository().deleteFood(food.foodId);
+                if(rs){
+                  showSnackBar(context, 'Delete food successful');
+                  Provider.of<FoodListProvider>(context, listen: false).deleteFood(food.foodId);
+                  // Navigator.pop(context);
+                }
+              },
+              child: const Icon(
+                CupertinoIcons.trash,
+                color: Colors.red,
+                size: 24,
+              ),
             ),
           ],
         )

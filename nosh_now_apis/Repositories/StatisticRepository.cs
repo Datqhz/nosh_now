@@ -16,7 +16,7 @@ namespace MyApp.Repositories
 
         public async Task<double> CalcTotalEarningOfShipperByDate(int shipperId, DateTime? date = null, int? year = null, int? month = null)
         {
-            var query = _context.Order.Where(order => order.StatusId == 4 && order.ShipperId == shipperId);
+            var query = _context.Order.Where(order => order.StatusId == 5 && order.ShipperId == shipperId);
 
             if (year.HasValue)
             {
@@ -132,9 +132,12 @@ namespace MyApp.Repositories
         public async Task<int> CountOrderOfUserByRoleAndDate(int roleId, int userId, DateTime? date = null, int? year = null, int? month = null)
         {
             IQueryable<Order> query;
-            if(roleId == 3){
+            if (roleId == 3)
+            {
                 query = _context.Order.Where(order => order.StatusId == 5 && order.MerchantId == userId);
-            }else {
+            }
+            else
+            {
                 query = _context.Order.Where(order => order.StatusId == 5 && order.ShipperId == userId);
             }
             if (year.HasValue)
@@ -156,9 +159,10 @@ namespace MyApp.Repositories
         public async Task<IEnumerable<FoodRevenueDto>> Top5Food(int merchantId, DateTime? date = null, int? year = null, int? month = null)
         {
             var query = _context.OrderDetail
-                        .Include(od => od.Food)
-                        .Include(od => od.Order)
-                        .AsQueryable();
+                .Include(od => od.Food)
+                .Include(od => od.Order)
+                .Where(od => od.Order.StatusId == 5)
+                .AsQueryable();
 
             if (date.HasValue)
             {
@@ -173,8 +177,9 @@ namespace MyApp.Repositories
                 query = query.Where(od => od.Order.OrderedDate.Year == year.Value);
             }
 
-            var topFoods = await query
-                                .Where(od => od.Food.MerchantId == merchantId) 
+            var filteredQuery = query
+                                .Where(od => od.Food.MerchantId == merchantId)
+                                .AsEnumerable() // Chuyển đánh giá sang phía máy khách từ đây
                                 .GroupBy(od => new { od.Food.Id, od.Food.FoodName })
                                 .Select(g => new FoodRevenueDto
                                 (
@@ -183,8 +188,9 @@ namespace MyApp.Repositories
                                     g.Sum(od => od.Price * od.Quantity)
                                 ))
                                 .OrderByDescending(fr => fr.revenue)
-                                .Take(5)
-                                .ToListAsync();
+                                .Take(5);
+
+            var topFoods = await Task.FromResult(filteredQuery.ToList());
 
             return topFoods;
         }

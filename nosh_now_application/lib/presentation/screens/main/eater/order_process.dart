@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/change_stream.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
@@ -556,72 +557,74 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
                             })
                       ],
                     ),
-                    ValueListenableBuilder(
-                        valueListenable: order,
-                        builder: (context, value, child) {
-                          if (value != null && value.orderStatus.step < 2) {
-                            return Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              width: double.infinity,
-                              height: 44,
-                              child: TextButton(
-                                onPressed: () async {
-                                  if (order.value != null) {
-                                    if (widget.type == 1) {
-                                      Order temp = order.value!;
-                                      temp.orderStatus.orderStatusId = 6;
-                                      bool rs =
-                                          await OrderRepository().update(temp);
-                                      if (rs) {
-                                        reload();
-                                        showSnackBar(
-                                            context, "Update successful");
+                    if (GlobalVariable.roleId != 3)
+                      ValueListenableBuilder(
+                          valueListenable: order,
+                          builder: (context, value, child) {
+                            if (value != null && value.orderStatus.step < 2) {
+                              return Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                width: double.infinity,
+                                height: 44,
+                                child: TextButton(
+                                  onPressed: () async {
+                                    if (order.value != null) {
+                                      if (widget.type == 1) {
+                                        Order temp = order.value!;
+                                        temp.orderStatus.orderStatusId = 6;
+                                        bool rs = await OrderRepository()
+                                            .update(temp);
+                                        if (rs) {
+                                          reload();
+                                          showSnackBar(
+                                              context, "Update successful");
+                                        } else {
+                                          showSnackBar(
+                                              context, "Something is wrong");
+                                        }
                                       } else {
-                                        showSnackBar(
-                                            context, "Something is wrong");
-                                      }
-                                    } else {
-                                      Order temp = order.value!;
-                                      temp.orderStatus.orderStatusId =
-                                          temp.orderStatus.orderStatusId + 1;
-                                      bool rs =
-                                          await OrderRepository().update(temp);
-                                      if (rs) {
-                                        print("begin reload");
-                                        reload();
-                                        print("done reload");
-                                        showSnackBar(
-                                            context, "Update successful");
-                                      } else {
-                                        showSnackBar(
-                                            context, "Something is wrong");
+                                        Order temp = order.value!;
+                                        temp.orderStatus.orderStatusId =
+                                            temp.orderStatus.orderStatusId + 1;
+                                        bool rs = await OrderRepository()
+                                            .update(temp);
+                                        if (rs) {
+                                          print("begin reload");
+                                          reload();
+                                          print("done reload");
+                                          showSnackBar(
+                                              context, "Update successful");
+                                        } else {
+                                          showSnackBar(
+                                              context, "Something is wrong");
+                                        }
                                       }
                                     }
-                                  }
-                                },
-                                style: TextButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: widget.type == 1
-                                        ? Colors.red
-                                        : Colors.black,
-                                    textStyle: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            color: widget.type == 1
-                                                ? Colors.red
-                                                : Colors.black),
-                                        borderRadius:
-                                            BorderRadius.circular(8))),
-                                child: Text(
-                                    widget.type == 1 ? 'Cancel' : "Next step"),
-                              ),
-                            );
-                          }
-                          return const SizedBox();
-                        }),
+                                  },
+                                  style: TextButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: widget.type == 1
+                                          ? Colors.red
+                                          : Colors.black,
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: widget.type == 1
+                                                  ? Colors.red
+                                                  : Colors.black),
+                                          borderRadius:
+                                              BorderRadius.circular(8))),
+                                  child: Text(widget.type == 1
+                                      ? 'Cancel'
+                                      : "Next step"),
+                                ),
+                              );
+                            }
+                            return const SizedBox();
+                          }),
                   ],
                 ),
               ),

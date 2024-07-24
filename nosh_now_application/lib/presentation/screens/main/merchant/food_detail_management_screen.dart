@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
+import 'package:nosh_now_application/data/providers/food_list_provider.dart';
+import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
+import 'package:provider/provider.dart';
 
-class FoodDetailManagementScreen extends StatefulWidget {
+class FoodDetailManagementScreen extends StatelessWidget {
   FoodDetailManagementScreen({
     super.key,
     required this.food,
@@ -14,57 +19,69 @@ class FoodDetailManagementScreen extends StatefulWidget {
   Food food;
 
   @override
-  State<FoodDetailManagementScreen> createState() =>
-      _FoodDetailManagementScreenState();
-}
-
-class _FoodDetailManagementScreenState
-    extends State<FoodDetailManagementScreen> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
       body: SafeArea(
-        child: Stack(
-          children: [
-            // food image
-            Column(
-              children: [
-                Image(
-                  image: AssetImage(widget.food.foodImage),
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 2.4,
-                  fit: BoxFit.cover,
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: MediaQuery.of(context).size.height / 1.7,
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                decoration: const BoxDecoration(
-                  color: Color.fromRGBO(240, 240, 240, 1),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+        child: Consumer<FoodListProvider>(
+          builder: (context, provider, child) {
+          final updatedFood = provider.foods
+              .firstWhere((f) => f.foodId == food.foodId, orElse: () => food);
+          return Stack(
+            children: [
+              // food image
+              Column(
+                children: [
+                  Image(
+                    image: MemoryImage(
+                        convertBase64ToUint8List(updatedFood.foodImage)),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 2.4,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 32,
+                ],
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 1.7,
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: const BoxDecoration(
+                    color: Color.fromRGBO(240, 240, 240, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            widget.food.foodName,
-                            textAlign: TextAlign.left,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              updatedFood.foodName,
+                              textAlign: TextAlign.left,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.w800,
+                                height: 1.2,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${updatedFood.price} ₫',
+                            textAlign: TextAlign.center,
                             maxLines: 1,
                             style: const TextStyle(
                               fontSize: 22.0,
@@ -74,109 +91,112 @@ class _FoodDetailManagementScreenState
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                        Text(
-                          '${widget.food.price} ₫',
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Expanded(
+                        child: Text(
+                          updatedFood.foodDescribe,
+                          textAlign: TextAlign.left,
+                          maxLines: 10,
                           style: const TextStyle(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
                             height: 1.2,
                             color: Color.fromRGBO(49, 49, 49, 1),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    Expanded(
-                      child: Text(
-                        widget.food.foodDescribe,
-                        textAlign: TextAlign.left,
-                        maxLines: 10,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                          overflow: TextOverflow.ellipsis,
+                      ),
+                      const Expanded(child: SizedBox()),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // App bar
+              Positioned(
+                top: 20,
+                left: 20,
+                right: 20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: const Icon(
+                          CupertinoIcons.arrow_left,
+                          color: Colors.black,
+                          size: 22,
                         ),
                       ),
                     ),
-                    const Expanded(child: SizedBox()),
-                    const SizedBox(
-                      height: 20,
+                    PopupMenuButton<String>(
+                      icon: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: const Icon(
+                          CupertinoIcons.ellipsis_vertical,
+                          color: Colors.black,
+                          size: 22,
+                        ),
+                      ),
+                      color: Colors.white,
+                      onSelected: (value) async {
+                        if (value == 'Update') {
+                          Food? temp = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ModifyFoodScreen(food: food)));
+                          if (temp != null) {
+                            Provider.of<FoodListProvider>(context,
+                                    listen: false)
+                                .updateFood(updatedFood.foodId, temp);
+                          }
+                        } else if (value == 'Delete') {
+                          bool rs = await FoodRepository()
+                              .deleteFood(updatedFood.foodId);
+                          if (rs) {
+                            showSnackBar(context, 'Delete food successful');
+                            Provider.of<FoodListProvider>(context,
+                                    listen: false)
+                                .deleteFood(updatedFood.foodId);
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return {'Update', 'Delete'}.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(
+                              choice,
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          );
+                        }).toList();
+                      },
                     ),
                   ],
                 ),
-              ),
-            ),
-            // App bar
-            Positioned(
-              top: 20,
-              left: 20,
-              right: 20,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      height: 30,
-                      width: 30,
-                      decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: const Icon(
-                        CupertinoIcons.arrow_left,
-                        color: Colors.black,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                  PopupMenuButton<String>(
-                    icon: Container(
-                      height: 30,
-                      width: 30,
-                      decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: const Icon(
-                        CupertinoIcons.ellipsis_vertical,
-                        color: Colors.black,
-                        size: 22,
-                      ),
-                    ),
-                    color: Colors.white,
-                    onSelected: (value) async {
-                      if (value == 'Update') {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ModifyFoodScreen(food: widget.food)));
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'Update', 'Delete'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(
-                            choice,
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+              )
+            ],
+          );
+        }),
       ),
     );
   }

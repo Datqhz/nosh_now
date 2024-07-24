@@ -3,18 +3,23 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
+import 'package:nosh_now_application/data/providers/food_list_provider.dart';
+import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
+import 'package:provider/provider.dart';
 
 class ModifyFoodScreen extends StatefulWidget {
   ModifyFoodScreen({
     super.key,
-    required this.food,
+    this.food,
   });
 
-  Food food;
+  Food? food;
 
   @override
   State<ModifyFoodScreen> createState() => _ModifyFoodScreenState();
@@ -30,9 +35,11 @@ class _ModifyFoodScreenState extends State<ModifyFoodScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.food.foodName;
-    _priceController.text = widget.food.price.toString();
-    _desController.text = widget.food.foodDescribe;
+    if (widget.food != null) {
+      _nameController.text = widget.food!.foodName;
+      _priceController.text = widget.food!.price.toString();
+      _desController.text = widget.food!.foodDescribe;
+    }
   }
 
   @override
@@ -64,12 +71,31 @@ class _ModifyFoodScreenState extends State<ModifyFoodScreen> {
                                   ValueListenableBuilder(
                                       valueListenable: _avatar,
                                       builder: (context, value, child) {
+                                        if (widget.food != null) {
+                                          return Image(
+                                            image: value != null
+                                                ? FileImage(File(value.path))
+                                                    as ImageProvider<Object>
+                                                : MemoryImage(
+                                                    convertBase64ToUint8List(
+                                                        widget
+                                                            .food!.foodImage)),
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                2.4,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            fit: BoxFit.cover,
+                                          );
+                                        }
                                         return Image(
                                           image: value != null
                                               ? FileImage(File(value.path))
                                                   as ImageProvider<Object>
-                                              : AssetImage(
-                                                  widget.food.foodImage),
+                                              : const AssetImage(
+                                                  'assets/images/black.jpg'),
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height /
@@ -83,7 +109,9 @@ class _ModifyFoodScreenState extends State<ModifyFoodScreen> {
                                     onTap: () async {
                                       XFile? img =
                                           await pickAnImageFromGallery();
-                                      _avatar.value = img;
+                                      if (img != null) {
+                                        _avatar.value = img;
+                                      }
                                     },
                                     child: Container(
                                         height:
@@ -290,9 +318,66 @@ class _ModifyFoodScreenState extends State<ModifyFoodScreen> {
                                       width: double.infinity,
                                       height: 44,
                                       child: TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          if (_avatar.value == null &&
+                                              widget.food == null) {
+                                            showSnackBar(context,
+                                                'Please choose your food image');
+                                            return;
+                                          }
                                           if (_formKey.currentState!
-                                              .validate()) {}
+                                              .validate()) {
+                                            final name =
+                                                _nameController.text.trim();
+                                            final price =
+                                                _priceController.text.trim();
+                                            final des =
+                                                _desController.text.trim();
+                                            Food? rs;
+                                            Food? tempFood;
+                                            if (widget.food != null) {
+                                              tempFood = widget.food!;
+                                              tempFood.foodName = name;
+                                              tempFood.price =
+                                                  double.parse(price);
+                                              tempFood.foodDescribe = des;
+                                              if (_avatar.value != null) {
+                                                tempFood.foodImage =
+                                                    await convertToBase64(
+                                                        _avatar.value!);
+                                              }
+                                              rs = await FoodRepository()
+                                                  .update(
+                                                      tempFood,
+                                                      GlobalVariable
+                                                          .currentUid);
+                                            } else {
+                                              print("add");
+                                              var tempBase64 =
+                                                  await convertToBase64(
+                                                      _avatar.value!);
+                                              tempFood = Food(
+                                                  foodId: 0,
+                                                  foodName: name,
+                                                  foodImage: tempBase64,
+                                                  foodDescribe: des,
+                                                  price: double.parse(price),
+                                                  status: 1);
+                                              rs = await FoodRepository()
+                                                  .create(
+                                                      tempFood,
+                                                      GlobalVariable
+                                                          .currentUid);
+                                            }
+                                            if (rs != null) {
+                                              showSnackBar(
+                                                  context, 'Save successful');
+                                              Navigator.pop(context, rs);
+                                            } else {
+                                              showSnackBar(context,
+                                                  'Something wrong when try to save food');
+                                            }
+                                          }
                                         },
                                         style: TextButton.styleFrom(
                                             backgroundColor: Colors.black,

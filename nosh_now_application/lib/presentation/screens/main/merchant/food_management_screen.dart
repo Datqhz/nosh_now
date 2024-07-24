@@ -5,11 +5,14 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/providers/food_list_provider.dart';
 import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_management_item.dart';
+import 'package:provider/provider.dart';
 
 class FoodManagementScreen extends StatefulWidget {
   const FoodManagementScreen({super.key});
@@ -28,6 +31,7 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
     // TODO: implement initState
     super.initState();
     fetchData();
+    Provider.of<FoodListProvider>(context, listen: false).fetchFoods(GlobalVariable.currentUid);
   }
 
   Future<void> fetchData() async {
@@ -44,126 +48,109 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
           color: const Color.fromRGBO(240, 240, 240, 1),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 70,
-                ),
-                ValueListenableBuilder(
-                    valueListenable: _isShowSeachBar,
-                    builder: (context, value, child) {
-                      if (value) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: TextFormField(
-                            controller: _nameController,
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    CupertinoIcons.xmark,
-                                    color: Color.fromRGBO(49, 49, 49, 1),
-                                    size: 18,
-                                  )),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(159, 159, 159, 1),
-                                    width: 1), // Màu viền khi không được chọn
-                              ),
-                              focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color.fromRGBO(159, 159, 159, 1),
-                                  width: 1,
-                                ),
-                              ),
-                              hintText: 'ex. Pho, Pizza',
-                              hintStyle: const TextStyle(
-                                  color: Color.fromRGBO(49, 49, 49, 0.5)),
-                              border: InputBorder.none,
-                            ),
-                            style: const TextStyle(
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                fontSize: 14,
-                                decoration: TextDecoration.none),
-                            validator: (value) {},
-                          ),
-                        );
-                      }
-                      return const SizedBox();
-                    }),
-                Row(
-                  children: [
-                    const Text(
-                      'Your foods',
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    IconButton(
-                        onPressed: () {
-                          _isShowSeachBar.value = !_isShowSeachBar.value;
-                        },
-                        icon: const Icon(
-                          CupertinoIcons.search,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                        ))
-                  ],
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                // list merchant
-                ValueListenableBuilder(
-                  valueListenable: foods,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 70,
+              ),
+              ValueListenableBuilder(
+                  valueListenable: _isShowSeachBar,
                   builder: (context, value, child) {
-                    if (value == null) {
-                      return const Center(
-                        child: SpinKitCircle(
-                          color: Colors.black,
-                          size: 50,
-                        ),
-                      );
-                    } else if (value.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "You don't have any food",
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromRGBO(49, 49, 49, 1),
-                            overflow: TextOverflow.ellipsis,
+                    if (value) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: TextFormField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  CupertinoIcons.xmark,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  size: 18,
+                                )),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(159, 159, 159, 1),
+                                  width: 1), // Màu viền khi không được chọn
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(159, 159, 159, 1),
+                                width: 1,
+                              ),
+                            ),
+                            hintText: 'ex. Pho, Pizza',
+                            hintStyle: const TextStyle(
+                                color: Color.fromRGBO(49, 49, 49, 0.5)),
+                            border: InputBorder.none,
                           ),
+                          style: const TextStyle(
+                              color: Color.fromRGBO(49, 49, 49, 1),
+                              fontSize: 14,
+                              decoration: TextDecoration.none),
+                          validator: (value) {},
                         ),
                       );
                     }
-                    return Column(
-                      children: List.generate(
-                        value.length,
-                        (index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: FoodManagementItem(
-                              food: value[index],
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 70,
-                ),
-              ],
-            ),
+                    return const SizedBox();
+                  }),
+              Row(
+                children: [
+                  const Text(
+                    'Your foods',
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(49, 49, 49, 1),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Expanded(child: SizedBox()),
+                  IconButton(
+                      onPressed: () {
+                        _isShowSeachBar.value = !_isShowSeachBar.value;
+                      },
+                      icon: const Icon(
+                        CupertinoIcons.search,
+                        color: Color.fromRGBO(49, 49, 49, 1),
+                      ))
+                ],
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              // list merchant
+              Expanded(
+                child: Consumer<FoodListProvider>(
+                    builder: (context, provider, child) {
+                  if (provider.isLoading) {
+                    return const Center(
+                        child: SpinKitCircle(
+                      color: Colors.black,
+                      size: 50,
+                    ));
+                  }
+                  return ListView.builder(
+                    itemCount: provider.foods.length,
+                    itemBuilder: (context, index) {
+                      final item = provider.foods[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: FoodManagementItem(
+                          food: item,
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ),
+              const SizedBox(
+                height: 70,
+              ),
+            ],
           ),
         ),
         Positioned(
@@ -188,10 +175,17 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                     color: Color.fromRGBO(49, 49, 49, 1),
                   ),
                 ),
-                // search merchant
+                // add
                 GestureDetector(
-                  onTap: () {
-                    // do something
+                  onTap: () async {
+                    Food? temp = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ModifyFoodScreen()));
+                    if (temp != null) {
+                      Provider.of<FoodListProvider>(context, listen: false)
+                          .addFood(temp);
+                    }
                   },
                   child: const Icon(
                     CupertinoIcons.add,

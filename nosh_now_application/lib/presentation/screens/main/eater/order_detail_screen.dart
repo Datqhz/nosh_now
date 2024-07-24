@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
@@ -431,7 +432,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         builder: (context, value, child) {
                           return Row(
                             children: [
-                              if (value.orderStatus.orderStatusId == 2)
+                              if (value.orderStatus.orderStatusId == 2 &&
+                                  GlobalVariable.roleId != 3)
                                 Expanded(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -485,7 +487,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                 OrderProcessScreen(
                                                   order: widget.order,
                                                   type: 1,
-                                                  callback: reload,
+                                                  callback:GlobalVariable.roleId != 3 ?  reload : null,
                                                 ))),
                                     style: TextButton.styleFrom(
                                         backgroundColor: Colors.white,

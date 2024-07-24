@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
@@ -28,7 +29,7 @@ class ManageOrderScreen extends StatefulWidget {
 class _ManageOrderScreenState extends State<ManageOrderScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  ValueNotifier<List<Order>> orders = ValueNotifier([]);
+  ValueNotifier<List<Order>?> orders = ValueNotifier(null);
   ValueNotifier<Widget> header = ValueNotifier(const SizedBox());
 
   @override
@@ -177,47 +178,55 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                 ValueListenableBuilder(
                     valueListenable: orders,
                     builder: (context, value, child) {
-                      if (value.isEmpty) {
-                        return Center(
-                          child: Text(
-                            _tabController.index == 0
-                                ? "You don't have any order."
-                                : "Don't have any order near your in 3km.",
-                            maxLines: 1,
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Column(
-                          children: List.generate(value.length, (index) {
-                            return GestureDetector(
-                              onTap: () => {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OrderDetailScreen(
-                                      order: value[index],
-                                      callback: fetchData,
-                                    ),
-                                  ),
-                                )
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: OrderItem(
-                                  order: value[index],
-                                  type: widget.type,
-                                ),
+                      if (value != null) {
+                        if (value.isEmpty) {
+                          return Center(
+                            child: Text(
+                              _tabController.index == 0
+                                  ? "You don't have any order."
+                                  : "Don't have any order near your in 3km.",
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            );
-                          }),
-                        );
+                            ),
+                          );
+                        } else {
+                          return Column(
+                            children: List.generate(value.length, (index) {
+                              return GestureDetector(
+                                onTap: () => {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrderDetailScreen(
+                                        order: value[index],
+                                        callback: fetchData,
+                                      ),
+                                    ),
+                                  )
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: OrderItem(
+                                    order: value[index],
+                                    type: widget.type,
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        }
                       }
+                      return const Center(
+                        child: SpinKitCircle(
+                          color: Colors.black,
+                          size: 50,
+                        ),
+                      );
                     }),
                 const SizedBox(
                   height: 70,

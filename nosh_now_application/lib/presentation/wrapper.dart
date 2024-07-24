@@ -9,10 +9,7 @@ class Wrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserLogin>(builder: (context, userState, _) {
-      bool isLoggedIn = userState.isLogin;
-      print("login: $isLoggedIn");
-      return !isLoggedIn ? const OnboardingScreen() : MainScreen();
-    });
+    final userLoginState = Provider.of<UserLogin>(context);
+    return !userLoginState.isLogin ? const OnboardingScreen() : MainScreen();
   }
 }

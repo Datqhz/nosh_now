@@ -1,9 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
+import 'package:nosh_now_application/data/models/top_food.dart';
+import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
@@ -18,13 +23,26 @@ class MerchantStatisticScreen extends StatefulWidget {
 }
 
 class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
+  ValueNotifier<int> currentOption = ValueNotifier(1);
+  ValueNotifier<DateTime> currentPick = ValueNotifier(DateTime.now());
+
+  String titleChart() {
+    if (currentOption.value == 1) {
+      return DateFormat('yyyy-MM-dd').format(currentPick.value);
+    } else if (currentOption.value == 2) {
+      return '${currentPick.value.year}-${currentPick.value.month}';
+    } else {
+      return currentPick.value.year.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
           padding: const EdgeInsets.only(left: 20, right: 20),
-          color: const Color.fromRGBO(240, 240, 240, 1),
+          color: const Color.fromARGB(15, 240, 240, 240),
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(
@@ -39,67 +57,98 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                   decoration: BoxDecoration(
                       color: const Color.fromRGBO(226, 226, 226, 1),
                       borderRadius: BorderRadius.circular(20)),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: double.infinity,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: const Text(
-                            'Day',
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis,
+                  child: ValueListenableBuilder(
+                      valueListenable: currentOption,
+                      builder: (context, value, child) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  currentOption.value = 1;
+                                },
+                                child: Container(
+                                  height: double.infinity,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: value == 1
+                                          ? Colors.black
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20)),
+                                  child: Text(
+                                    'Day',
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: value == 1
+                                          ? Colors.white
+                                          : const Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: double.infinity,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: const Text(
-                            'Month',
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              overflow: TextOverflow.ellipsis,
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  currentOption.value = 2;
+                                },
+                                child: Container(
+                                  height: double.infinity,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: value == 2
+                                          ? Colors.black
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20)),
+                                  child: Text(
+                                    'Month',
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: value == 2
+                                          ? Colors.white
+                                          : const Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: double.infinity,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: const Text(
-                            'Year',
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  currentOption.value = 3;
+                                },
+                                child: Container(
+                                  height: double.infinity,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: value == 3
+                                          ? Colors.black
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20)),
+                                  child: Text(
+                                    'Year',
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: value == 3
+                                          ? Colors.white
+                                          : const Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        );
+                      }),
                 ),
                 const SizedBox(
                   height: 20,
@@ -109,7 +158,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                     const Text(
                       'Revenue detail',
                       maxLines: 1,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Color.fromRGBO(49, 49, 49, 1),
@@ -118,7 +167,14 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                     ),
                     const Expanded(child: SizedBox()),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async {
+                        DateTime? picked =
+                            await selectDate(context, currentOption.value);
+                        if (picked != null) {
+                          print(picked.toString());
+                          currentPick.value = picked;
+                        }
+                      },
                       child: const Icon(
                         CupertinoIcons.calendar,
                         color: Color.fromRGBO(49, 49, 49, 1),
@@ -129,27 +185,164 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
+                SizedBox(
                   width: double.infinity,
-                  child: Text(
-                    'Revenue detail',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(49, 49, 49, 1),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+                  child: ValueListenableBuilder(
+                      valueListenable: currentPick,
+                      builder: (context, value, child) {
+                        return Text(
+                          'Total revenue in ${titleChart()}',
+                          textAlign: TextAlign.left,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                const AspectRatio(
-                  aspectRatio: 1,
-                  child: _BarChartVerticle(),
-                ),
+                ValueListenableBuilder(
+                    valueListenable: currentPick,
+                    builder: (context, value, child) {
+                      return SizedBox(
+                        width: (MediaQuery.of(context).size.width),
+                        height: (MediaQuery.of(context).size.width / 2),
+                        child: FutureBuilder(
+                            future: StatisticRepository()
+                                .getRevenueOfMerchantByTime(
+                                    GlobalVariable.currentUid,
+                                    currentOption.value,
+                                    value),
+                            builder: (context, snapshot) {
+                              double target = 0;
+                              if (currentOption.value == 1) {
+                                target = 1000000;
+                              } else if (currentOption.value == 2) {
+                                target = 10000000;
+                              } else {
+                                target = 100000000;
+                              }
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: SizedBox(
+                                        width:
+                                            (MediaQuery.of(context).size.width /
+                                                2.2),
+                                        height:
+                                            (MediaQuery.of(context).size.width /
+                                                2.2),
+                                        child: CircularProgressIndicator(
+                                          backgroundColor: const Color.fromRGBO(
+                                              66, 36, 250, 0.2),
+                                          strokeWidth: 10,
+                                          value: snapshot.data! / target,
+                                          valueColor:
+                                              const AlwaysStoppedAnimation<
+                                                  Color>(Colors.blue),
+                                        ),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            NumberFormat.currency(
+                                                    locale: 'vi_VN',
+                                                    symbol: '₫')
+                                                .format(snapshot.data!),
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                          Text(
+                                            '/${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(target)}',
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                );
+                              }
+                              return Stack(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: SizedBox(
+                                      width:
+                                          (MediaQuery.of(context).size.width /
+                                              2.2),
+                                      height:
+                                          (MediaQuery.of(context).size.width /
+                                              2.2),
+                                      child: const CircularProgressIndicator(
+                                        backgroundColor:
+                                            Color.fromRGBO(66, 36, 250, 0.2),
+                                        strokeWidth: 10,
+                                        value: 0,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.blue),
+                                      ),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          '0',
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                        Text(
+                                          '/$target₫',
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              );
+                            }),
+                      );
+                    }),
                 const SizedBox(
                   height: 20,
                 ),
@@ -166,27 +359,52 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
+                SizedBox(
                   width: double.infinity,
-                  child: Text(
-                    'Best-selling in',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(49, 49, 49, 1),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+                  child: ValueListenableBuilder(
+                      valueListenable: currentPick,
+                      builder: (context, value, child) {
+                        return Text(
+                          'Best-selling in ${titleChart()}',
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                const AspectRatio(
-                  aspectRatio: 1,
-                  child: _BarChartVerticle(),
-                ),
+                ValueListenableBuilder(
+                    valueListenable: currentPick,
+                    builder: (context, value, child) {
+                      return FutureBuilder(
+                          future: StatisticRepository().getTop5FoodBestSelling(
+                              GlobalVariable.currentUid,
+                              currentOption.value,
+                              value),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              return AspectRatio(
+                                aspectRatio: 1,
+                                child: BarChartVerticle(
+                                  foods: snapshot.data!,
+                                ),
+                              );
+                            }
+                            return AspectRatio(
+                              aspectRatio: 1,
+                              child: BarChartVerticle(foods: []),
+                            );
+                          });
+                    }),
                 const SizedBox(
                   height: 20,
                 ),
@@ -229,63 +447,157 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                             height: 8,
                           ),
                           Expanded(
-                            child: Stack(
-                              children: [
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: SizedBox(
-                                    width:
-                                        (MediaQuery.of(context).size.width / 2 -
-                                            40 -
-                                            12 -
-                                            16 -
-                                            12),
-                                    height:
-                                        (MediaQuery.of(context).size.width / 2 -
-                                            40 -
-                                            12 -
-                                            16 -
-                                            12),
-                                    child: const CircularProgressIndicator(
-                                      backgroundColor: const Color.fromRGBO(
-                                          66, 36, 250, 0.2),
-                                      strokeWidth: 6,
-                                      value: 7 / 10,
-                                      valueColor:
-                                          const AlwaysStoppedAnimation<Color>(
-                                              Colors.blue),
-                                    ),
-                                  ),
-                                ),
-                                const Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '7',
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                      const Text(
-                                        '/10 Orders',
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
+                            child: ValueListenableBuilder(
+                                valueListenable: currentPick,
+                                builder: (context, value, child) {
+                                  return FutureBuilder(
+                                      future: StatisticRepository()
+                                          .getTotalOrderOfUserByTimeAndRole(
+                                              GlobalVariable.currentUid,
+                                              GlobalVariable.roleId,
+                                              currentOption.value,
+                                              value),
+                                      builder: (context, snapshot) {
+                                        int target = 0;
+                                        if (currentOption.value == 1) {
+                                          target = 10;
+                                        } else if (currentOption.value == 2) {
+                                          target = 50;
+                                        } else {
+                                          target = 100;
+                                        }
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Stack(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: SizedBox(
+                                                  width: (MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          2 -
+                                                      80),
+                                                  height:
+                                                      (MediaQuery.of(context)
+                                                                  .size
+                                                                  .width /
+                                                              2 -
+                                                          80),
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    backgroundColor:
+                                                        const Color.fromRGBO(
+                                                            66, 36, 250, 0.2),
+                                                    strokeWidth: 6,
+                                                    value:
+                                                        snapshot.data! / target,
+                                                    valueColor:
+                                                        const AlwaysStoppedAnimation<
+                                                            Color>(Colors.blue),
+                                                  ),
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      snapshot.data!.toString(),
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black,
+                                                          overflow: TextOverflow
+                                                              .ellipsis),
+                                                    ),
+                                                    Text(
+                                                      '/$target Orders',
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                          fontSize: 14.0,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: Colors.black,
+                                                          overflow: TextOverflow
+                                                              .ellipsis),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          );
+                                        }
+                                        return Stack(
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.center,
+                                              child: SizedBox(
+                                                width: (MediaQuery.of(context)
+                                                            .size
+                                                            .width /
+                                                        2 -
+                                                    80),
+                                                height: (MediaQuery.of(context)
+                                                            .size
+                                                            .width /
+                                                        2 -
+                                                    80),
+                                                child:
+                                                    const CircularProgressIndicator(
+                                                  backgroundColor:
+                                                      Color.fromRGBO(
+                                                          66, 36, 250, 0.2),
+                                                  strokeWidth: 6,
+                                                  value: 0,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(Colors.blue),
+                                                ),
+                                              ),
+                                            ),
+                                            Center(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  const Text(
+                                                    '0',
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                        overflow: TextOverflow
+                                                            .ellipsis),
+                                                  ),
+                                                  Text(
+                                                    '/$target Orders',
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Colors.black,
+                                                        overflow: TextOverflow
+                                                            .ellipsis),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      });
+                                }),
                           )
                         ],
                       ),
@@ -319,34 +631,96 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                           const SizedBox(
                             height: 8,
                           ),
-                          const Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  '100.000',
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(49, 49, 49, 1),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const Text(
-                                  '/200.000₫',
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(49, 49, 49, 1),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          Expanded(
+                            child: ValueListenableBuilder(
+                                valueListenable: currentPick,
+                                builder: (context, value, child) {
+                                  return FutureBuilder(
+                                      future: StatisticRepository()
+                                          .getRevenueOfMerchantByTime(
+                                              GlobalVariable.currentUid,
+                                              currentOption.value,
+                                              value),
+                                      builder: (context, snapshot) {
+                                        double target = 0;
+                                        if (currentOption.value == 1) {
+                                          target = 1000000;
+                                        } else if (currentOption.value == 2) {
+                                          target = 10000000;
+                                        } else {
+                                          target = 100000000;
+                                        }
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                NumberFormat.currency(
+                                                        locale: 'vi_VN',
+                                                        symbol: '₫')
+                                                    .format(snapshot.data),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color.fromRGBO(
+                                                      49, 49, 49, 1),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Text(
+                                                '/${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(target)}',
+                                                textAlign: TextAlign.center,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color.fromRGBO(
+                                                      49, 49, 49, 1),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              '0',
+                                              textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromRGBO(
+                                                    49, 49, 49, 1),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            Text(
+                                              '/${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(target)}',
+                                              textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromRGBO(
+                                                    49, 49, 49, 1),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                }),
                           )
                         ],
                       ),
@@ -402,9 +776,10 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
   }
 }
 
-class _BarChartVerticle extends StatelessWidget {
-  const _BarChartVerticle();
+class BarChartVerticle extends StatelessWidget {
+  BarChartVerticle({super.key, required this.foods});
 
+  List<TopFood> foods;
   @override
   Widget build(BuildContext context) {
     return BarChart(
@@ -415,9 +790,23 @@ class _BarChartVerticle extends StatelessWidget {
         barGroups: barGroups,
         gridData: const FlGridData(show: true, drawVerticalLine: false),
         alignment: BarChartAlignment.spaceAround,
-        maxY: 900,
+        maxY: roundToNearest(findMaxRevenue()) / 1.0 + 60,
       ),
     );
+  }
+
+  double findMaxRevenue() {
+    double rs = 0;
+    for (var food in foods) {
+      if (food.revenue > rs) {
+        rs = food.revenue;
+      }
+    }
+    return rs;
+  }
+
+  int roundToNearest(double value) {
+    return (value / 1000).round();
   }
 
   BarTouchData get barTouchData => BarTouchData(
@@ -444,42 +833,16 @@ class _BarChartVerticle extends StatelessWidget {
       );
 
   Widget getTitles(double value, TitleMeta meta) {
-    final style = TextStyle(
+    const style = const TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    String text;
-    switch (value.toInt()) {
-      case 0:
-        text = 'Mn';
-        break;
-      case 1:
-        text = 'Te';
-        break;
-      case 2:
-        text = 'Wd';
-        break;
-      case 3:
-        text = 'Tu';
-        break;
-      case 4:
-        text = 'Fr';
-        break;
-      case 5:
-        text = 'St';
-        break;
-      case 6:
-        text = 'Sn';
-        break;
-      default:
-        text = '';
-        break;
-    }
+
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 4,
-      child: Text(text, style: style),
+      child: Text(foods[value.toInt()].foodName, style: style),
     );
   }
 
@@ -489,6 +852,7 @@ class _BarChartVerticle extends StatelessWidget {
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
+    print(value);
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 4,
@@ -505,7 +869,7 @@ class _BarChartVerticle extends StatelessWidget {
             getTitlesWidget: getTitles,
           ),
           axisNameWidget: const Text(
-            'Day in week',
+            'Food name',
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -520,7 +884,7 @@ class _BarChartVerticle extends StatelessWidget {
             getTitlesWidget: getLeftTitles,
           ),
           axisNameWidget: const Text(
-            'Revenue (thounsand dong)',
+            'Revenue (k₫)',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -550,76 +914,17 @@ class _BarChartVerticle extends StatelessWidget {
         end: Alignment.bottomRight,
       );
 
-  List<BarChartGroupData> get barGroups => [
-        BarChartGroupData(
-          x: 0,
-          barRods: [
-            BarChartRodData(
-              toY: 8,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 1,
-          barRods: [
-            BarChartRodData(
-              toY: 10,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 2,
-          barRods: [
-            BarChartRodData(
-              toY: 14,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 3,
-          barRods: [
-            BarChartRodData(
-              toY: 15,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 4,
-          barRods: [
-            BarChartRodData(
-              toY: 800,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 5,
-          barRods: [
-            BarChartRodData(
-              toY: 10,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 6,
-          barRods: [
-            BarChartRodData(
-              toY: 16,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-      ];
+  List<BarChartGroupData> get barGroups => List.generate(
+      foods.length,
+      (index) => BarChartGroupData(
+            x: index,
+            barRods: [
+              BarChartRodData(
+                toY: double.parse(
+                    (foods[index].revenue / 1000).toStringAsFixed(1)),
+                gradient: _barsGradient,
+              )
+            ],
+            showingTooltipIndicators: [0],
+          ));
 }
