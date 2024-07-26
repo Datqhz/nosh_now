@@ -5,6 +5,7 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
+import 'package:nosh_now_application/data/repositories/firebase_message_repository.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 
 class ShipperDashboardScreen extends StatelessWidget {
@@ -328,7 +329,17 @@ class ShipperDashboardScreen extends StatelessWidget {
                         )
                       ],
                     ),
-                  )
+                  ),
+                  // TextButton(
+                  //     onPressed: () async {
+                  //       await FirebaseMessageRepository().sendPushMessage(
+                  //           'order-status',
+                  //           'order:1-eater:1-merchant-1',
+                  //           "shipper picking up your order");
+                  //       await FirebaseMessageRepository().sendPushMessage(
+                  //           'eater', 'order:1', "update shipper location");
+                  //     },
+                  //     child: Text("tesst"))
                 ],
               ),
             ),

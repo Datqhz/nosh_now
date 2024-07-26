@@ -2,10 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
+import 'package:nosh_now_application/data/repositories/firebase_message_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
@@ -25,8 +28,10 @@ class HomeScreen extends StatelessWidget {
 
   Future<List<MerchantWithDistance>> _fetchMerchantNearByData() async {
     try {
-      List<MerchantWithDistance> merchants =
-          await MerchantRepository().getAllMerchantNearby('0-0');
+      LatLng currentCoord = await checkPermissions();
+      List<MerchantWithDistance> merchants = await MerchantRepository()
+          .getAllMerchantNearby(
+              '${currentCoord.latitude}-${currentCoord.longitude}');
       return merchants;
     } catch (e) {
       throw Exception(e.toString());
@@ -167,8 +172,9 @@ class HomeScreen extends StatelessWidget {
                 ),
                 // search merchant
                 GestureDetector(
-                  onTap: () {
-                    // do something
+                  onTap: () async {
+                    // await FirebaseMessageRepository().sendPushMessage('shipper',
+                    //     'order:1-eater:1-merchant-1', "order near you");
                   },
                   child: const Icon(
                     CupertinoIcons.search,

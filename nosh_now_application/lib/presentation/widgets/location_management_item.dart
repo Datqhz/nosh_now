@@ -7,7 +7,7 @@ import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
-import 'package:nosh_now_application/presentation/screens/pick_location_from_map.dart';
+import 'package:nosh_now_application/presentation/screens/main/pick_location_from_map.dart';
 
 class LocationManagementItem extends StatelessWidget {
   LocationManagementItem(

@@ -67,10 +67,11 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
     fetchData();
   }
 
+//  need edit
   Future<void> fetchOrderNearbyData() async {
-    LatLng currentLocation = await getCurrentLocation();
+    // LatLng currentLocation = await getCurrentCoordinator();
     orders.value = await OrderRepository().getAllNearBy(
-        "${currentLocation.latitude}-${currentLocation.longitude}");
+        "10.848355617658296-106.77554947888908");
   }
 
   Widget buildHeader() {

@@ -1,6 +1,8 @@
 class GlobalVariable {
-  static String url = 'http://192.168.1.6:5000';
+  static String url = 'http://192.168.1.17:5000';
   static int currentUid = 0;
   static String roleName = '';
   static int roleId = 0;
+  static String messageOAuthToken =
+      "ya29.c.c0ASRK0GaI-ykX9RX6Xcmf9a6Jvch2LFIonkJTL8nDJtyKPZn8UxVdeArQi_8b9ITbwyEMOF3-WG7zrEuMQXhgvilEhEjqTrbN4qsBsqe2ECSK6-XbIznutJvInOU8jcDW14JzuVJY8_lcjgagj00aIJ1PnkT4us_C4qpuRXQFDIpzvWp1egP_njxAB_gDhfTaJDS_p1jBODKE3ujOzqzyEc0txpwaORk1OB2_XUNKC2T-mb10N-MyGH7Yofm2Rh2-YahS1c93ziY0j8UAoKPoS7kLv_g9K7QdRhquCKqYRoHrCT-JAA3oYqqYDyNucFLM8spDs1n-k-WhHjmmNZInt3lgiOzyzfmZUNwO9vD-jNgX98dZSpgiqjcE384DBjImw94pawcMsbdddtewSv9u7wjMfvr2Mz0JaI7kR2pzc3rlVnd57mjsMUnWYlY3ofcZOzrr4a0xz2jdqp2ZyIR_W939rUfo3zhsymwyifg9vXfBtohwplcoqBJphIYV3QZqQ2Jp9jfJfasp0rdhQqZId_-69Vj0zvzfOYJWwwkxkmnmoBBgBmxd9Vu63eQQ_8YwIkSw3WFkogbQcscl-Jroc191h4pjt0z61FvyrBO44qqkregQ6Vg97hftBUqkee50VB3_Y7WMv94yVQ4bZ8g45FY-75WYaW_nI7kdk283YgUicdhzil96YwrRtamarWaUx2U6mvdfnpzM5Zgxv0O01ktaUyZ1mX83pbVrJWIYynJsnOfcxq5chIqt1YSnnu_zq7mszotqie-d4YkWx0X3aV1-xY0b3ssbJjQhUq6j9193wjfu0RIjJrbaoY-0iSZ6ma3vtfcppBU-gQyfllq69rqJY0s5hiJ-dfFB6sUm78M1mZd56So1QaYQmyw4MnmnUW8BoFS5RI459FmkQJne7l61ztx2udv2eJ-hQQbsr3fjkpfvs9zi2B-gaVlU3uSFcOdphvcrpXsc3ky54g5vixqo2Bi3YgzhFgji8pxQrt08rIYkn6OUmXj";
 }

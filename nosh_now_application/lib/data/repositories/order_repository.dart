@@ -112,7 +112,8 @@ class OrderRepository {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
-    print("${GlobalVariable.url}/api/order/near-by?coordinator=$coordinator");
+    print(
+        "${GlobalVariable.url}/api/order/near-by?coordinator=10.848355617658296-106.77554947888908");
     try {
       Response response = await get(
           Uri.parse(

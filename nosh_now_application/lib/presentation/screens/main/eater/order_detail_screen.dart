@@ -486,8 +486,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                             builder: (context) =>
                                                 OrderProcessScreen(
                                                   order: widget.order,
-                                                  type: 1,
-                                                  callback:GlobalVariable.roleId != 3 ?  reload : null,
+                                                  type:
+                                                      GlobalVariable.roleId != 4
+                                                          ? 1
+                                                          : 2,
+                                                  callback:
+                                                      GlobalVariable.roleId != 3
+                                                          ? reload
+                                                          : null,
                                                 ))),
                                     style: TextButton.styleFrom(
                                         backgroundColor: Colors.white,

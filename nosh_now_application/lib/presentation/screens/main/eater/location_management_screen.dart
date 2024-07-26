@@ -7,7 +7,7 @@ import 'package:nosh_now_application/core/streams/location_notifier.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
-import 'package:nosh_now_application/presentation/screens/pick_location_from_map.dart';
+import 'package:nosh_now_application/presentation/screens/main/pick_location_from_map.dart';
 import 'package:nosh_now_application/presentation/widgets/location_management_item.dart';
 import 'package:nosh_now_application/presentation/widgets/saved_location.dart';
 

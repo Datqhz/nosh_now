@@ -1,7 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/providers/food_list_provider.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
@@ -150,6 +152,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
       default:
     }
+
   }
 
   @override

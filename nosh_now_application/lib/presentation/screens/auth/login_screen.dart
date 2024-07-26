@@ -1,6 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/user_login_stream.dart';
+import 'package:nosh_now_application/core/utils/notify.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
 import 'package:nosh_now_application/data/repositories/account_repository.dart';
@@ -251,6 +255,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .signIn(email, password);
                                           if (rs) {
                                             Navigator.pop(context);
+                                            final instance = FirebaseMessaging.instance;
+                                            if(GlobalVariable.roleId == 2){
+                                              instance.subscribeToTopic('tracking');
+                                              instance.subscribeToTopic('order-status');
+                                              FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+                                            }else if(GlobalVariable.roleId == 3){
+                                              instance.subscribeToTopic('order-status');
+                                              FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+                                            }else if(GlobalVariable.roleId == 4){
+                                              instance.subscribeToTopic('shipper');
+                                            }
                                             Provider.of<UserLogin>(context,
                                                     listen: false)
                                                 .login();

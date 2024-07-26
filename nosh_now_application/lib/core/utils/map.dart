@@ -1,4 +1,4 @@
- import 'dart:convert';
+import 'dart:convert';
 
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,31 +6,34 @@ import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<void> _checkPermissions() async {
-    var status = await Permission.location.status;
-    if (status.isDenied || status.isPermanentlyDenied) {
-      if (await Permission.location.request().isGranted) {
-        _getCurrentLocation();
-      }
+Future<LatLng> checkPermissions() async {
+  var status = await Permission.location.status;
+  if (status.isDenied || status.isPermanentlyDenied) {
+    if (await Permission.location.request().isGranted) {
+      return await getCurrentCoordinator();
     } else {
-      _getCurrentLocation();
+      throw Exception();
     }
+  } else {
+    return await getCurrentCoordinator();
   }
+}
 
-  Future<LatLng> _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    return LatLng(position.latitude, position.longitude);
-  }
+Future<LatLng> getCurrentCoordinator() async {
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return LatLng(position.latitude, position.longitude);
+}
 
-  Future<List<LatLng>> getRouteCoordinates(LatLng start, LatLng end) async {
+Future<List<LatLng>> getRouteCoordinates(LatLng start, LatLng end) async {
   final url =
       'http://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson';
   final response = await get(Uri.parse(url));
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     final coordinates = data['routes'][0]['geometry']['coordinates'];
+    print(coordinates);
     return coordinates
         .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
         .toList();
@@ -56,30 +59,3 @@ Future<String> getAddressFromLatLng(LatLng latlng) async {
     throw Exception();
   }
 }
-
-Future<LatLng> checkPermissions() async {
-    var status = await Permission.location.status;
-    if (status.isDenied || status.isPermanentlyDenied) {
-      if (await Permission.location.request().isGranted) {
-        return await _getCurrentLocation();
-      } else {
-        throw Exception();
-      }
-    } else {
-      return await _getCurrentLocation();
-    }
-  }
-
-  Future<LatLng> getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    // await _loadRoute(LatLng(position.latitude, position.longitude),
-    //     const LatLng(13.297841113632936, 109.06575986815542));
-    return LatLng(position.latitude, position.longitude);
-  }
-
-  Future<String> getCurrentAddress() async {
-    LatLng current = await checkPermissions();
-    return getAddressFromLatLng(current);
-  } 
