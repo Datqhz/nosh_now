@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
+import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/category.dart';
-import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
-import 'package:nosh_now_application/data/repositories/firebase_message_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/filter_merchant_by_category_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/search_merchant_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   Future<List<FoodCategory>> _fetchCategoryData() async {
     try {
@@ -72,8 +72,18 @@ class HomeScreen extends StatelessWidget {
                           width: MediaQuery.of(context).size.width,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) => CategoryItem(
-                              category: snapshot.data![index],
+                            itemBuilder: (context, index) => GestureDetector(
+                              onTap: () async {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            FilterMerchantByCategoryScreen(
+                                                init: snapshot.data![index])));
+                              },
+                              child: CategoryItem(
+                                category: snapshot.data![index],
+                              ),
                             ),
                             itemCount: snapshot.data!.length,
                           ),
@@ -163,6 +173,7 @@ class HomeScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     // do something
+                    Scaffold.of(context).openDrawer();
                   },
                   child: const Icon(
                     CupertinoIcons.bars,
@@ -173,8 +184,11 @@ class HomeScreen extends StatelessWidget {
                 // search merchant
                 GestureDetector(
                   onTap: () async {
-                    // await FirebaseMessageRepository().sendPushMessage('shipper',
-                    //     'order:1-eater:1-merchant-1', "order near you");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const SearchMerchantScreen()));
                   },
                   child: const Icon(
                     CupertinoIcons.search,
@@ -190,22 +204,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-List<Merchant> merchants = [
-  Merchant(
-      merchantId: 1,
-      displayName: 'Pho 10 Ly Quoc Su',
-      email: 'gatanai@gmail.com',
-      phone: '0983473223',
-      avatar: 'assets/images/store_avatar.jpg',
-      openingTime: '7:30',
-      closingTime: '18:00',
-      coordinator: '322 - 455',
-      category: categories[0])
-];
-List<FoodCategory> categories = [
-  FoodCategory(
-      categoryId: 1,
-      categoryName: 'Pho - Chao - Hau',
-      categoryImage: 'assets/images/pho.png')
-];

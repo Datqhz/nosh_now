@@ -20,6 +20,7 @@ namespace MyApp.Extensions
             (
                 account.Id,
                 account.Email,
+                account.CreatedDate,
                 account.Role?.AsDto()
             );
         }

@@ -545,7 +545,7 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                "Do you have an account?",
+                                "Already have an account?",
                                 style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold,

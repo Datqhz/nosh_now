@@ -54,7 +54,31 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Shipper>> GetAll()
         {
-            return await _context.Shipper.ToListAsync();
+            return await _context.Shipper.Select(e => new Shipper
+            {
+                Id = e.Id,
+                DisplayName = e.DisplayName,
+                Avatar = e.Avatar,
+                Phone = e.Phone,
+                Email = e.Email,
+                VehicleName = e.VehicleName,
+                MomoPayment = e.MomoPayment,
+                Coordinator = e.Coordinator,
+                AccountId = e.AccountId,
+                Status = e.Status,
+                Account = new Account
+                {
+                    Id = e.Account.Id,
+                    Email = e.Account.Email,
+                    CreatedDate = e.Account.CreatedDate
+                },
+                VehicleType = new VehicleType
+                {
+                    Id = e.VehicleType.Id,
+                    TypeName = e.VehicleType.TypeName,
+                    Icon = e.VehicleType.Icon
+                }
+            }).ToListAsync();
         }
         public async Task<Shipper> GetById(int id)
         {

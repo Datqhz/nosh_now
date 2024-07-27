@@ -117,16 +117,44 @@ namespace MyApp.Controllers
             }
         }
         [HttpGet("find")]
-        public async Task<IActionResult> FindContainRegex([FromQuery] string regex)
+        public async Task<IActionResult> FindContainRegex([FromQuery] string regex, [FromQuery] string coordinator)
         {
             var data = await merchantRepository.FindContainRegex(regex);
-            return Ok(data.Select(merchant => merchant.AsDto()).ToList());
+            List<MerchantAndDistanceResponseDto> merchants = new List<MerchantAndDistanceResponseDto>();
+            foreach (var merchant in data)
+            {
+                double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
+                Console.WriteLine($"distance {distance}");
+                if (distance < 10000)
+                {
+                    merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
+                }
+            }
+            SortUtil.SortOrderByDistance(merchants, 0, merchants.Count - 1);
+            return Ok(merchants);
         }
 
         [HttpGet("near-by")]
         public async Task<IActionResult> GetMerchantNearBy([FromQuery] string coordinator)
         {
             var data = await merchantRepository.GetAllMerchantIsOpening();
+            List<MerchantAndDistanceResponseDto> merchants = new List<MerchantAndDistanceResponseDto>();
+            foreach (var merchant in data)
+            {
+                double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
+                Console.WriteLine($"distance {distance}");
+                if (distance < 10000)
+                {
+                    merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
+                }
+            }
+            SortUtil.SortOrderByDistance(merchants, 0, merchants.Count - 1);
+            return Ok(merchants);
+        }
+        [HttpGet("category")]
+        public async Task<IActionResult> GetMerchantByCategory([FromQuery] int categoryId, [FromQuery] string coordinator)
+        {
+            var data = await merchantRepository.GetAllMerchantByCategory(categoryId);
             List<MerchantAndDistanceResponseDto> merchants = new List<MerchantAndDistanceResponseDto>();
             foreach (var merchant in data)
             {

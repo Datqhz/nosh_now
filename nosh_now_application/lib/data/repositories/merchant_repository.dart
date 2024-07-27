@@ -58,8 +58,71 @@ class MerchantRepository {
     }
   }
 
-  Future<List<MerchantWithDistance>> getMerchantById(
-      String coordinator) async {
+  Future<List<MerchantWithDistance>> getAllMerchantByCategory(
+      int cateogryId, String coord) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse(
+              "${GlobalVariable.url}/api/merchant/category?categoryId=$cateogryId&coordinator=$coord"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return [];
+      }
+      List<dynamic> data = json.decode(response.body);
+      return data.map((e) => MerchantWithDistance.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<List<Merchant>> getAllMerchant() async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse("${GlobalVariable.url}/api/merchant"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return [];
+      }
+      List<dynamic> data = json.decode(response.body);
+      return data.map((e) => Merchant.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<List<MerchantWithDistance>> FindByRegex(
+      String regex, String coord) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await get(
+          Uri.parse(
+              "${GlobalVariable.url}/api/merchant/find?regex=$regex&coordinator=$coord"),
+          headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        return [];
+      }
+      List<dynamic> data = json.decode(response.body);
+      return data.map((e) => MerchantWithDistance.fromJson(e)).toList();
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<List<MerchantWithDistance>> getMerchantById(String coordinator) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };

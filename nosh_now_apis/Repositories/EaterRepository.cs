@@ -44,7 +44,21 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Eater>> GetAll()
         {
-            return await _context.Eater.ToListAsync();
+            return await _context.Eater.Select(e => new Eater
+                                {
+                                    Id = e.Id,
+                                    DisplayName = e.DisplayName,
+                                    Avatar = e.Avatar,
+                                    Phone = e.Phone,
+                                    Email = e.Email,
+                                    AccountId = e.AccountId,
+                                    Account = new Account
+                                    {
+                                        Id = e.Account.Id,
+                                        Email = e.Account.Email,
+                                        CreatedDate = e.Account.CreatedDate
+                                    }
+                                }).ToListAsync();
         }
         public async Task<Eater> GetById(int id)
         {

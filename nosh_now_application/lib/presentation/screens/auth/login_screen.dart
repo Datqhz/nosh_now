@@ -255,17 +255,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                               .signIn(email, password);
                                           if (rs) {
                                             Navigator.pop(context);
-                                            final instance = FirebaseMessaging.instance;
-                                            if(GlobalVariable.roleId == 2){
-                                              instance.subscribeToTopic('tracking');
-                                              instance.subscribeToTopic('order-status');
-                                              FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-                                            }else if(GlobalVariable.roleId == 3){
-                                              instance.subscribeToTopic('order-status');
-                                              FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-                                            }else if(GlobalVariable.roleId == 4){
-                                              instance.subscribeToTopic('shipper');
-                                            }
                                             Provider.of<UserLogin>(context,
                                                     listen: false)
                                                 .login();

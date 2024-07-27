@@ -625,36 +625,3 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     );
   }
 }
-
-Location location = Location(
-    locationId: 1,
-    locationName: 'Home',
-    coordinator: '223 - 432',
-    phone: '0943382223',
-    defaultLocation: false);
-
-Shipper shipper = Shipper(
-    shipperId: 1,
-    displayName: 'Dat',
-    email: 'gatanai@gmail.com',
-    phone: '0983473223',
-    avatar: 'assets/images/avatar.jpg',
-    vehicleName: 'YAMAHA SURIUS 2024',
-    momoPayment: '0112548325',
-    coordinator: '322 - 455',
-    vehicleType: VehicleType(
-        typeId: 1, typeName: 'Motobikes', icon: 'assets/images/motocycle.png'));
-List<PaymentMethod> methods = [
-  PaymentMethod(
-      methodId: 1, methodName: 'Cash', methodImage: 'assets/images/wallet.png'),
-  PaymentMethod(
-      methodId: 2, methodName: 'Momo', methodImage: 'assets/images/momo.webp')
-];
-
-Order tempOrder = Order(
-    orderId: 9,
-    totalPay: 8000,
-    orderStatus:
-        OrderStatus(orderStatusId: 1, orderStatusName: "test", step: 2),
-    eater: eater,
-    merchant: merchants[0]);

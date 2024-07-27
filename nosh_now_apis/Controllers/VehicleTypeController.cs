@@ -60,22 +60,23 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateVehicleType(UpdateVehicleType updateVehicleType)
         {
             var vehicleType = await vehicleTypeRepository.GetById(updateVehicleType.id);
-            if(vehicleType == null){
+            if (vehicleType == null)
+            {
                 return NotFound(new
                 {
                     error = "Vehicle type doesn't exits!"
                 });
             }
-            var data = await vehicleTypeRepository.FindByName(updateVehicleType.typeName);
-            if (data.Any())
-            {
-                return BadRequest(new
-                {
-                    error = $"Vehicle type name =  {updateVehicleType.typeName} was used."
-                });
-            }
+            // var data = await vehicleTypeRepository.FindByName(updateVehicleType.typeName);
+            // if (data.Any())
+            // {
+            //     return BadRequest(new
+            //     {
+            //         error = $"Vehicle type name =  {updateVehicleType.typeName} was used."
+            //     });
+            // }
             vehicleType.TypeName = updateVehicleType.typeName;
-            if(updateVehicleType.image != "")
+            if (updateVehicleType.image != "")
             {
                 vehicleType.Icon = Convert.FromBase64String(updateVehicleType.image);
             }

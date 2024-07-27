@@ -201,26 +201,3 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
     );
   }
 }
-
-Order orderFull = Order(
-    orderId: 1,
-    shipmentFee: 20000,
-    eater: eater,
-    merchant: merchants[0],
-    coordinator: '232 - 234',
-    orderedDate: DateTime.now(),
-    orderStatus:
-        OrderStatus(orderStatusId: 2, orderStatusName: 'Wait shipper', step: 1),
-    totalPay: 100000,
-    phone: '0947329732',
-    shipper: shipper,
-    paymentMethod: methods[0]);
-
-Food dataTest = Food(
-    foodId: 1,
-    foodName: 'Pho',
-    foodImage: 'assets/images/store_avatar.jpg',
-    foodDescribe:
-        "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
-    price: 32000,
-    status: 1);

@@ -6,7 +6,8 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/top_food.dart';
 
 class StatisticRepository {
-  Future<double> getRevenueOfMerchantByTime(int merchantId, int option, DateTime time) async {
+  Future<double> getRevenueOfMerchantByTime(
+      int merchantId, int option, DateTime time) async {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -37,7 +38,8 @@ class StatisticRepository {
     }
   }
 
-  Future<double> getEanrningOfShipperByTime(int shipperId, int option, DateTime time) async {
+  Future<double> getEanrningOfShipperByTime(
+      int shipperId, int option, DateTime time) async {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -97,6 +99,94 @@ class StatisticRepository {
       throw Exception('Fail to get data');
     }
   }
+
+  Future<int> getTotalOrderByTime(int option, DateTime time) async {
+    // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    String url = "${GlobalVariable.url}/api/statistic/count-order?";
+    if (option == 1) {
+      url += 'date=${DateFormat('yyyy-MM-dd').format(time)}';
+    } else {
+      url += 'year=${time.year}';
+      if (option == 2) {
+        url += '&month=${time.month}';
+      }
+    }
+    try {
+      Response response = await get(Uri.parse(url), headers: headers);
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        throw Exception("Something wrong when request to get data");
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return data['count'];
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<double> getTotalTransaction(int option, DateTime time) async {
+    // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    String url = "${GlobalVariable.url}/api/statistic/calc-transaction?";
+    if (option == 1) {
+      url += 'date=${DateFormat('yyyy-MM-dd').format(time)}';
+    } else {
+      url += 'year=${time.year}';
+      if (option == 2) {
+        url += '&month=${time.month}';
+      }
+    }
+    try {
+      Response response = await get(Uri.parse(url), headers: headers);
+      int statusCode = response.statusCode;
+      // print(response.body);
+      if (statusCode != 200) {
+        throw Exception("Something wrong when request to get data");
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return data['total'] / 1.0;
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
+  Future<int> getNumOfNewUser(int roleId, int option, DateTime time) async {
+    // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    String url =
+        "${GlobalVariable.url}/api/statistic/count-account?roleId=$roleId&";
+    if (option == 1) {
+      url += 'date=${DateFormat('yyyy-MM-dd').format(time)}';
+    } else {
+      url += 'year=${time.year}';
+      if (option == 2) {
+        url += '&month=${time.month}';
+      }
+    }
+    try {
+      Response response = await get(Uri.parse(url), headers: headers);
+      int statusCode = response.statusCode;
+      print(response.body);
+      if (statusCode != 200) {
+        throw Exception("Something wrong when request to get data");
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return data['count'];
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to get data');
+    }
+  }
+
   Future<List<TopFood>> getTop5FoodBestSelling(
       int merchantId, int option, DateTime time) async {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year

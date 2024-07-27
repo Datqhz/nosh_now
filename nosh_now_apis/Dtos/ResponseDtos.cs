@@ -5,7 +5,7 @@ using MyApp.Models;
 
 namespace MyApp.Dtos.Response
 {
-    public record AccountResponseDto(int id, string email, RoleResponseDto role);
+    public record AccountResponseDto(int id, string email, DateTime createdDate, RoleResponseDto role);
     public record RoleResponseDto(int id, string roleName);
     public record ManagerResponseDto(int id, string displayName, byte[] avatar, string phone, string email, AccountResponseDto account);
     public record EaterResponseDto(int id, string displayName, byte[] avatar, string phone, string email, AccountResponseDto account);
@@ -23,7 +23,7 @@ namespace MyApp.Dtos.Response
 
     public record ShipperResponseDto(int id, string displayName, byte[] avatar, string phone,
     string email, string vehicleName, string momoPayment, string coordinator,
-    bool stauts, AccountResponseDto account, VehicleTypeResponseDto vehicleType);
+    bool status, AccountResponseDto account, VehicleTypeResponseDto vehicleType);
     public record LocationResponseDto(int id, string locationName, string phone, string coordinator, bool defaultLocation, EaterResponseDto eater);
     public record FoodResponseDto(int id, string foodName, byte[] foodImage, string foodDescribe,
     double price, int status, MerchantResponseDto merchant);

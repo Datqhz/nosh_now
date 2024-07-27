@@ -11,6 +11,7 @@ class Merchant {
   String openingTime;
   String closingTime;
   String coordinator;
+  bool status;
   Account? account;
   FoodCategory? category;
   Merchant(
@@ -22,6 +23,7 @@ class Merchant {
       required this.openingTime,
       required this.closingTime,
       required this.coordinator,
+      required this.status,
       this.category,
       this.account});
   factory Merchant.fromJson(Map<dynamic, dynamic> json) {
@@ -34,6 +36,7 @@ class Merchant {
       openingTime: json['openingTime'],
       closingTime: json['closingTime'],
       coordinator: json['coordinator'],
+      status: json['status'],
       account:
           json['account'] != null ? Account.fromJson(json['account']) : null,
           category:

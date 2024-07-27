@@ -60,21 +60,22 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateCategory(UpdateCategory updateCategory)
         {
             var category = await categoryRepository.GetById(updateCategory.id);
-            if(category == null){
+            if (category == null)
+            {
                 return NotFound(new
                 {
                     error = "Category doesn't exits!"
                 });
             }
-            var data = await categoryRepository.FindByName(updateCategory.categoryName);
-            if (data.Any())
-            {
-                return BadRequest(new
-                {
-                    error = $"Category name =  {updateCategory.categoryName} was used."
-                });
-            }
-            if(!string.IsNullOrEmpty(updateCategory.image))
+            // var data = await categoryRepository.FindByName(updateCategory.categoryName);
+            // if (data.Any())
+            // {
+            //     return BadRequest(new
+            //     {
+            //         error = $"Category name =  {updateCategory.categoryName} was used."
+            //     });
+            // }
+            if (!string.IsNullOrEmpty(updateCategory.image))
             {
                 category.CategoryImage = Convert.FromBase64String(updateCategory.image);
             }

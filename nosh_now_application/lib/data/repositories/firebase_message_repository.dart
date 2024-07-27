@@ -28,7 +28,7 @@ class FirebaseMessageRepository {
       if (response.statusCode == 200) {
         print('Notification sent successfully');
       } else {
-        print('Failed to send notification: ${response.statusCode}');
+        print('Failed to send notification: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
       print('Error sending notification: $e');

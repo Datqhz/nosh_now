@@ -1,25 +1,18 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
-import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
-import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
-import 'package:nosh_now_application/presentation/widgets/status_item.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   OrderDetailScreen({super.key, required this.order, required this.callback});

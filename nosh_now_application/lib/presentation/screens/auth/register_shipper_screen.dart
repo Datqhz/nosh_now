@@ -6,11 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
-import 'package:nosh_now_application/data/models/eater.dart';
 import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/repositories/account_repository.dart';
-import 'package:nosh_now_application/data/repositories/eater_repository.dart';
 import 'package:nosh_now_application/data/repositories/shipper_repository.dart';
 import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
@@ -563,7 +561,8 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                                                 vehicleName: vehicleName,
                                                 coordinator: '0 - 0',
                                                 momoPayment: phone,
-                                                vehicleType: type);
+                                                vehicleType: type,
+                                                status: true);
                                             bool rs = await ShipperRepository()
                                                 .create(eater,
                                                     createdAccountResult);
@@ -608,7 +607,7 @@ class _RegisterShipperScreenState extends State<RegisterShipperScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                "Do you have an account?",
+                                "Already have an account?",
                                 style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold,

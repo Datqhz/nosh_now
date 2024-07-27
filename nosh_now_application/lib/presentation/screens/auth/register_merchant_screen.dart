@@ -665,7 +665,8 @@ class _RegisterMerchantStep1ScreenState
                                               openingTime: openingTime,
                                               closingTime: closingTime,
                                               coordinator: _coordinator.value,
-                                              category: category);
+                                              category: category,
+                                              status:  true);
 
                                           Navigator.push(
                                               context,
@@ -921,7 +922,8 @@ class _RegisterMerchantStep2ScreenState
                                   openingTime: widget.merchant.openingTime,
                                   closingTime: widget.merchant.closingTime,
                                   coordinator: widget.merchant.coordinator,
-                                  category: widget.merchant.category);
+                                  category: widget.merchant.category,
+                                  status: widget.merchant.status);
                               bool rs = await MerchantRepository()
                                   .create(eater, createdAccountResult);
                               if (rs) {

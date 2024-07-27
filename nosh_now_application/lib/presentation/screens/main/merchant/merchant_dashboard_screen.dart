@@ -352,16 +352,3 @@ class MerchantDashboardScreen extends StatelessWidget {
   }
 }
 
-Merchant merchantData = Merchant(
-    merchantId: 1,
-    displayName: 'Pho 10 Ly Quoc Su',
-    email: 'gatanai@gmail.com',
-    phone: '0983473223',
-    avatar: 'assets/images/store_avatar.jpg',
-    openingTime: '7:30',
-    closingTime: '18:00',
-    coordinator: '322 - 455',
-    category: categories[0]);
-
-double revenue = 120000;
-int numOfOrder = 7;

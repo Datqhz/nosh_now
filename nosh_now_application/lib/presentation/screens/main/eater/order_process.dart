@@ -74,40 +74,39 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
           0);
     }
 
-    // listen notify for eater and merchant
-    if (GlobalVariable.roleId != 3 &&
-        widget.order.orderStatus.orderStatusId < 2) {
-      FirebaseMessaging.instance.getInitialMessage();
-      FirebaseMessaging.onBackgroundMessage(messageHandle);
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        if (message.notification != null) {
-          if (message.notification!.title == 'Current shipper location' &&
-              ((message.data['eaterId'] == GlobalVariable.currentUid &&
-                      GlobalVariable.roleId == 2) ||
-                  (message.data['merchantId'] == GlobalVariable.currentUid &&
-                      GlobalVariable.roleId == 3)) &&
-              message.data['orderId'] == widget.order.orderId) {
-            if (order.value!.orderStatus.orderStatusId == 3) {
-              // if order status is picked up -> update route shipper to merchant on map
-              updatePolylineFromStartToTarget(
-                  splitCoordinatorString(message.data['shipperCoord']),
-                  splitCoordinatorString(widget.order.merchant.coordinator),
-                  1);
-            } else if (order.value!.orderStatus.orderStatusId == 4) {
-              // if order status is delivery -> hidden route from shipper to merchant, update route shipper to eater
-              hiddenPolyline(1);
-              updatePolylineFromStartToTarget(
-                  splitCoordinatorString(message.data['shipperCoord']),
-                  splitCoordinatorString(widget.order.coordinator!),
-                  0);
-            } else {}
+    // // listen notify for eater and merchant
+    // if (GlobalVariable.roleId != 3 &&
+    //     widget.order.orderStatus.orderStatusId < 2) {
+    //   FirebaseMessaging.instance.getInitialMessage();
+    //   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    //     if (message.notification != null) {
+    //       if (message.notification!.title == 'Current shipper location' &&
+    //           ((message.data['eaterId'] == GlobalVariable.currentUid &&
+    //                   GlobalVariable.roleId == 2) ||
+    //               (message.data['merchantId'] == GlobalVariable.currentUid &&
+    //                   GlobalVariable.roleId == 3)) &&
+    //           message.data['orderId'] == widget.order.orderId) {
+    //         if (order.value!.orderStatus.orderStatusId == 3) {
+    //           // if order status is picked up -> update route shipper to merchant on map
+    //           updatePolylineFromStartToTarget(
+    //               splitCoordinatorString(message.data['shipperCoord']),
+    //               splitCoordinatorString(widget.order.merchant.coordinator),
+    //               1);
+    //         } else if (order.value!.orderStatus.orderStatusId == 4) {
+    //           // if order status is delivery -> hidden route from shipper to merchant, update route shipper to eater
+    //           hiddenPolyline(1);
+    //           updatePolylineFromStartToTarget(
+    //               splitCoordinatorString(message.data['shipperCoord']),
+    //               splitCoordinatorString(widget.order.coordinator!),
+    //               0);
+    //         } else {}
 
-            shipperCoord.value =
-                splitCoordinatorString(message.data['shipperCoord']);
-          }
-        }
-      });
-    }
+    //         shipperCoord.value =
+    //             splitCoordinatorString(message.data['shipperCoord']);
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   Future<void> updatePolylineFromStartToTarget(
@@ -146,21 +145,6 @@ class _OrderProcessScreenState extends State<OrderProcessScreen> {
 
   void updateShipperLocation(LatLng coord) {
     shipperCoord.value = coord;
-  }
-
-  @pragma('vm:entry-point')
-  Future<void> messageHandle(RemoteMessage message) async {
-    if (message.notification != null) {
-      if (message.notification!.title == 'Order is change status' &&
-          ((message.data['eaterId'] == GlobalVariable.currentUid &&
-                  GlobalVariable.roleId == 2) ||
-              (message.data['merchantId'] == GlobalVariable.currentUid &&
-                  GlobalVariable.roleId == 3))) {
-        print(
-            "Your order is changed status ${message.data['status']} shipper has id is ${message.data['shipper']} ");
-        await fetchOrderData();
-      }
-    }
   }
 
   IconData pickItemForStatus(int step) {

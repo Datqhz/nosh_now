@@ -48,7 +48,9 @@ class OrderItem extends StatelessWidget {
             children: [
               // name
               Text(
-                type == 1 ? order.merchant.displayName : order.eater.displayName,
+                type == 1
+                    ? order.merchant.displayName
+                    : order.eater.displayName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(
@@ -90,7 +92,7 @@ class OrderItem extends StatelessWidget {
                     width: 4,
                   ),
                   Text(
-                    '${calcTotalPay(details, order.shipmentFee!)}₫',
+                    '${order.totalPay}₫',
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style: const TextStyle(

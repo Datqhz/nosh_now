@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
+import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 
 class UserItem extends StatelessWidget {
@@ -27,11 +28,13 @@ class UserItem extends StatelessWidget {
 
   String pickTitleForStatus(){
     if(status == 1){
-      return "In operation";
-    }else if(status == 2){
-      return "suspended";
-    }else {
-      return "In delivery";
+      return "In operation"; // merchant
+    }else if(status == 2){ // merchant
+      return "Suspended";
+    }else if(status == 3){ // active (shipper)
+      return "Active";
+    }else{
+      return "Unactive";
     }
   }
 
@@ -75,7 +78,7 @@ class UserItem extends StatelessWidget {
             width: 80,
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage(avatar), fit: BoxFit.cover),
+                  image: MemoryImage(convertBase64ToUint8List(avatar)), fit: BoxFit.cover),
               color: Colors.black,
               borderRadius: BorderRadius.circular(6),
             ),

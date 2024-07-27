@@ -3,8 +3,16 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
+import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
+import 'package:nosh_now_application/data/models/category.dart';
+import 'package:nosh_now_application/data/models/vehicle_type.dart';
+import 'package:nosh_now_application/data/repositories/category_repository.dart';
+import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
+import 'package:nosh_now_application/presentation/screens/auth/pick_location_register_screen.dart';
 
 class ModifyProfileScreen extends StatefulWidget {
   const ModifyProfileScreen({super.key});
@@ -16,13 +24,41 @@ class ModifyProfileScreen extends StatefulWidget {
 class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _displayNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _vehicleNameController = TextEditingController();
+  // final TextEditingController _momoPaymentController = TextEditingController();
+  final TextEditingController _openingTimeController = TextEditingController();
+  final TextEditingController _closingTimeController = TextEditingController();
   ValueNotifier<XFile?> avatar = ValueNotifier(null);
   ValueNotifier<String> coordinator = ValueNotifier('');
-  final ValueNotifier<bool> _isObscure = ValueNotifier(true);
+  List<dynamic> _dropdownItems = [];
+  final ValueNotifier<String?> _itemSelected = ValueNotifier(null);
+
+  Future<void> fetchDropdownData() async {
+    if (GlobalVariable.roleId == 3) {
+      _dropdownItems = await CategoryRepository().getAll();
+      for (var item in _dropdownItems) {
+        if (item.categoryId == GlobalVariable.user.category.categoryId) {
+          _itemSelected.value = item.categoryName;
+        }
+      }
+    } else if (GlobalVariable.roleId == 4) {
+      _dropdownItems = await VehicleTypeRepository().getAll();
+      for (var item in _dropdownItems) {
+        if (item.typeId == GlobalVariable.user.vehicleType.typeId) {
+          _itemSelected.value = item.typeName;
+        }
+      }
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    fetchDropdownData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +103,10 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                                             backgroundImage: value != null
                                                 ? FileImage(File(value.path))
                                                     as ImageProvider<Object>
-                                                : const AssetImage(
-                                                    "assets/images/avatar.jpg"),
+                                                : MemoryImage(
+                                                    convertBase64ToUint8List(
+                                                        GlobalVariable
+                                                            .user.avatar)),
                                           );
                                         }),
                                     Positioned(
@@ -163,155 +201,6 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                                       height: 12,
                                     ),
                                     const Text(
-                                      'Email',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color:
-                                              Color.fromRGBO(55, 55, 55, 0.5),
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    // Email input
-                                    TextFormField(
-                                      controller: _emailController,
-                                      decoration: const InputDecoration(
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  118, 118, 118, 1),
-                                              width:
-                                                  1), // Màu viền khi không được chọn
-                                        ),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color:
-                                                Color.fromRGBO(35, 35, 35, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        errorBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: Color.fromRGBO(182, 0, 0, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        focusedErrorBorder:
-                                            UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: Color.fromRGBO(182, 0, 0, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        errorStyle: TextStyle(
-                                            color:
-                                                Color.fromRGBO(182, 0, 0, 1)),
-                                        border: InputBorder.none,
-                                      ),
-                                      style: const TextStyle(
-                                          color: Color.fromRGBO(49, 49, 49, 1),
-                                          fontSize: 14,
-                                          decoration: TextDecoration.none),
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return "Please enter email.";
-                                        } else if (!validateEmail(value)) {
-                                          return "Email invalid";
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(
-                                      height: 12,
-                                    ),
-                                    const Text(
-                                      'Password',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color:
-                                              Color.fromRGBO(55, 55, 55, 0.5),
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    // password input
-                                    ValueListenableBuilder(
-                                        valueListenable: _isObscure,
-                                        builder: (context, value, child) {
-                                          return TextFormField(
-                                            controller: _passwordController,
-                                            obscureText: value,
-                                            decoration: InputDecoration(
-                                              suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  _isObscure.value =
-                                                      !_isObscure.value;
-                                                },
-                                                icon: value
-                                                    ? const Icon(CupertinoIcons
-                                                        .eye_slash)
-                                                    : const Icon(
-                                                        CupertinoIcons.eye),
-                                              ),
-                                              suffixStyle: const TextStyle(
-                                                  color: Color.fromRGBO(
-                                                      49, 49, 49, 1)),
-                                              enabledBorder:
-                                                  const UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Color.fromRGBO(
-                                                        118, 118, 118, 1),
-                                                    width:
-                                                        1), // Màu viền khi không được chọn
-                                              ),
-                                              focusedBorder:
-                                                  const UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color: Color.fromRGBO(
-                                                      35, 35, 35, 1),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              errorBorder:
-                                                  const UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color: Color.fromRGBO(
-                                                      182, 0, 0, 1),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              focusedErrorBorder:
-                                                  const UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                  color: Color.fromRGBO(
-                                                      182, 0, 0, 1),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              errorStyle: const TextStyle(
-                                                  color: Color.fromRGBO(
-                                                      182, 0, 0, 1)),
-                                              border: InputBorder.none,
-                                            ),
-                                            style: const TextStyle(
-                                                color: Color.fromRGBO(
-                                                    49, 49, 49, 1),
-                                                fontSize: 14,
-                                                decoration:
-                                                    TextDecoration.none),
-                                            validator: (value) {
-                                              if (value!.isEmpty) {
-                                                return "Please enter your password.";
-                                              } else if (containsWhitespace(
-                                                  value)) {
-                                                return "Password must not contain any whitespace.";
-                                              } else if (value.length < 6) {
-                                                return "Password must be at least 6 characters.";
-                                              }
-                                              return null;
-                                            },
-                                          );
-                                        }),
-                                    const SizedBox(
-                                      height: 12,
-                                    ),
-                                    const Text(
                                       'Phone',
                                       style: TextStyle(
                                           fontSize: 18,
@@ -373,45 +262,368 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                                     const SizedBox(
                                       height: 12,
                                     ),
-                                    const Text(
-                                      'Address',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color:
-                                              Color.fromRGBO(55, 55, 55, 0.5),
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    // address input
-                                    TextFormField(
-                                      controller: _addressController,
-                                      readOnly: true,
-                                      decoration: const InputDecoration(
-                                        suffixIcon: Icon(
-                                            CupertinoIcons.map_pin_ellipse),
-                                        suffixStyle: TextStyle(
+                                    if (GlobalVariable.roleId != 2)
+                                      Text(
+                                        GlobalVariable.roleId == 3
+                                            ? 'Category'
+                                            : 'Vehicle type',
+                                        style: const TextStyle(
+                                            fontSize: 18,
                                             color:
-                                                Color.fromRGBO(49, 49, 49, 1)),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  118, 118, 118, 1),
-                                              width:
-                                                  1), // Màu viền khi không được chọn
-                                        ),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color:
-                                                Color.fromRGBO(35, 35, 35, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        border: InputBorder.none,
+                                                Color.fromRGBO(55, 55, 55, 0.5),
+                                            fontWeight: FontWeight.w400),
                                       ),
-                                      style: const TextStyle(
+                                    // category input
+                                    if (GlobalVariable.roleId != 2)
+                                      DropdownButtonFormField<String>(
+                                        dropdownColor: Colors.white,
+                                        style: const TextStyle(
                                           color: Color.fromRGBO(49, 49, 49, 1),
-                                          fontSize: 14,
-                                          decoration: TextDecoration.none),
-                                    ),
+                                        ),
+                                        icon: const Icon(
+                                          CupertinoIcons.chevron_down,
+                                          size: 14,
+                                          color:
+                                              Color.fromRGBO(118, 118, 118, 1),
+                                        ),
+                                        decoration: const InputDecoration(
+                                          border: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    118, 118, 118, 1),
+                                                width:
+                                                    1), // Màu viền khi không được chọn
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1)),
+                                        ),
+                                        value: _itemSelected.value,
+                                        items: _dropdownItems
+                                            .map((item) =>
+                                                DropdownMenuItem<String>(
+                                                  value:
+                                                      GlobalVariable.roleId == 3
+                                                          ? item.categoryName
+                                                          : item.typeName,
+                                                  child: Text(
+                                                    GlobalVariable.roleId == 3
+                                                        ? item.categoryName
+                                                        : item.typeName,
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          _itemSelected.value = value!;
+                                        },
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select an option';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    if (GlobalVariable.roleId == 3) ...[
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      const Text(
+                                        'Address',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Color.fromRGBO(55, 55, 55, 0.5),
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      // address input
+                                      if (GlobalVariable.roleId == 3)
+                                        TextFormField(
+                                          onTap: () async {
+                                            dynamic latlng = await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const PickLocationRegisterScreen()));
+                                            String address =
+                                                await getAddressFromLatLng(
+                                                    latlng);
+                                            _addressController.text = address;
+                                            coordinator.value =
+                                                '${latlng.latitude}-${latlng.longitude}';
+                                          },
+                                          controller: _addressController,
+                                          readOnly: true,
+                                          decoration: const InputDecoration(
+                                            suffixIcon: Icon(
+                                                CupertinoIcons.map_pin_ellipse),
+                                            suffixStyle: TextStyle(
+                                                color: Color.fromRGBO(
+                                                    49, 49, 49, 1)),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      118, 118, 118, 1),
+                                                  width:
+                                                      1), // Màu viền khi không được chọn
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    35, 35, 35, 1),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    182, 0, 0, 1),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            focusedErrorBorder:
+                                                UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    182, 0, 0, 1),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            errorStyle: TextStyle(
+                                                color: Color.fromRGBO(
+                                                    182, 0, 0, 1)),
+                                            border: InputBorder.none,
+                                          ),
+                                          style: const TextStyle(
+                                              color:
+                                                  Color.fromRGBO(49, 49, 49, 1),
+                                              fontSize: 14,
+                                              decoration: TextDecoration.none),
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return "Please choose your address.";
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      const Text(
+                                        'Opening time',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Color.fromRGBO(55, 55, 55, 0.5),
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      // opening time input
+                                      TextFormField(
+                                        onTap: () async {
+                                          TimeOfDay? time =
+                                              await selectTime(context);
+                                          if (time != null) {
+                                            _openingTimeController.text =
+                                                formatTimeOfDay(time);
+                                          }
+                                        },
+                                        controller: _openingTimeController,
+                                        readOnly: true,
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    118, 118, 118, 1),
+                                                width:
+                                                    1), // Màu viền khi không được chọn
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(35, 35, 35, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1)),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: const TextStyle(
+                                            color:
+                                                Color.fromRGBO(49, 49, 49, 1),
+                                            fontSize: 14,
+                                            decoration: TextDecoration.none),
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return "Please enter choose your opening time.";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      const Text(
+                                        'Closing time',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Color.fromRGBO(55, 55, 55, 0.5),
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      // closing time input
+                                      TextFormField(
+                                        onTap: () async {
+                                          TimeOfDay? time =
+                                              await selectTime(context);
+                                          if (time != null) {
+                                            _closingTimeController.text =
+                                                formatTimeOfDay(time);
+                                          }
+                                        },
+                                        controller: _closingTimeController,
+                                        readOnly: true,
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    118, 118, 118, 1),
+                                                width:
+                                                    1), // Màu viền khi không được chọn
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(35, 35, 35, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1)),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: const TextStyle(
+                                            color:
+                                                Color.fromRGBO(49, 49, 49, 1),
+                                            fontSize: 14,
+                                            decoration: TextDecoration.none),
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return "Please enter choose your closing time.";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                    if (GlobalVariable.roleId == 4) ...[
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      const Text(
+                                        'Vehicle name',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color:
+                                                Color.fromRGBO(55, 55, 55, 0.5),
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      // vehicle name input
+                                      TextFormField(
+                                        controller: _vehicleNameController,
+                                        decoration: const InputDecoration(
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    118, 118, 118, 1),
+                                                width:
+                                                    1), // Màu viền khi không được chọn
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(35, 35, 35, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          errorStyle: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(182, 0, 0, 1)),
+                                          border: InputBorder.none,
+                                        ),
+                                        style: const TextStyle(
+                                            color:
+                                                Color.fromRGBO(49, 49, 49, 1),
+                                            fontSize: 14,
+                                            decoration: TextDecoration.none),
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return "Please enter your vehicle name.";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
                                     const SizedBox(
                                       height: 20,
                                     ),
@@ -465,13 +677,6 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                         GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              final displayName =
-                                  _displayNameController.text.trim();
-                              final email = _displayNameController.text.trim();
-                              final password = _passwordController.text.trim();
-                              final phone = _displayNameController.text.trim();
-                              print(
-                                  'display name: $displayName - email: $email - password: $password - phone: $phone - address: ${coordinator.value}');
                               Navigator.pop(context);
                             }
                           },

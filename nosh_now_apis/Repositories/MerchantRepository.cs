@@ -47,6 +47,7 @@ namespace MyApp.Repositories
                                     {
                                         Id = e.Category.Id,
                                         CategoryName = e.Category.CategoryName,
+                                        CategoryImage = e.Category.CategoryImage,
                                     }
                                 })
                                 .ToListAsync();
@@ -54,7 +55,34 @@ namespace MyApp.Repositories
 
         public async Task<IEnumerable<Merchant>> GetAll()
         {
-            return await _context.Merchant.ToListAsync();
+            return await _context.Merchant
+            .Select(e => new Merchant
+            {
+                Id = e.Id,
+                DisplayName = e.DisplayName,
+                Avatar = e.Avatar,
+                Phone = e.Phone,
+                Email = e.Email,
+                OpeningTime = e.OpeningTime,
+                ClosingTime = e.ClosingTime,
+                Coordinator = e.Coordinator,
+                Status = e.Status,
+                AccountId = e.AccountId,
+                CategoryId = e.CategoryId,
+                Account = new Account
+                {
+                    Id = e.Account.Id,
+                    Email = e.Account.Email,
+                    CreatedDate = e.Account.CreatedDate
+                },
+                Category = new Category
+                {
+                    Id = e.Category.Id,
+                    CategoryName = e.Category.CategoryName,
+                    CategoryImage = e.Category.CategoryImage,
+                }
+            })
+            .ToListAsync();
         }
 
         public async Task<IEnumerable<Merchant>> GetAllMerchantIsOpening()
@@ -79,7 +107,45 @@ namespace MyApp.Repositories
                                         Id = e.Account.Id,
                                         Email = e.Account.Email,
                                         CreatedDate = e.Account.CreatedDate,
-                                        Role = new Role{
+                                        Role = new Role
+                                        {
+                                            Id = e.Account.Role.Id,
+                                            RoleName = e.Account.Role.RoleName,
+                                        }
+                                    },
+                                    Category = new Category
+                                    {
+                                        Id = e.Category.Id,
+                                        CategoryName = e.Category.CategoryName,
+                                        CategoryImage = e.Category.CategoryImage
+                                    }
+                                })
+                                .ToListAsync();
+        }
+        public async Task<IEnumerable<Merchant>> GetAllMerchantByCategory(int categoryId)
+        {
+            return await _context.Merchant
+                                .Where(m => m.Status == true && m.CategoryId == categoryId)
+                                .Select(e => new Merchant
+                                {
+                                    Id = e.Id,
+                                    DisplayName = e.DisplayName,
+                                    Avatar = e.Avatar,
+                                    Phone = e.Phone,
+                                    Email = e.Email,
+                                    OpeningTime = e.OpeningTime,
+                                    ClosingTime = e.ClosingTime,
+                                    Coordinator = e.Coordinator,
+                                    Status = e.Status,
+                                    AccountId = e.AccountId,
+                                    CategoryId = e.CategoryId,
+                                    Account = new Account
+                                    {
+                                        Id = e.Account.Id,
+                                        Email = e.Account.Email,
+                                        CreatedDate = e.Account.CreatedDate,
+                                        Role = new Role
+                                        {
                                             Id = e.Account.Role.Id,
                                             RoleName = e.Account.Role.RoleName,
                                         }

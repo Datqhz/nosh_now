@@ -6,5 +6,6 @@ namespace MyApp.Repositories.Interface
     {
         Task<IEnumerable<Merchant>> FindContainRegex(string regex);
         Task<IEnumerable<Merchant>> GetAllMerchantIsOpening();
+        Task<IEnumerable<Merchant>> GetAllMerchantByCategory(int categoryId);
     }
 }

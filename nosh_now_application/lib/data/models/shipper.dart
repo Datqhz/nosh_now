@@ -10,6 +10,7 @@ class Shipper {
   String vehicleName;
   String momoPayment;
   String coordinator;
+  bool status;
   Account? account;
   VehicleType? vehicleType;
   Shipper(
@@ -21,6 +22,7 @@ class Shipper {
       required this.vehicleName,
       required this.momoPayment,
       required this.coordinator,
+      required this.status,
       this.account,
       this.vehicleType});
   factory Shipper.fromJson(Map<dynamic, dynamic> json) {
@@ -33,6 +35,7 @@ class Shipper {
       vehicleName: json['vehicleName'],
       momoPayment: json['momoPayment'],
       coordinator: json['coordinator'],
+      status: json['status'],
       account:
           json['account'] != null ? Account.fromJson(json['account']) : null,
       vehicleType: json['vehicleType'] != null

@@ -1,5 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/utils/shared_preference.dart';
+import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/shipper.dart';
+import 'package:nosh_now_application/data/repositories/eater_repository.dart';
+import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
+import 'package:nosh_now_application/data/repositories/shipper_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/user_item.dart';
 
@@ -13,113 +22,159 @@ class UserManagementScreen extends StatefulWidget {
 class _UserManagementScreenState extends State<UserManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  ValueNotifier<List<Eater>?> eaters = ValueNotifier(null);
+  ValueNotifier<List<Merchant>?> merchants = ValueNotifier(null);
+  ValueNotifier<List<Shipper>?> shippers = ValueNotifier(null);
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    print(await getUser());
+    eaters.value = await EaterRepository().getAllEater();
+    merchants.value = await MerchantRepository().getAllMerchant();
+    shippers.value = await ShipperRepository().getAllShipper();
   }
 
   Widget eaterView() {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 120,
-            ),
-            ...List.generate(
-              12,
-              (index) => GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: UserItem(
-                    avatar: 'assets/images/avatar.jpg',
-                    name: "Var'Gatanai",
-                    joinedDate: DateTime.now(),
-                    type: 1,
-                    status: 3,
-                  ),
+    return ValueListenableBuilder(
+        valueListenable: eaters,
+        builder: (context, value, child) {
+          if (value != null) {
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 120,
+                    ),
+                    ...List.generate(
+                      value.length,
+                      (index) => GestureDetector(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: UserItem(
+                            avatar: value[index].avatar,
+                            name: value[index].displayName,
+                            joinedDate: value[index].account!.createdDate,
+                            type: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 80,
+                    )
+                  ],
                 ),
               ),
+            );
+          }
+          return const Center(
+            child: SpinKitCircle(
+              color: Colors.black,
+              size: 50,
             ),
-            const SizedBox(
-              height: 80,
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Widget merchantView() {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 120,
-            ),
-            ...List.generate(
-              12,
-              (index) => GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: UserItem(
-                    avatar: 'assets/images/avatar.jpg',
-                    name: "Var'Gatanai",
-                    joinedDate: DateTime.now(),
-                    type: 2,
-                    status: 3,
-                  ),
+    return ValueListenableBuilder(
+        valueListenable: merchants,
+        builder: (context, value, child) {
+          if (value != null) {
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 120,
+                    ),
+                    ...List.generate(
+                      value.length,
+                      (index) => GestureDetector(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: UserItem(
+                            avatar: value[index].avatar,
+                            name: value[index].displayName,
+                            joinedDate: value[index].account!.createdDate,
+                            type: 2,
+                            status: value[index].status ? 1 : 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 80,
+                    )
+                  ],
                 ),
               ),
+            );
+          }
+          return const Center(
+            child: SpinKitCircle(
+              color: Colors.black,
+              size: 50,
             ),
-            const SizedBox(
-              height: 80,
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Widget shipperView() {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 120,
-            ),
-            ...List.generate(
-              12,
-              (index) => GestureDetector(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: UserItem(
-                    avatar: 'assets/images/avatar.jpg',
-                    name: "Var'Gatanai",
-                    joinedDate: DateTime.now(),
-                    type: 3,
-                    status: 3,
-                  ),
+    return ValueListenableBuilder(
+        valueListenable: shippers,
+        builder: (context, value, child) {
+          if (value != null) {
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 120,
+                    ),
+                    ...List.generate(
+                      value.length,
+                      (index) => GestureDetector(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: UserItem(
+                            avatar: value[index].avatar,
+                            name: value[index].displayName,
+                            joinedDate: value[index].account!.createdDate,
+                            type: 2,
+                            status: value[index].status ? 3 : 4,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 80,
+                    )
+                  ],
                 ),
               ),
+            );
+          }
+          return const Center(
+            child: SpinKitCircle(
+              color: Colors.black,
+              size: 50,
             ),
-            const SizedBox(
-              height: 80,
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   @override
@@ -152,6 +207,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       GestureDetector(
                         onTap: () {
                           // do something
+                          Scaffold.of(context).openDrawer();
                         },
                         child: const Icon(
                           CupertinoIcons.bars,

@@ -320,17 +320,3 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
     );
   }
 }
-
-Order orderFull = Order(
-    orderId: 1,
-    shipmentFee: 20000,
-    eater: eater,
-    merchant: merchants[0],
-    coordinator: '232 - 234',
-    orderedDate: DateTime.now(),
-    orderStatus:
-        OrderStatus(orderStatusId: 2, orderStatusName: 'Wait shipper', step: 1),
-    totalPay: 100000,
-    phone: '0947329732',
-    shipper: shipper,
-    paymentMethod: methods[0]);

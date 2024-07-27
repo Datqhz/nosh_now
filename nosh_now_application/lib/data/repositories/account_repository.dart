@@ -31,13 +31,16 @@ class AccountRepository {
       final Map<String, dynamic> data = json.decode(response.body);
       if (data['user']['account']['role']['roleName'] == 'Manager') {
         await storeCurrentUser(manager: Manager.fromJson(data['user']));
+        GlobalVariable.user = Manager.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Eater') {
         await storeCurrentUser(eater: Eater.fromJson(data['user']));
+        GlobalVariable.user = Eater.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Merchant') {
-        print(data['user']);
         await storeCurrentUser(merchant: Merchant.fromJson(data['user']));
+        GlobalVariable.user = Merchant.fromJson(data['user']);
       } else {
         await storeCurrentUser(shipper: Shipper.fromJson(data['user']));
+        GlobalVariable.user = Shipper.fromJson(data['user']);
       }
       var account = Account.fromJson(data['user']['account']);
       await storeAccount(account);

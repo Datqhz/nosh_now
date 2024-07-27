@@ -20,6 +20,7 @@ import 'package:nosh_now_application/presentation/screens/main/shipper/shipper_d
 import 'package:nosh_now_application/presentation/screens/main/shipper/shipper_statistic_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar.dart';
 import 'package:nosh_now_application/presentation/widgets/bottom_bar_item.dart';
+import 'package:nosh_now_application/presentation/widgets/drawer.dart';
 import 'package:nosh_now_application/presentation/widgets/vehicle_type_managemet_item.dart';
 import 'package:provider/provider.dart';
 
@@ -152,7 +153,6 @@ class _MainScreenState extends State<MainScreen> {
         break;
       default:
     }
-
   }
 
   @override
@@ -202,6 +202,7 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
+      drawer: const MyDrawer(),
     );
   }
 }

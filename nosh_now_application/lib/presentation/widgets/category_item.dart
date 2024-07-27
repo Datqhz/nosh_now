@@ -15,11 +15,16 @@ class CategoryItem extends StatelessWidget {
       child: Column(
         children: [
           // category image
-          Image(
-            height: 65,
-            width: 65,
-            image: MemoryImage(convertBase64ToUint8List(category.categoryImage)),
-            fit: BoxFit.cover,
+          Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
+            clipBehavior: Clip.antiAlias,
+            child: Image(
+              height: 65,
+              width: 65,
+              image:
+                  MemoryImage(convertBase64ToUint8List(category.categoryImage)),
+              fit: BoxFit.cover,
+            ),
           ),
           // category name
           Text(

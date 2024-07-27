@@ -330,16 +330,6 @@ class ShipperDashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // TextButton(
-                  //     onPressed: () async {
-                  //       await FirebaseMessageRepository().sendPushMessage(
-                  //           'order-status',
-                  //           'order:1-eater:1-merchant-1',
-                  //           "shipper picking up your order");
-                  //       await FirebaseMessageRepository().sendPushMessage(
-                  //           'eater', 'order:1', "update shipper location");
-                  //     },
-                  //     child: Text("tesst"))
                 ],
               ),
             ),
@@ -364,18 +354,3 @@ class ShipperDashboardScreen extends StatelessWidget {
   }
 }
 
-Shipper shipperData = Shipper(
-  shipperId: 1,
-  displayName: 'Ho Quoc Dat',
-  email: 'gatanai@gmail.com',
-  phone: '0983473223',
-  avatar: 'assets/images/store_avatar.jpg',
-  vehicleName: '7:30',
-  momoPayment: '18:00',
-  coordinator: '322 - 455',
-  vehicleType: VehicleType(
-      typeId: 1, typeName: 'Motobikes', icon: 'assets/images/car.png'),
-);
-
-double revenue = 120000;
-int numOfOrder = 7;

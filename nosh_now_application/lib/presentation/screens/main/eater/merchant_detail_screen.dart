@@ -336,31 +336,3 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
   }
 }
 
-List<Food> foods = [
-  Food(
-      foodId: 1,
-      foodName: 'Pho',
-      foodImage: 'assets/images/store_avatar.jpg',
-      foodDescribe:
-          "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
-      price: 32000,
-      status: 1)
-];
-List<OrderDetail> details = [
-  OrderDetail(odId: 1, orderId: 1, price: 32000, quantity: 3, food: foods[0])
-];
-Order orderData = Order(
-    orderId: 1,
-    totalPay: 0,
-    shipmentFee: 20000,
-    orderStatus:
-        OrderStatus(orderStatusId: 1, orderStatusName: 'Initialize', step: 0),
-    eater: eater,
-    merchant: merchants[0]);
-Eater eater = Eater(
-  eaterId: 1,
-  displayName: 'Pho 10 Ly Quoc Su',
-  email: 'gatanai@gmail.com',
-  phone: '0983473223',
-  avatar: 'assets/images/store_avatar.jpg',
-);

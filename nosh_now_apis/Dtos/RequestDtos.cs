@@ -8,24 +8,24 @@ namespace MyApp.Dtos.Request
     public record UpdatePaymentMethod(int id, string methodName, string image);
     public record CreateOrderStatus(string statusName, int step);
     public record UpdateOrderStatus(int id, string statusName, int step);
-        public record CreateVehicleType(string typeName, string image);
+    public record CreateVehicleType(string typeName, string image);
     public record UpdateVehicleType(int id, string typeName, string image);
     public record CreateAccount(string email, string password, int roleId);
     public record UpdateAccount(int id, string email, string password, int roleId);
     public record CreateEaterOrManager(string displayName, string avatar, string email, string phone, int accountId);
     public record UpdateEaterOrManager(int id, string displayName, string avatar, string phone);
     public record CreateMerchant(string displayName, string avatar, string email,
-                                string phone, string openingTime, string closingTime, 
+                                string phone, string openingTime, string closingTime,
                                 string coordinator, int accountId, int categoryId);
     public record UpdateMerchant(int id, string displayName, string avatar,
-                                string phone, string openingTime, string closingTime, int categoryId ,
-                                string coordinator);
+                                string phone, string openingTime, string closingTime, int categoryId,
+                                string coordinator, bool status);
     public record CreateShipper(string displayName, string avatar, string email,
-                                string phone, string vehicleName, string momoPayment, 
+                                string phone, string vehicleName, string momoPayment,
                                 string coordinator, int accountId, int vehicleTypeId);
     public record UpdateShipper(int id, string displayName, string avatar,
-                                string phone, string vehicleName, string momoPayment, 
-                                string coordinator, int vehicleTypeId);
+                                string phone, string vehicleName, string momoPayment,
+                                string coordinator, int vehicleTypeId, bool status);
 
 
     public record LoginRequest(string email, string password);
