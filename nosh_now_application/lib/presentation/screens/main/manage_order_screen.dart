@@ -1,20 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
-import 'package:nosh_now_application/data/models/category.dart';
-import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/order.dart';
-import 'package:nosh_now_application/data/models/order_detail.dart';
-import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_detail_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/order_item.dart';
 
 class ManageOrderScreen extends StatefulWidget {
@@ -30,7 +22,10 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   ValueNotifier<List<Order>?> orders = ValueNotifier(null);
+  ValueNotifier<List<Order>?> tempOrders = ValueNotifier(null);
   ValueNotifier<Widget> header = ValueNotifier(const SizedBox());
+  late TextEditingController _controller;
+  ValueNotifier<int> option = ValueNotifier(1);
 
   @override
   void initState() {
@@ -47,31 +42,62 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
     });
     fetchData();
     header.value = buildHeader();
+    if (GlobalVariable.roleId == 2) {
+      _controller = TextEditingController();
+    }
   }
 
   Future<void> fetchData() async {
     if (widget.type == 1) {
-      orders.value =
+      List<Order> list =
           await OrderRepository().getByEater(GlobalVariable.currentUid);
+      orders.value = list;
+      tempOrders.value = list;
     } else if (widget.type == 2) {
-      orders.value =
+      List<Order> list =
           await OrderRepository().getByMerchant(GlobalVariable.currentUid);
+      orders.value = list;
+      tempOrders.value = list;
     } else {
-      orders.value =
+      List<Order> list =
           await OrderRepository().getByShipper(GlobalVariable.currentUid);
+      orders.value = list;
+      tempOrders.value = list;
+    }
+  }
+
+  void filterOrderByMerchantName() {
+    List<Order> afterFilter = [];
+    String regex = _controller.text.trim();
+    for (var order in tempOrders.value!) {
+      if (order.merchant.displayName.contains(regex)) {
+        afterFilter.add(order);
+      }
+    }
+    orders.value = afterFilter;
+  }
+
+  void sortOrder(List<Order> data) {
+    if (option.value == 2) {
+      data.sort((a, b) {
+        return a.orderedDate!.compareTo(b.orderedDate!);
+      });
+    } else {
+      data.sort((a, b) {
+        return b.orderedDate!.compareTo(a.orderedDate!);
+      });
     }
   }
 
   void reload() {
-    print("call to get data");
     fetchData();
   }
 
 //  need edit
   Future<void> fetchOrderNearbyData() async {
-    // LatLng currentLocation = await getCurrentCoordinator();
+    LatLng currentLocation = await getCurrentCoordinator();
     orders.value = await OrderRepository().getAllNearBy(
-        "10.848355617658296-106.77554947888908");
+        '${currentLocation.latitude}-${currentLocation.longitude}');
   }
 
   Widget buildHeader() {
@@ -119,9 +145,9 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
         );
       }
     } else {
-      return const Row(
+      return Row(
         children: [
-          Text(
+          const Text(
             'Your orders',
             maxLines: 1,
             style: TextStyle(
@@ -131,21 +157,135 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Expanded(child: SizedBox()),
-          Text(
-            'Newest',
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w400,
-              color: Color.fromRGBO(49, 49, 49, 1),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Icon(
-            CupertinoIcons.sort_down,
-            color: Color.fromRGBO(49, 49, 49, 1),
-          )
+          const Expanded(child: SizedBox()),
+          ValueListenableBuilder(
+              valueListenable: option,
+              builder: (context, value, child) {
+                return GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Container(
+                            height: 220,
+                            color: Colors.black,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      CupertinoIcons.minus,
+                                      color: Colors.white.withOpacity(0.8),
+                                      size: 40,
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                const Text(
+                                  "Sort",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    option.value = 1;
+                                    filterOrderByMerchantName();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        "Newest",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 12,
+                                      ),
+                                      if (value == 1)
+                                        const Icon(
+                                          CupertinoIcons
+                                              .checkmark_alt_circle_fill,
+                                          color: Colors.white,
+                                        )
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    option.value = 2;
+                                    filterOrderByMerchantName();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        "Oldest",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 12,
+                                      ),
+                                      if (value == 2)
+                                        const Icon(
+                                          CupertinoIcons
+                                              .checkmark_alt_circle_fill,
+                                          color: Colors.white,
+                                        )
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 18,
+                                ),
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        value == 1 ? 'Newest' : 'Oldest',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Icon(
+                        value == 1
+                            ? CupertinoIcons.sort_down
+                            : CupertinoIcons.sort_up,
+                        color: const Color.fromRGBO(49, 49, 49, 1),
+                      )
+                    ],
+                  ),
+                );
+              })
         ],
       );
     }
@@ -179,6 +319,7 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                 ValueListenableBuilder(
                     valueListenable: orders,
                     builder: (context, value, child) {
+                      print('build');
                       if (value != null) {
                         if (value.isEmpty) {
                           return Center(
@@ -247,11 +388,12 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // drawer
                     GestureDetector(
                       onTap: () {
-                        // do something
+                        Scaffold.of(context).openDrawer();
                       },
                       child: const Icon(
                         CupertinoIcons.bars,
@@ -259,17 +401,47 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                         color: Color.fromRGBO(49, 49, 49, 1),
                       ),
                     ),
-                    // search merchant
-                    GestureDetector(
-                      onTap: () {
-                        // do something
-                      },
-                      child: const Icon(
-                        CupertinoIcons.search,
-                        size: 20,
-                        color: Color.fromRGBO(49, 49, 49, 1),
+                    if (GlobalVariable.roleId == 2) ...[
+                      const SizedBox(
+                        width: 12,
                       ),
-                    )
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 100,
+                        height: 40,
+                        child: TextFormField(
+                          controller: _controller,
+                          decoration: const InputDecoration(
+                            hintText: "ex. Pho 10, abc,...",
+                            hintStyle: TextStyle(
+                                color: Color.fromRGBO(159, 159, 159, 1)),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(35, 35, 35, 1),
+                                width: 1,
+                              ),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            print(value);
+                            filterOrderByMerchantName();
+                          },
+                          style: const TextStyle(
+                              color: Color.fromRGBO(49, 49, 49, 1),
+                              fontSize: 14,
+                              decoration: TextDecoration.none),
+                        ),
+                      ),
+                      // search merchant
+                      GestureDetector(
+                        onTap: () {},
+                        child: const Icon(
+                          CupertinoIcons.search,
+                          size: 20,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                        ),
+                      )
+                    ]
                   ],
                 ),
                 if (widget.type == 3) ...[

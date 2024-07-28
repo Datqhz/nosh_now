@@ -2,15 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/streams/change_stream.dart';
 import 'package:nosh_now_application/core/streams/user_login_stream.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/shared_preference.dart';
+import 'package:nosh_now_application/presentation/screens/main/change_password_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/location_management_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/modify_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  ProfileScreen({super.key});
+
+  ChangeStream stream = ChangeStream();
 
   Widget _optionItem(
       String option, Color color, VoidCallback handle, bool isSignOut) {
@@ -58,7 +62,15 @@ class ProfileScreen extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ModifyProfileScreen()));
+                  builder: (context) => ModifyProfileScreen(
+                        stream: stream,
+                      )));
+        }, false),
+        _optionItem('Change password', Colors.black, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ChangePasswordScreen()));
         }, false),
         _optionItem('Saved location', Colors.black, () {
           Navigator.push(
@@ -72,10 +84,10 @@ class ProfileScreen extends StatelessWidget {
           GlobalVariable.roleId = 0;
           GlobalVariable.roleName = '';
           GlobalVariable.user = null;
-          await disposeUserInfo();
-          await destroyAccount();
-          await destroyRole();
-          await destroyToken();
+          // await disposeUserInfo();
+          // await destroyAccount();
+          // await destroyRole();
+          // await destroyToken();
           Provider.of<UserLogin>(context, listen: false).logout();
         }, true)
       ];
@@ -85,7 +97,15 @@ class ProfileScreen extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ModifyProfileScreen()));
+                  builder: (context) => ModifyProfileScreen(
+                        stream: stream,
+                      )));
+        }, false),
+        _optionItem('Change password', Colors.black, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ChangePasswordScreen()));
         }, false),
         _optionItem('My orders', Colors.black, () {}, false),
         _optionItem('Sign out', Colors.red, () async {
@@ -93,10 +113,10 @@ class ProfileScreen extends StatelessWidget {
           GlobalVariable.roleId = 0;
           GlobalVariable.roleName = '';
           GlobalVariable.user = null;
-          await disposeUserInfo();
-          await destroyAccount();
-          await destroyRole();
-          await destroyToken();
+          // await disposeUserInfo();
+          // await destroyAccount();
+          // await destroyRole();
+          // await destroyToken();
           Provider.of<UserLogin>(context, listen: false).logout();
         }, true)
       ];
@@ -197,75 +217,80 @@ class ProfileScreen extends StatelessWidget {
             //         );
             //       }
             //     }),
-            child: Row(
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      GlobalVariable.user.displayName,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text(
-                      GlobalVariable.roleName,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const Expanded(child: SizedBox()),
-                GestureDetector(
-                  onTap: () async {},
-                  child: SizedBox(
-                    height: 100,
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(50)),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.black,
-                            radius: 50,
-                            backgroundImage: MemoryImage(
-                                convertBase64ToUint8List(
-                                    GlobalVariable.user.avatar)),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 3,
-                          child: Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Icon(
-                              CupertinoIcons.pencil,
-                              size: 16,
-                              color: Colors.black,
+            child: StreamBuilder<void>(
+                stream: stream.stream,
+                builder: (context, child) {
+                  return Row(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            GlobalVariable.user.displayName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                          Text(
+                            GlobalVariable.roleName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Expanded(child: SizedBox()),
+                      GestureDetector(
+                        onTap: () async {},
+                        child: SizedBox(
+                          height: 100,
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.white, width: 2),
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.black,
+                                  radius: 50,
+                                  backgroundImage: MemoryImage(
+                                      convertBase64ToUint8List(
+                                          GlobalVariable.user.avatar)),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 3,
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child: const Icon(
+                                    CupertinoIcons.pencil,
+                                    size: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
           ),
           const SizedBox(
             height: 12,

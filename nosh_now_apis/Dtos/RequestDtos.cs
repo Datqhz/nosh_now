@@ -11,7 +11,7 @@ namespace MyApp.Dtos.Request
     public record CreateVehicleType(string typeName, string image);
     public record UpdateVehicleType(int id, string typeName, string image);
     public record CreateAccount(string email, string password, int roleId);
-    public record UpdateAccount(int id, string email, string password, int roleId);
+    public record UpdateAccount(int id, string oldPassword, string newPassword);
     public record CreateEaterOrManager(string displayName, string avatar, string email, string phone, int accountId);
     public record UpdateEaterOrManager(int id, string displayName, string avatar, string phone);
     public record CreateMerchant(string displayName, string avatar, string email,

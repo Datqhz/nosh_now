@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/shared_preference.dart';
@@ -30,21 +31,21 @@ class AccountRepository {
       print("success");
       final Map<String, dynamic> data = json.decode(response.body);
       if (data['user']['account']['role']['roleName'] == 'Manager') {
-        await storeCurrentUser(manager: Manager.fromJson(data['user']));
+        // await storeCurrentUser(manager: Manager.fromJson(data['user']));
         GlobalVariable.user = Manager.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Eater') {
-        await storeCurrentUser(eater: Eater.fromJson(data['user']));
+        // await storeCurrentUser(eater: Eater.fromJson(data['user']));
         GlobalVariable.user = Eater.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Merchant') {
-        await storeCurrentUser(merchant: Merchant.fromJson(data['user']));
+        // await storeCurrentUser(merchant: Merchant.fromJson(data['user']));
         GlobalVariable.user = Merchant.fromJson(data['user']);
       } else {
-        await storeCurrentUser(shipper: Shipper.fromJson(data['user']));
+        // await storeCurrentUser(shipper: Shipper.fromJson(data['user']));
         GlobalVariable.user = Shipper.fromJson(data['user']);
       }
-      var account = Account.fromJson(data['user']['account']);
-      await storeAccount(account);
-      await storeToken(data['token']);
+      // var account = Account.fromJson(data['user']['account']);
+      // await storeAccount(account);
+      // await storeToken(data['token']);
       GlobalVariable.currentUid = data['user']['id'];
       GlobalVariable.roleName = data['user']['account']['role']['roleName'];
       GlobalVariable.roleId = data['user']['account']['role']['id'];
@@ -74,6 +75,32 @@ class AccountRepository {
       }
       Map<String, dynamic> data = json.decode(response.body);
       return data['id'];
+    } catch (e) {
+      throw Exception('Fail to register');
+    }
+  }
+
+  Future<bool> changePassword(int accountId, String oldPass, String newPass,
+      BuildContext context) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response = await put(
+          Uri.parse("${GlobalVariable.url}/api/account"),
+          headers: headers,
+          body: jsonEncode(<String, dynamic>{
+            "id": accountId,
+            "oldPassword": oldPass,
+            "newPassword": newPass
+          }));
+      int statusCode = response.statusCode;
+      Map<String, dynamic> data = json.decode(response.body);
+      if (statusCode != 200) {
+        showSnackBar(context, data['error']);
+        return false;
+      }
+      return true;
     } catch (e) {
       throw Exception('Fail to register');
     }

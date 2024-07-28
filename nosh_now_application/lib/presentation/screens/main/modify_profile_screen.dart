@@ -4,18 +4,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/streams/change_stream.dart';
+import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
+import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
 import 'package:nosh_now_application/data/models/category.dart';
+import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/data/models/merchant.dart';
+import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
+import 'package:nosh_now_application/data/repositories/eater_repository.dart';
+import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
+import 'package:nosh_now_application/data/repositories/shipper_repository.dart';
 import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
 import 'package:nosh_now_application/presentation/screens/auth/pick_location_register_screen.dart';
 
 class ModifyProfileScreen extends StatefulWidget {
-  const ModifyProfileScreen({super.key});
+  ModifyProfileScreen({super.key, required this.stream});
+
+  ChangeStream stream;
 
   @override
   State<ModifyProfileScreen> createState() => _ModifyProfileScreenState();
@@ -34,6 +45,7 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
   ValueNotifier<String> coordinator = ValueNotifier('');
   List<dynamic> _dropdownItems = [];
   final ValueNotifier<String?> _itemSelected = ValueNotifier(null);
+  final ValueNotifier<bool> _active = ValueNotifier(false);
 
   Future<void> fetchDropdownData() async {
     if (GlobalVariable.roleId == 3) {
@@ -54,9 +66,30 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
     setState(() {});
   }
 
+  Future<void> setInitValue() async {
+    _displayNameController.text = GlobalVariable.user.displayName;
+    _phoneController.text = GlobalVariable.user.phone;
+    if (GlobalVariable.roleId == 3) {
+      _openingTimeController.text = GlobalVariable.user.openingTime;
+      _closingTimeController.text = GlobalVariable.user.closingTime;
+      _addressController.text = await getAddressFromLatLng(
+          splitCoordinatorString(GlobalVariable.user.coordinator));
+      if (GlobalVariable.user.status) {
+        _active.value = true;
+      }
+      coordinator.value = GlobalVariable.user.coordinator;
+    } else if (GlobalVariable.roleId == 4) {
+      _vehicleNameController.text = GlobalVariable.user.vehicleName;
+      if (GlobalVariable.user.status) {
+        _active.value = true;
+      }
+    }
+  }
+
   @override
   void initState() {
     fetchDropdownData();
+    setInitValue();
     super.initState();
   }
 
@@ -100,13 +133,14 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                                           return CircleAvatar(
                                             backgroundColor: Colors.black,
                                             radius: 50,
-                                            backgroundImage: value != null
+                                            foregroundImage: value != null
                                                 ? FileImage(File(value.path))
                                                     as ImageProvider<Object>
                                                 : MemoryImage(
                                                     convertBase64ToUint8List(
                                                         GlobalVariable
-                                                            .user.avatar)),
+                                                            .user.avatar),
+                                                  ),
                                           );
                                         }),
                                     Positioned(
@@ -627,6 +661,39 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                                     const SizedBox(
                                       height: 20,
                                     ),
+                                    if (GlobalVariable.roleId != 2)
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            'Active',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Color.fromRGBO(
+                                                    55, 55, 55, 0.5),
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          const SizedBox(
+                                            width: 12,
+                                          ),
+                                          ValueListenableBuilder(
+                                              valueListenable: _active,
+                                              builder: (context, value, child) {
+                                                return Switch(
+                                                  // This bool value toggles the switch.
+                                                  value: value,
+                                                  activeColor: Colors.red,
+                                                  onChanged: (bool value) {
+                                                    // This is called when the user toggles the switch.
+                                                    _active.value =
+                                                        !_active.value;
+                                                  },
+                                                );
+                                              })
+                                        ],
+                                      ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -675,9 +742,101 @@ class _ModifyProfileScreenState extends State<ModifyProfileScreen> {
                         ),
                         const Expanded(child: SizedBox()),
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             if (_formKey.currentState!.validate()) {
-                              Navigator.pop(context);
+                              final name = _displayNameController.text.trim();
+                              final phone = _phoneController.text.trim();
+                              String base64 = '';
+                              if (avatar.value != null) {
+                                base64 = await convertToBase64(avatar.value!);
+                              }
+                              if (GlobalVariable.roleId == 2) {
+                                // eater
+                                Eater temp = Eater(
+                                    eaterId: GlobalVariable.currentUid,
+                                    displayName: name,
+                                    email: GlobalVariable.user.email,
+                                    phone: phone,
+                                    avatar: base64);
+                                Eater? rs =
+                                    await EaterRepository().update(temp);
+                                if (rs != null) {
+                                  temp.avatar = rs.avatar;
+                                  temp.account = GlobalVariable.user.account;
+                                  GlobalVariable.user = temp;
+                                  showSnackBar(context, "Save successful");
+                                  widget.stream.notifyChange();
+                                  Navigator.pop(context);
+                                } else {
+                                  showSnackBar(context, "Can't save your data");
+                                }
+                              } else if (GlobalVariable.roleId == 3) {
+                                //merchant
+                                FoodCategory? category;
+                                _dropdownItems.forEach((e) {
+                                  if (e.categoryName == _itemSelected.value) {
+                                    category = e;
+                                  }
+                                });
+                                final openingTime =
+                                    _openingTimeController.text.trim();
+                                final closingTime =
+                                    _closingTimeController.text.trim();
+                                Merchant temp = Merchant(
+                                    merchantId: GlobalVariable.currentUid,
+                                    displayName: name,
+                                    email: GlobalVariable.user.email,
+                                    phone: phone,
+                                    avatar: base64,
+                                    category: category,
+                                    coordinator: coordinator.value,
+                                    openingTime: openingTime,
+                                    closingTime: closingTime,
+                                    status: _active.value);
+                                Merchant? rs =
+                                    await MerchantRepository().update(temp);
+                                if (rs != null) {
+                                  temp.avatar = rs.avatar;
+                                  temp.account = GlobalVariable.user.account;
+                                  GlobalVariable.user = temp;
+                                  showSnackBar(context, "Save successful");
+                                  widget.stream.notifyChange();
+                                  Navigator.pop(context);
+                                } else {
+                                  showSnackBar(context, "Can't save your data");
+                                }
+                              } else {
+                                VehicleType? type;
+                                _dropdownItems.forEach((e) {
+                                  if (e.typeName == _itemSelected.value) {
+                                    type = e;
+                                  }
+                                });
+                                Shipper temp = Shipper(
+                                    shipperId: GlobalVariable.currentUid,
+                                    displayName: name,
+                                    email: GlobalVariable.user.email,
+                                    phone: phone,
+                                    avatar: base64,
+                                    vehicleType: type,
+                                    coordinator: '0-0',
+                                    vehicleName:
+                                        _vehicleNameController.text.trim(),
+                                    momoPayment: phone,
+                                    status: _active.value);
+                                Shipper? rs =
+                                    await ShipperRepository().update(temp);
+                                if (rs != null) {
+                                  temp.avatar = rs.avatar;
+                                  temp.account = GlobalVariable.user.account;
+                                  GlobalVariable.user = temp;
+                                  showSnackBar(context, "Save successful");
+                                  widget.stream.notifyChange();
+                                  Navigator.pop(context);
+                                } else {
+                                  showSnackBar(context, "Can't save your data");
+                                }
+                              }
                             }
                           },
                           child: const Text(

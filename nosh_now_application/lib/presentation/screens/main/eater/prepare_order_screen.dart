@@ -16,15 +16,11 @@ import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/models/payment_method.dart';
-import 'package:nosh_now_application/data/models/shipper.dart';
-import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/choose_payment_method_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/pick_location.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
@@ -46,14 +42,19 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   ValueNotifier<double> delivery = ValueNotifier(0);
   ValueNotifier<double> total = ValueNotifier(0);
   ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null);
+  ValueNotifier<bool> isInit = ValueNotifier(true);
 
   void calcSubstantialOnChange() {
     double subs = 0;
+    if (detailItemKeys.value.isEmpty) {
+      return;
+    }
     for (var i in detailItemKeys.value) {
       subs += i.currentState!.calcTotal();
     }
     substantial.value = subs;
     total.value = subs + delivery.value;
+    isInit.value = false;
   }
 
   List<OrderDetail> getFinalDetails() {
@@ -66,14 +67,19 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
 
   void calcDeliveryOnChange() {
     if (currentLocationPicked.value != null) {
-      print("start");
       getRouteCoordinates(
               splitCoordinatorString(widget.order.merchant.coordinator),
               splitCoordinatorString(currentLocationPicked.value!.coordinator))
           .then((route) {
-        double shipmentFee = calculateTotalDistanceByRoute(route) * 15;
+        double distance = calculateTotalDistanceByRoute(route);
+        if (distance < 1) {
+          delivery.value = 15000;
+        } else {
+          delivery.value = distance * 15000;
+        }
+        double shipmentFee = distance * 15000;
+
         delivery.value = shipmentFee;
-        print("end");
       });
     } else {
       delivery.value = 0;
@@ -92,7 +98,6 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   @override
   void initState() {
     super.initState();
-    detailItemKeys.addListener(calcSubstantialOnChange);
     currentLocationPicked.addListener(calcDeliveryOnChange);
     substantial.addListener(calcTotal);
     delivery.addListener(calcTotal);
@@ -251,7 +256,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                             detailItemKeys.value = List.generate(
                                 snapshot.data!.length,
                                 (index) => GlobalKey<OrderDetailItemState>());
-                            substantial.value = calcSubtantial(snapshot.data!);
+                            detailItemKeys.addListener(calcSubstantialOnChange);
                             return Column(
                                 children: List.generate(
                               snapshot.data!.length,
@@ -376,6 +381,9 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                           ValueListenableBuilder(
                               valueListenable: substantial,
                               builder: (context, value, child) {
+                                if (isInit.value == true) {
+                                  calcDeliveryOnChange();
+                                }
                                 return Text(
                                   '$value₫',
                                   maxLines: 1,

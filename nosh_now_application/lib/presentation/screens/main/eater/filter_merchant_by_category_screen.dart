@@ -7,6 +7,7 @@ import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
@@ -16,10 +17,12 @@ class FilterMerchantByCategoryScreen extends StatefulWidget {
   final FoodCategory? init;
 
   @override
-  State<FilterMerchantByCategoryScreen> createState() => _FilterMerchantByCategoryScreenState();
+  State<FilterMerchantByCategoryScreen> createState() =>
+      _FilterMerchantByCategoryScreenState();
 }
 
-class _FilterMerchantByCategoryScreenState extends State<FilterMerchantByCategoryScreen> {
+class _FilterMerchantByCategoryScreenState
+    extends State<FilterMerchantByCategoryScreen> {
   // final TextEditingController _controller = TextEditingController();
   ValueNotifier<List<MerchantWithDistance>> merchants = ValueNotifier([]);
   late ValueNotifier<bool> isLoading;
@@ -146,9 +149,20 @@ class _FilterMerchantByCategoryScreenState extends State<FilterMerchantByCategor
                         builder: (context, value, child) {
                           return Column(
                             children: List.generate(value.length, (index) {
-                              return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: MerchantItem(merchant: value[index]));
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              MerchantDetailScreen(
+                                                  merchant: value[index])));
+                                },
+                                child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child:
+                                        MerchantItem(merchant: value[index])),
+                              );
                             }),
                           );
                         }),

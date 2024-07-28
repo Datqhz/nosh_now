@@ -51,4 +51,32 @@ class EaterRepository {
       throw Exception('Fail to register');
     }
   }
+
+  Future<Eater?> update(Eater eater) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response =
+          await put(Uri.parse("${GlobalVariable.url}/api/eater"),
+              headers: headers,
+              body: jsonEncode(<String, dynamic>{
+                "id": eater.eaterId,
+                "displayName": eater.displayName,
+                "avatar": eater.avatar == '' ? '' : eater.avatar,
+                "email": eater.email,
+                "phone": eater.phone,
+              }));
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        print('body ${response.body}');
+        return null;
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return Eater.fromJson(data);
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to register');
+    }
+  }
 }

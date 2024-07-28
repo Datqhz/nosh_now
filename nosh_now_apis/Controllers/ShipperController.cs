@@ -47,17 +47,17 @@ namespace MyApp.Controllers
         public async Task<IActionResult> CreateShipper(CreateShipper createShipper)
         {
             var vehicleType = await vehicleTypeRepository.GetById(createShipper.vehicleTypeId);
-            if(vehicleType == null)
+            if (vehicleType == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Vehicle type has id = {createShipper.vehicleTypeId} doesn't exist."
                 });
             }
             var account = await accountRepository.GetById(createShipper.accountId);
-            if(account == null)
+            if (account == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Account has id = {createShipper.accountId} doesn't exist."
                 });
@@ -81,21 +81,22 @@ namespace MyApp.Controllers
         public async Task<IActionResult> UpdateOrderStatus(UpdateShipper updateShipper)
         {
             var shipper = await shipperRepository.GetById(updateShipper.id);
-            if(shipper == null){
+            if (shipper == null)
+            {
                 return NotFound(new
                 {
                     error = "Shipper doesn't exits!"
                 });
             }
             var vehicleType = await vehicleTypeRepository.GetById(updateShipper.vehicleTypeId);
-            if(vehicleType == null)
+            if (vehicleType == null)
             {
-                return NotFound(new 
+                return NotFound(new
                 {
                     error = $"Vehicle type has id = {updateShipper.vehicleTypeId} doesn't exist."
                 });
             }
-            if(!string.IsNullOrEmpty(updateShipper.avatar))
+            if (!string.IsNullOrEmpty(updateShipper.avatar))
             {
                 shipper.Avatar = Convert.FromBase64String(updateShipper.avatar);
             }
@@ -105,6 +106,7 @@ namespace MyApp.Controllers
             shipper.MomoPayment = updateShipper.momoPayment;
             shipper.Coordinator = updateShipper.coordinator;
             shipper.VehicleTypeId = updateShipper.vehicleTypeId;
+            shipper.Status = updateShipper.status;
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {

@@ -524,7 +524,7 @@ class _ShipperStatisticScreenState extends State<ShipperStatisticScreen> {
                 // drawer
                 GestureDetector(
                   onTap: () {
-                    // do something
+                   Scaffold.of(context).openDrawer();
                   },
                   child: const Icon(
                     CupertinoIcons.bars,

@@ -34,7 +34,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   Future<void> fetchData() async {
-    print(await getUser());
     eaters.value = await EaterRepository().getAllEater();
     merchants.value = await MerchantRepository().getAllMerchant();
     shippers.value = await ShipperRepository().getAllShipper();

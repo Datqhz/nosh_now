@@ -36,6 +36,39 @@ class MerchantRepository {
     }
   }
 
+  Future<Merchant?> update(Merchant merchant) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response =
+          await put(Uri.parse("${GlobalVariable.url}/api/merchant"),
+              headers: headers,
+              body: jsonEncode(<String, dynamic>{
+                "id": merchant.merchantId,
+                "displayName": merchant.displayName,
+                "avatar": merchant.avatar,
+                "email": merchant.email,
+                "phone": merchant.phone,
+                "openingTime": merchant.openingTime,
+                "closingTime": merchant.closingTime,
+                "coordinator": merchant.coordinator,
+                "categoryId": merchant.category!.categoryId,
+                "status": merchant.status
+              }));
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        print("body: ${response.body}");
+        return null;
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return Merchant.fromJson(data);
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to register');
+    }
+  }
+
   Future<List<MerchantWithDistance>> getAllMerchantNearby(
       String coordinator) async {
     Map<String, String> headers = {

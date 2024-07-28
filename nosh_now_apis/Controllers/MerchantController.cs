@@ -108,6 +108,7 @@ namespace MyApp.Controllers
             merchant.ClosingTime = updateMerchant.closingTime;
             merchant.Coordinator = updateMerchant.coordinator;
             merchant.CategoryId = updateMerchant.categoryId;
+            merchant.Status = updateMerchant.status;
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {

@@ -56,4 +56,35 @@ class ShipperRepository {
       throw Exception('Fail to register');
     }
   }
+  Future<Shipper?> update(Shipper shipper) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    try {
+      Response response =
+          await put(Uri.parse("${GlobalVariable.url}/api/shipper"),
+              headers: headers,
+              body: jsonEncode(<String, dynamic>{
+                "id": shipper.shipperId,
+                "displayName": shipper.displayName,
+                "avatar": shipper.avatar,
+                "email": shipper.email,
+                "phone": shipper.phone,
+                "vehicleName": shipper.vehicleName,
+                "momoPayment": shipper.momoPayment,
+                "coordinator": '0-0',
+                "vehicleTypeId": shipper.vehicleType!.typeId
+              }));
+      int statusCode = response.statusCode;
+      if (statusCode != 200) {
+        print("body: ${response.body}");
+        return null;
+      }
+      Map<String, dynamic> data = json.decode(response.body);
+      return Shipper.fromJson(data);
+    } catch (e) {
+      print(e.toString());
+      throw Exception('Fail to register');
+    }
+  }
 }

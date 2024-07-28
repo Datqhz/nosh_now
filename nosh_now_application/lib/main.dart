@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/streams/user_login_stream.dart';
 import 'package:nosh_now_application/data/providers/category_list_provider.dart';
 import 'package:nosh_now_application/data/providers/food_list_provider.dart';
+// ignore: unused_import
 import 'package:nosh_now_application/data/providers/timer_provider.dart';
 import 'package:nosh_now_application/data/providers/vehicle_type_provider.dart';
 import 'package:nosh_now_application/presentation/wrapper.dart';

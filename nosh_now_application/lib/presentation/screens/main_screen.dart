@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         return const ManagerStatisticScreen();
       case 'Eater':
         if (idx == 0) {
-          return HomeScreen();
+          return const HomeScreen();
         } else if (idx == 1) {
           return ManageOrderScreen(
             type: 1,
@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
             type: 1,
           );
         }
-        return const ProfileScreen();
+        return ProfileScreen();
       case 'Merchant':
         if (idx == 0) {
           return MerchantDashboardScreen();
@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
         } else if (idx == 3) {
           return const MerchantStatisticScreen();
         }
-        return const ProfileScreen();
+        return ProfileScreen();
       case 'Shipper':
         if (idx == 0) {
           return ShipperDashboardScreen();
@@ -92,7 +92,7 @@ class _MainScreenState extends State<MainScreen> {
         } else if (idx == 2) {
           return const ShipperStatisticScreen();
         }
-        return const ProfileScreen();
+        return ProfileScreen();
       default:
         return const SizedBox();
     }

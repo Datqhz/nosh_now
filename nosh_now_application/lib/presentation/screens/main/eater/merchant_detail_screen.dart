@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
@@ -36,12 +37,11 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
   ValueNotifier<List<OrderDetail>> details = ValueNotifier([]);
 
   Future<bool> _fetchAllData() async {
-    Eater eater = await getUser();
     try {
       foods.value = await FoodRepository()
           .getAllByMerchantAndIsSelling(widget.merchant.merchant.merchantId);
       order.value = await OrderRepository().getByMerchantAndEater(
-          widget.merchant.merchant.merchantId, eater.eaterId);
+          widget.merchant.merchant.merchantId, GlobalVariable.currentUid);
       details.value =
           await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
       return true;
@@ -51,7 +51,6 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
   }
 
   Future<void> _fetchOrderDetailData(int orderId) async {
-    Eater eater = await getUser();
     try {
       details.value =
           await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
@@ -121,144 +120,150 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  // merchant avatar
-                  Image(
-                    image: MemoryImage(convertBase64ToUint8List(
-                        widget.merchant.merchant.avatar)),
-                    width: MediaQuery.of(context).size.width,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                  Container(
-                    height: 140,
-                    width: MediaQuery.of(context).size.width - 40,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                        color: const Color.fromRGBO(240, 240, 240, 1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: const Color.fromRGBO(159, 159, 159, 1),
-                            width: 0.4)),
-                    transform: Matrix4.translationValues(0, -70, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // merchant name
-                        Text(
-                          widget.merchant.merchant.displayName,
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width - 80,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  color: Color.fromRGBO(159, 159, 159, 1),
-                                ),
-                                top: BorderSide(
-                                  color: Color.fromRGBO(159, 159, 159, 1),
-                                )),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // merchant avatar
+                    Image(
+                      image: MemoryImage(convertBase64ToUint8List(
+                          widget.merchant.merchant.avatar)),
+                      width: MediaQuery.of(context).size.width,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      height: 140,
+                      width: MediaQuery.of(context).size.width - 40,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                          color: const Color.fromRGBO(240, 240, 240, 1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: const Color.fromRGBO(159, 159, 159, 1),
+                              width: 0.4)),
+                      transform: Matrix4.translationValues(0, -70, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // merchant name
+                          Text(
+                            widget.merchant.merchant.displayName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
                           ),
-                          child: const Row(
+                          Container(
+                            width: MediaQuery.of(context).size.width - 80,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    color: Color.fromRGBO(159, 159, 159, 1),
+                                  ),
+                                  top: BorderSide(
+                                    color: Color.fromRGBO(159, 159, 159, 1),
+                                  )),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_sharp,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                //address
+                                Text(
+                                  '97 Man Thien, Hiep Phu ward, Thu Duc city',
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
                             children: [
-                              Icon(
-                                Icons.location_on_sharp,
-                                color: Colors.red,
-                                size: 20,
-                              ),
-                              //address
+                              // distance to merchant
                               Text(
-                                '97 Man Thien, Hiep Phu ward, Thu Duc city',
+                                '${double.parse((widget.merchant.distance).toStringAsFixed(2))} km',
+                                textAlign: TextAlign.center,
                                 maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color.fromRGBO(49, 49, 49, 1),
-                                    overflow: TextOverflow.ellipsis),
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.2,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              const Icon(
+                                CupertinoIcons.circle_fill,
+                                size: 4,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              // category name
+                              Text(
+                                widget.merchant.merchant.category!.categoryName,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.2,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            // distance to merchant
-                            Text(
-                              '${double.parse((widget.merchant.distance).toStringAsFixed(2))} km',
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                height: 1.2,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 4,
-                            ),
-                            const Icon(
-                              CupertinoIcons.circle_fill,
-                              size: 4,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                            ),
-                            const SizedBox(
-                              width: 4,
-                            ),
-                            // category name
-                            Text(
-                              widget.merchant.merchant.category!.categoryName,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                                height: 1.2,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  FutureBuilder(
-                      future: _fetchAllData(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: GridView.count(
-                                primary: false,
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 2,
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.9,
-                                children: buildListFood()),
-                          );
-                        } else {
-                          return const Center(
-                              child: SpinKitCircle(
-                            color: Colors.black,
-                            size: 40,
-                          ));
-                        }
-                      }),
-                ],
+                    FutureBuilder(
+                        future: _fetchAllData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              snapshot.hasData) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: GridView.count(
+                                  primary: false,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 2,
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.9,
+                                  children: buildListFood()),
+                            );
+                          } else {
+                            return const Center(
+                                child: SpinKitCircle(
+                              color: Colors.black,
+                              size: 40,
+                            ));
+                          }
+                        }),
+                  ],
+                ),
               ),
             ),
             // App bar
@@ -296,36 +301,17 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                                 order: order.value!,
                               )));
                 },
-                child: Stack(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(50)),
-                      child: const Icon(
-                        CupertinoIcons.news,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
-                    // Positioned(
-                    //   bottom: 0,
-                    //   right: 0,
-                    //   child: Container(
-                    //       height: 22,
-                    //       width: 22,
-                    //       alignment: Alignment.center,
-                    //       decoration: BoxDecoration(
-                    //           color: const Color.fromRGBO(233, 163, 59, 1),
-                    //           borderRadius: BorderRadius.circular(50)),
-                    //       child: Text(
-                    //         '${details.length}',
-                    //         style: const TextStyle(color: Colors.white),
-                    //       )),
-                    // ),
-                  ],
+                child: Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(50)),
+                  child: const Icon(
+                    CupertinoIcons.news,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
               ),
             )
@@ -335,4 +321,3 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     );
   }
 }
-

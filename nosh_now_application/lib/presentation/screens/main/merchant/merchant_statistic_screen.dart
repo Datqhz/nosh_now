@@ -748,7 +748,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                 // drawer
                 GestureDetector(
                   onTap: () {
-                    // do something
+                    Scaffold.of(context).openDrawer();
                   },
                   child: const Icon(
                     CupertinoIcons.bars,

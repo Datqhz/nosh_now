@@ -65,7 +65,7 @@ namespace MyApp.Controllers
             return CreatedAtAction(nameof(GetById), new { id = eaterCreated.Id }, eaterCreated.AsDto());
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateEaterOrManager updateEater)
+        public async Task<IActionResult> UpdateEater(UpdateEaterOrManager updateEater)
         {
             var eater = await eaterRepository.GetById(updateEater.id);
             if(eater == null){

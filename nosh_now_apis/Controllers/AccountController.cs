@@ -1,4 +1,5 @@
 using System.Transactions;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Authentication;
@@ -69,7 +70,7 @@ namespace MyApp.Controllers
             return CreatedAtAction(nameof(GetById), new { id = accountCreated.Id }, accountCreated);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateAccount updateAccount)
+        public async Task<IActionResult> UpdateAccont(UpdateAccount updateAccount)
         {
             var account = await accountRepository.GetById(updateAccount.id);
             if (account == null)
@@ -79,13 +80,18 @@ namespace MyApp.Controllers
                     error = "Account doesn't exits!"
                 });
             }
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(updateAccount.password);
+            if(!BCrypt.Net.BCrypt.Verify(updateAccount.oldPassword, account.Password)){
+                return BadRequest(new {
+                    error = "Your old password is incorrect"
+                });
+            }
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(updateAccount.newPassword);
             account.Password = passwordHash;
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var accountUpdated = await accountRepository.Update(account);
+                await accountRepository.Update(account);
                 scope.Complete();
-                return Ok(accountUpdated);
+                return Ok();
             }
         }
         [HttpPost("login")]

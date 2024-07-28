@@ -58,24 +58,15 @@ class MerchantDashboardScreen extends StatelessWidget {
                             color: Colors.white,
                             overflow: TextOverflow.ellipsis),
                       ),
-                      FutureBuilder(
-                          future: getUser(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              return Text(
-                                snapshot.data!.displayName,
+                     Text(
+                                GlobalVariable.user.displayName,
                                 maxLines: 1,
                                 style: const TextStyle(
                                     fontSize: 20.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     overflow: TextOverflow.ellipsis),
-                              );
-                            }
-                            return const SizedBox();
-                          }),
+                              )
                     ],
                   ),
                   const Text(
@@ -336,7 +327,7 @@ class MerchantDashboardScreen extends StatelessWidget {
               left: 20,
               child: GestureDetector(
                 onTap: () {
-                  // do something
+                  Scaffold.of(context).openDrawer();
                 },
                 child: const Icon(
                   CupertinoIcons.bars,

@@ -167,7 +167,7 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                 // drawer
                 GestureDetector(
                   onTap: () {
-                    // do something
+                    Scaffold.of(context).openDrawer();
                   },
                   child: const Icon(
                     CupertinoIcons.bars,
