@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
-import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 
+// ignore: must_be_immutable
 class FoodDetailScreen extends StatefulWidget {
   FoodDetailScreen(
       {super.key,
@@ -38,7 +39,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     int temp = 0;
     if (widget.notifier.detail != null) {
@@ -149,49 +149,57 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     const SizedBox(
                       height: 12,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.food.foodName,
-                          textAlign: TextAlign.left,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.w800,
-                            height: 1.2,
-                            color: Color.fromRGBO(49, 49, 49, 1),
-                            overflow: TextOverflow.ellipsis,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.food.foodName,
+                              textAlign: TextAlign.left,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.w800,
+                                height: 1.2,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${double.parse((widget.food.price).toStringAsFixed(2))} ₫',
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.w800,
-                            height: 1.2,
-                            color: Color.fromRGBO(49, 49, 49, 1),
-                            overflow: TextOverflow.ellipsis,
+                          Text(
+                            NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                                .format(widget.food.price),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                              color: Color.fromRGBO(49, 49, 49, 1),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
                     ),
-                    Text(
-                      widget.food.foodDescribe,
-                      textAlign: TextAlign.left,
-                      maxLines: 10,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Text(
+                        widget.food.foodDescribe,
+                        textAlign: TextAlign.left,
+                        maxLines: 10,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                     const Expanded(child: SizedBox()),
@@ -205,7 +213,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                               'Total price',
                               textAlign: TextAlign.left,
                               maxLines: 10,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w400,
                                 height: 1.2,
@@ -217,7 +225,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                 valueListenable: quantity,
                                 builder: (context, value, child) {
                                   return Text(
-                                    '${double.parse((widget.food.price * value).toStringAsFixed(2))} ₫',
+                                    NumberFormat.currency(
+                                            locale: 'vi_VN', symbol: '₫')
+                                        .format(widget.food.price * value),
                                     textAlign: TextAlign.left,
                                     maxLines: 10,
                                     style: const TextStyle(
@@ -261,7 +271,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                           price: widget.food.price,
                                           quantity: quantity.value,
                                           food: widget.food);
-                                      OrderDetail createRs =
+                                      OrderDetail? createRs =
                                           await OrderDetailRepository()
                                               .create(temp);
                                       if (createRs != null) {
@@ -273,11 +283,16 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
                                   if (rs) {
                                     showSnackBar(
-                                        context, "Update order successfully!");
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        "Update order successfully!");
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context);
                                   } else {
                                     showSnackBar(
-                                        context, "Update order failed!");
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        "Update order failed!");
                                   }
                                 },
                                 icon: const Icon(

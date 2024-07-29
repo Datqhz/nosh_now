@@ -13,6 +13,7 @@ class SavedLocation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: MediaQuery.of(context).size.width - 40,
       padding: const EdgeInsets.only(bottom: 8, top: 12),
       decoration: const BoxDecoration(
         border: Border(
@@ -40,53 +41,51 @@ class SavedLocation extends StatelessWidget {
           const SizedBox(
             width: 12,
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // location - phone
-              Text(
-                '${location.locationName} - ${location.phone}',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  color: Color.fromRGBO(49, 49, 49, 1),
-                  overflow: TextOverflow.ellipsis,
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // location - phone
+                Text(
+                  '${location.locationName} - ${location.phone}',
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    color: Color.fromRGBO(49, 49, 49, 1),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              FutureBuilder(
-                  future: getAddressFromLatLng(
-                      splitCoordinatorString(location.coordinator)),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
-                      return Text(
-                        snapshot.data!,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w300,
-                          height: 1.2,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }
-                    return const SizedBox();
-                  })
-            ],
+                const SizedBox(
+                  height: 6,
+                ),
+                FutureBuilder(
+                    future: getAddressFromLatLng(
+                        splitCoordinatorString(location.coordinator)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        return Text(
+                          snapshot.data!,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w300,
+                            height: 1.2,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    })
+              ],
+            ),
           ),
-          const Expanded(
-              child: SizedBox(
-            width: 12,
-          )),
           if (isPicked) ...[
             const Icon(
               CupertinoIcons.check_mark,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:nosh_now_application/core/utils/delete_dialog.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
@@ -46,7 +47,9 @@ class FoodManagementItem extends StatelessWidget {
                   width: 80,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: MemoryImage(convertBase64ToUint8List(food.foodImage)), fit: BoxFit.cover),
+                        image: MemoryImage(
+                            convertBase64ToUint8List(food.foodImage)),
+                        fit: BoxFit.cover),
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -54,40 +57,46 @@ class FoodManagementItem extends StatelessWidget {
                 const SizedBox(
                   width: 12,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // food name
-                    Text(
-                      food.foodName,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // food name
+                      Text(
+                        food.foodName,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 6,
-                    ),
-                    Text(
-                      '₫ ${food.price}',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w300,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(
+                        height: 6,
                       ),
-                    )
-                  ],
+                      Text(
+                        NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                            .format(food.price),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w300,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
+                const SizedBox(
+                  width: 8,
+                )
               ],
             ),
           ),
@@ -101,10 +110,11 @@ class FoodManagementItem extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ModifyFoodScreen(food: food)));
-                        if(temp!=null){
-                          // ignore: use_build_context_synchronously
-                          Provider.of<FoodListProvider>(context, listen: false).updateFood(food.foodId, temp);
-                        }
+                if (temp != null) {
+                  // ignore: use_build_context_synchronously
+                  Provider.of<FoodListProvider>(context, listen: false)
+                      .updateFood(food.foodId, temp);
+                }
               },
               child: const Icon(
                 CupertinoIcons.pencil,
@@ -117,12 +127,19 @@ class FoodManagementItem extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () async {
-                bool rs = await FoodRepository().deleteFood(food.foodId);
-                if(rs){
-                  showSnackBar(context, 'Delete food successful');
-                  Provider.of<FoodListProvider>(context, listen: false).deleteFood(food.foodId);
-                  // Navigator.pop(context);
-                }
+                showDeleteDialog(
+                  context,
+                  'food',
+                  food.foodName,
+                  () async {
+                    bool rs = await FoodRepository().deleteFood(food.foodId);
+                    if (rs) {
+                      showSnackBar(context, 'Delete food successful');
+                      Provider.of<FoodListProvider>(context, listen: false)
+                          .deleteFood(food.foodId);
+                    }
+                  },
+                );
               },
               child: const Icon(
                 CupertinoIcons.trash,

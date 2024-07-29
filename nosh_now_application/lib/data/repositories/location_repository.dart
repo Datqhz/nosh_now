@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
-import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 
 class LocationRepository {
-  Future<Location> create(Location location, int eaterId) async {
+  Future<Location?> create(Location location, int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -24,12 +22,10 @@ class LocationRepository {
               }));
       int statusCode = response.statusCode;
       if (statusCode != 201) {
-        print(response.body);
-        throw Exception();
+        return null;
       }
       return Location.fromJson(json.decode(response.body));
     } catch (e) {
-      print(e.toString());
       throw Exception('Fail to save location');
     }
   }

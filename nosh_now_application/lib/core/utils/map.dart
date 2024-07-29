@@ -33,7 +33,6 @@ Future<List<LatLng>> getRouteCoordinates(LatLng start, LatLng end) async {
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     final coordinates = data['routes'][0]['geometry']['coordinates'];
-    print(coordinates);
     return coordinates
         .map<LatLng>((coord) => LatLng(coord[1], coord[0]))
         .toList();

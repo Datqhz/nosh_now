@@ -2,10 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
-import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 
 class MerchantDashboardScreen extends StatelessWidget {
   MerchantDashboardScreen({super.key});
@@ -13,8 +10,8 @@ class MerchantDashboardScreen extends StatelessWidget {
 
   Future<void> getNumOfOrder() async {
     orderCount.value = await StatisticRepository()
-        .getTotalOrderOfUserByTimeAndRole(
-            GlobalVariable.currentUid, GlobalVariable.roleId, 1, DateTime.now());
+        .getTotalOrderOfUserByTimeAndRole(GlobalVariable.currentUid,
+            GlobalVariable.roleId, 1, DateTime.now());
   }
 
   @override
@@ -26,6 +23,7 @@ class MerchantDashboardScreen extends StatelessWidget {
         child: Stack(
           children: [
             Container(
+              width: MediaQuery.of(context).size.width,
               height: 300,
               decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -52,21 +50,23 @@ class MerchantDashboardScreen extends StatelessWidget {
                       const Text(
                         'Hi ',
                         maxLines: 1,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.w400,
                             color: Colors.white,
                             overflow: TextOverflow.ellipsis),
                       ),
-                     Text(
-                                GlobalVariable.user.displayName,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    overflow: TextOverflow.ellipsis),
-                              )
+                      Expanded(
+                        child: Text(
+                          GlobalVariable.user.displayName,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      )
                     ],
                   ),
                   const Text(
@@ -122,14 +122,17 @@ class MerchantDashboardScreen extends StatelessWidget {
                             FutureBuilder(
                                 future: StatisticRepository()
                                     .getRevenueOfMerchantByTime(
-                                        GlobalVariable.currentUid, 2,
-                                       DateTime.now()),
+                                        GlobalVariable.currentUid,
+                                        2,
+                                        DateTime.now()),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                           ConnectionState.done &&
                                       snapshot.hasData) {
                                     return Text(
-                                      '${snapshot.data} ₫',
+                                      NumberFormat.currency(
+                                              locale: 'vi_VN', symbol: '₫')
+                                          .format(snapshot.data),
                                       maxLines: 1,
                                       style: const TextStyle(
                                           fontSize: 16.0,
@@ -211,14 +214,18 @@ class MerchantDashboardScreen extends StatelessWidget {
                                     FutureBuilder(
                                         future: StatisticRepository()
                                             .getRevenueOfMerchantByTime(
-                                                GlobalVariable.currentUid, 1,
+                                                GlobalVariable.currentUid,
+                                                1,
                                                 DateTime.now()),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState ==
                                                   ConnectionState.done &&
                                               snapshot.hasData) {
                                             return Text(
-                                              '${snapshot.data!} ₫',
+                                              NumberFormat.currency(
+                                                      locale: 'vi_VN',
+                                                      symbol: '₫')
+                                                  .format(snapshot.data),
                                               maxLines: 1,
                                               style: const TextStyle(
                                                   fontSize: 16.0,
@@ -304,7 +311,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                                     const Text(
                                       '/10 Orders',
                                       maxLines: 1,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 14.0,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.black,
@@ -342,4 +349,3 @@ class MerchantDashboardScreen extends StatelessWidget {
     );
   }
 }
-

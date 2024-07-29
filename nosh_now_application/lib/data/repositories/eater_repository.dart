@@ -25,7 +25,7 @@ class EaterRepository {
     }
   }
 
-  Future<Eater> create(Eater eater, int accountId) async {
+  Future<Eater?> create(Eater eater, int accountId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -42,7 +42,7 @@ class EaterRepository {
               }));
       int statusCode = response.statusCode;
       if (statusCode != 201) {
-        throw Exception();
+        return null;
       }
       Map<String, dynamic> data = json.decode(response.body);
       return Eater.fromJson(data);

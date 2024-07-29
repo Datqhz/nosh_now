@@ -144,6 +144,7 @@ class MerchantRepository {
               "${GlobalVariable.url}/api/merchant/find?regex=$regex&coordinator=$coord"),
           headers: headers);
       int statusCode = response.statusCode;
+      print(response.body);
       if (statusCode != 200) {
         return [];
       }

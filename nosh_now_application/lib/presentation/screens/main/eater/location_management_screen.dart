@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/change_stream.dart';
-import 'package:nosh_now_application/core/streams/location_notifier.dart';
-import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/pick_location_from_map.dart';
 import 'package:nosh_now_application/presentation/widgets/location_management_item.dart';
-import 'package:nosh_now_application/presentation/widgets/saved_location.dart';
 
 class LocationManagementScreen extends StatefulWidget {
-  LocationManagementScreen({super.key});
+  const LocationManagementScreen({super.key});
 
   @override
   State<LocationManagementScreen> createState() =>
@@ -40,10 +36,10 @@ class _LocationManagementScreenState extends State<LocationManagementScreen> {
                         return FutureBuilder(
                             future: LocationRepository()
                                 .getAllByEater(GlobalVariable.currentUid),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
+                            builder: (context, futureSnapshot) {
+                              if (futureSnapshot.connectionState ==
                                       ConnectionState.done &&
-                                  snapshot.hasData) {
+                                  futureSnapshot.hasData) {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -51,9 +47,11 @@ class _LocationManagementScreenState extends State<LocationManagementScreen> {
                                       height: 66,
                                     ),
                                     ...List.generate(
-                                      snapshot.data!.length,
+                                      futureSnapshot.data!.length,
                                       (index) => LocationManagementItem(
-                                          location: snapshot.data![index], notifier: notifier,),
+                                        location: futureSnapshot.data![index],
+                                        notifier: notifier,
+                                      ),
                                     )
                                   ],
                                 );

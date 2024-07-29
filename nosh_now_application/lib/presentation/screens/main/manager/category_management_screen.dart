@@ -108,7 +108,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                           color: Color.fromRGBO(49, 49, 49, 1),
                         ),
                       ),
-                      // search merchant
+                      // add category
                       GestureDetector(
                         onTap: () async {
                           showDialog(

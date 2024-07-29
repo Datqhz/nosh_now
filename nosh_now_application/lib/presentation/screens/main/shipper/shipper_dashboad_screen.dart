@@ -2,10 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
-import 'package:nosh_now_application/data/models/shipper.dart';
-import 'package:nosh_now_application/data/models/vehicle_type.dart';
-import 'package:nosh_now_application/data/repositories/firebase_message_repository.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 
 class ShipperDashboardScreen extends StatelessWidget {
@@ -39,6 +35,7 @@ class ShipperDashboardScreen extends StatelessWidget {
             ),
             Container(
               height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               color: Colors.transparent,
               child: Column(
@@ -58,14 +55,16 @@ class ShipperDashboardScreen extends StatelessWidget {
                             color: Colors.white,
                             overflow: TextOverflow.ellipsis),
                       ),
-                      Text(
-                        GlobalVariable.user.displayName,
-                        maxLines: 1,
-                        style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            overflow: TextOverflow.ellipsis),
+                      Expanded(
+                        child: Text(
+                          GlobalVariable.user.displayName,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              overflow: TextOverflow.ellipsis),
+                        ),
                       )
                     ],
                   ),
@@ -130,7 +129,9 @@ class ShipperDashboardScreen extends StatelessWidget {
                                           ConnectionState.done &&
                                       snapshot.hasData) {
                                     return Text(
-                                      '${snapshot.data} ₫',
+                                      NumberFormat.currency(
+                                              locale: 'vi_VN', symbol: '₫')
+                                          .format(snapshot.data),
                                       maxLines: 1,
                                       style: const TextStyle(
                                           fontSize: 16.0,
@@ -220,7 +221,10 @@ class ShipperDashboardScreen extends StatelessWidget {
                                                   ConnectionState.done &&
                                               snapshot.hasData) {
                                             return Text(
-                                              '${snapshot.data!} ₫',
+                                              NumberFormat.currency(
+                                                      locale: 'vi_VN',
+                                                      symbol: '₫')
+                                                  .format(snapshot.data),
                                               maxLines: 1,
                                               style: const TextStyle(
                                                   fontSize: 16.0,

@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
-import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
-import 'package:nosh_now_application/data/repositories/category_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/category_item.dart';
 import 'package:nosh_now_application/presentation/widgets/merchant_item.dart';
 
 class SearchMerchantScreen extends StatefulWidget {
@@ -73,7 +70,7 @@ class _SearchMerchantScreenState extends State<SearchMerchantScreen> {
                     ValueListenableBuilder(
                         valueListenable: merchants,
                         builder: (context, value, child) {
-                          if (value.isEmpty & isLoading.value == false) {
+                          if (value.isEmpty && isLoading.value == false) {
                             return Text(
                               "Don't have any merchant has name contain '${regex.value}'",
                               textAlign: TextAlign.center,

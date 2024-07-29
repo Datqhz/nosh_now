@@ -3,16 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/time_picker.dart';
-import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/order.dart';
-import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/models/top_food.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/food_management_item.dart';
 
 class ShipperStatisticScreen extends StatefulWidget {
   const ShipperStatisticScreen({super.key});
@@ -154,30 +146,24 @@ class _ShipperStatisticScreenState extends State<ShipperStatisticScreen> {
                 ),
                 Row(
                   children: [
-                    Text(
-                      'Statistic in ${titleChart()}',
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Text(
+                        'Statistic in ${titleChart()}',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                    const Expanded(child: SizedBox()),
-                    GestureDetector(
-                      onTap: () async {
-                        DateTime? picked =
-                            await selectDate(context, currentOption.value);
-                        if (picked != null) {
-                          print(picked.toString());
-                          currentPick.value = picked;
-                        }
-                      },
-                      child: const Icon(
-                        CupertinoIcons.calendar,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                      ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    const Icon(
+                      CupertinoIcons.calendar,
+                      color: Color.fromRGBO(49, 49, 49, 1),
                     )
                   ],
                 ),
@@ -524,7 +510,7 @@ class _ShipperStatisticScreenState extends State<ShipperStatisticScreen> {
                 // drawer
                 GestureDetector(
                   onTap: () {
-                   Scaffold.of(context).openDrawer();
+                    Scaffold.of(context).openDrawer();
                   },
                   child: const Icon(
                     CupertinoIcons.bars,

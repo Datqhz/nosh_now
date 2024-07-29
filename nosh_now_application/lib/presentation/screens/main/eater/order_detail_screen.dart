@@ -11,7 +11,7 @@ import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/order_process_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -88,14 +88,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
-                        Text(
-                          widget.order.eater.displayName,
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
+                        Expanded(
+                          child: Text(
+                            widget.order.eater.displayName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w400,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ],
                     ),
@@ -110,16 +112,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
-                        Text(
-                          DateFormat.yMMMd("en_US")
-                              .format(widget.order.orderedDate!)
-                              .toString(),
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
+                        Expanded(
+                          child: Text(
+                            DateFormat.yMMMd("en_US")
+                                .format(widget.order.orderedDate!)
+                                .toString(),
+                            maxLines: 1,
+                            style: const TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w400,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ],
                     ),
@@ -205,14 +209,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               color: Color.fromRGBO(49, 49, 49, 1),
                               overflow: TextOverflow.ellipsis),
                         ),
-                        Text(
-                          widget.order.merchant.displayName,
-                          maxLines: 1,
-                          style: const TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
+                        Expanded(
+                          child: Text(
+                            widget.order.merchant.displayName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.w400,
+                                color: Color.fromRGBO(49, 49, 49, 1),
+                                overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ],
                     ),
@@ -276,14 +282,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 color: Color.fromRGBO(49, 49, 49, 1),
                                 overflow: TextOverflow.ellipsis),
                           ),
-                          Text(
-                            widget.order.shipper!.displayName,
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.w400,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis),
+                          Expanded(
+                            child: Text(
+                              widget.order.shipper!.displayName,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
                           ),
                         ],
                       ),
@@ -352,7 +360,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             builder: (context, value, child) {
                               if (value.isNotEmpty) {
                                 return Text(
-                                  '${calcSubtantial(value)}₫',
+                                  NumberFormat.currency(
+                                          locale: 'vi_VN', symbol: '₫')
+                                      .format(calcSubtantial(value)),
                                   maxLines: 1,
                                   style: const TextStyle(
                                       fontSize: 16.0,
@@ -381,7 +391,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          '${widget.order.shipmentFee}₫',
+                          NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                              .format(widget.order.shipmentFee),
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 16.0,
@@ -407,7 +418,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               overflow: TextOverflow.ellipsis),
                         ),
                         Text(
-                          '${widget.order.totalPay}₫',
+                          NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                              .format(widget.order.totalPay),
                           maxLines: 1,
                           style: const TextStyle(
                               fontSize: 20.0,
@@ -426,7 +438,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           return Row(
                             children: [
                               if (value.orderStatus.orderStatusId == 2 &&
-                                  GlobalVariable.roleId != 3)
+                                  GlobalVariable.roleId == 2)
                                 Expanded(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -440,9 +452,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                         bool rs = await OrderRepository()
                                             .update(temp);
                                         if (rs) {
-                                          if (widget.callback != null) {
-                                            reload();
-                                          }
+                                          reload();
                                           showSnackBar(
                                               context, "Update successful");
                                         } else {
@@ -466,43 +476,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   ),
                                 ),
                               //see proccess
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  // width: double.infinity,
-                                  height: 44,
-                                  child: TextButton(
-                                    onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                OrderProcessScreen(
-                                                  order: widget.order,
-                                                  type:
-                                                      GlobalVariable.roleId != 4
-                                                          ? 1
-                                                          : 2,
-                                                  callback:
-                                                      GlobalVariable.roleId != 3
-                                                          ? reload
-                                                          : null,
-                                                ))),
-                                    style: TextButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        foregroundColor: Colors.black,
-                                        textStyle: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600),
-                                        shape: RoundedRectangleBorder(
-                                            side:
-                                                BorderSide(color: Colors.black),
-                                            borderRadius:
-                                                BorderRadius.circular(8))),
-                                    child: const Text('See process'),
+                              if (value.orderStatus.orderStatusId != 5)
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    // width: double.infinity,
+                                    height: 44,
+                                    child: TextButton(
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  OrderProcessScreen(
+                                                    order: widget.order,
+                                                    callback:
+                                                        GlobalVariable.roleId !=
+                                                                3
+                                                            ? reload
+                                                            : null,
+                                                  ))),
+                                      style: TextButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          foregroundColor: Colors.black,
+                                          textStyle: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                          shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black),
+                                              borderRadius:
+                                                  BorderRadius.circular(8))),
+                                      child: const Text('See process'),
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           );
                         }),
@@ -537,11 +545,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     const SizedBox(
                       width: 12,
                     ),
-                    Text(
-                      widget.order.merchant.displayName,
+                    const Text(
+                      'Order detail',
                       maxLines: 1,
-                      style: const TextStyle(
-                          fontSize: 16.0,
+                      style: TextStyle(
+                          fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(49, 49, 49, 1),
                           overflow: TextOverflow.ellipsis),

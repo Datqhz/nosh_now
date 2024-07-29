@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
-import 'package:nosh_now_application/presentation/screens/auth/question_screen.dart';
 
 class RegisterSuccessScreen extends StatelessWidget {
   const RegisterSuccessScreen({super.key});

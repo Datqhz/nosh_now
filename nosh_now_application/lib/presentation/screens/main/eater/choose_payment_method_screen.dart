@@ -2,12 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
-import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/payment_method.dart';
 import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/saved_location.dart';
 
+// ignore: must_be_immutable
 class ChoosePaymentMethodScreen extends StatefulWidget {
   ChoosePaymentMethodScreen({super.key, required this.currentPick});
 
@@ -139,47 +137,6 @@ class _ChoosePaymentMethodScreenState extends State<ChoosePaymentMethodScreen> {
                     ],
                   ),
                 ),
-              ),
-              // pick from map
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                            top: BorderSide(
-                                color: Color.fromRGBO(159, 159, 159, 1))),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        )),
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          CupertinoIcons.map,
-                          size: 18,
-                          color: Color.fromRGBO(49, 49, 49, 1),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          'Pick from map',
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    )),
               ),
             ],
           ),

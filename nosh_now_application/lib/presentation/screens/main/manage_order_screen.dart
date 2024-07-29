@@ -74,6 +74,7 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
         afterFilter.add(order);
       }
     }
+    sortOrder(afterFilter);
     orders.value = afterFilter;
   }
 
@@ -103,9 +104,9 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
   Widget buildHeader() {
     if (widget.type == 3) {
       if (_tabController.index == 0) {
-        return const Row(
+        return Row(
           children: [
-            Text(
+            const Text(
               'Order received',
               maxLines: 1,
               style: TextStyle(
@@ -115,21 +116,151 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Expanded(child: SizedBox()),
-            Text(
-              'Newest',
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w400,
-                color: Color.fromRGBO(49, 49, 49, 1),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Icon(
-              CupertinoIcons.sort_down,
-              color: Color.fromRGBO(49, 49, 49, 1),
-            )
+            const Expanded(child: SizedBox()),
+            ValueListenableBuilder(
+                valueListenable: option,
+                builder: (context, value, child) {
+                  return GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              height: 220,
+                              color: Colors.black,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.minus,
+                                        color: Colors.white.withOpacity(0.8),
+                                        size: 40,
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  const Text(
+                                    "Sort",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      option.value = 1;
+                                      if (GlobalVariable.roleId != 2) {
+                                        List<Order> temp =
+                                            List.from(orders.value!);
+                                        sortOrder(temp);
+                                        orders.value = temp;
+                                      } else {
+                                        filterOrderByMerchantName();
+                                      }
+
+                                      Navigator.pop(context);
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Newest",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 12,
+                                        ),
+                                        if (value == 1)
+                                          const Icon(
+                                            CupertinoIcons
+                                                .checkmark_alt_circle_fill,
+                                            color: Colors.white,
+                                          )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      option.value = 2;
+                                      if (GlobalVariable.roleId != 2) {
+                                        List<Order> temp =
+                                            List.from(orders.value!);
+                                        sortOrder(temp);
+                                        orders.value = temp;
+                                      } else {
+                                        filterOrderByMerchantName();
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Oldest",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 12,
+                                        ),
+                                        if (value == 2)
+                                          const Icon(
+                                            CupertinoIcons
+                                                .checkmark_alt_circle_fill,
+                                            color: Colors.white,
+                                          )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
+                                ],
+                              ),
+                            );
+                          });
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          value == 1 ? 'Newest' : 'Oldest',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                            color: Color.fromRGBO(49, 49, 49, 1),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(
+                          value == 1
+                              ? CupertinoIcons.sort_down
+                              : CupertinoIcons.sort_up,
+                          color: const Color.fromRGBO(49, 49, 49, 1),
+                        )
+                      ],
+                    ),
+                  );
+                })
           ],
         );
       } else {
@@ -200,7 +331,15 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                                 GestureDetector(
                                   onTap: () {
                                     option.value = 1;
-                                    filterOrderByMerchantName();
+                                    if (GlobalVariable.roleId != 2) {
+                                      List<Order> temp =
+                                          List.from(orders.value!);
+                                      sortOrder(temp);
+                                      orders.value = temp;
+                                    } else {
+                                      filterOrderByMerchantName();
+                                    }
+
                                     Navigator.pop(context);
                                   },
                                   child: Row(
@@ -231,7 +370,14 @@ class _ManageOrderScreenState extends State<ManageOrderScreen>
                                 GestureDetector(
                                   onTap: () {
                                     option.value = 2;
-                                    filterOrderByMerchantName();
+                                    if (GlobalVariable.roleId != 2) {
+                                      List<Order> temp =
+                                          List.from(orders.value!);
+                                      sortOrder(temp);
+                                      orders.value = temp;
+                                    } else {
+                                      filterOrderByMerchantName();
+                                    }
                                     Navigator.pop(context);
                                   },
                                   child: Row(

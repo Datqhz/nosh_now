@@ -1,15 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/shipper.dart';
 import 'package:nosh_now_application/data/repositories/eater_repository.dart';
 import 'package:nosh_now_application/data/repositories/merchant_repository.dart';
 import 'package:nosh_now_application/data/repositories/shipper_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/user_item.dart';
 
 class UserManagementScreen extends StatefulWidget {

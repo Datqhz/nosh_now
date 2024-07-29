@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
@@ -55,12 +54,15 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(
                   height: 70,
                 ),
-                const Text(
-                  'Categories for you',
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(49, 49, 49, 1)),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: const Text(
+                    'Categories for you',
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(49, 49, 49, 1)),
+                  ),
                 ),
                 FutureBuilder(
                     future: _fetchCategoryData(),
@@ -100,14 +102,17 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(
                   height: 12,
                 ),
-                const Text(
-                  'Some merchants are near you',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(49, 49, 49, 1),
-                    overflow: TextOverflow.ellipsis,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: const Text(
+                    'Some merchants are near you',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(49, 49, 49, 1),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 // list merchant

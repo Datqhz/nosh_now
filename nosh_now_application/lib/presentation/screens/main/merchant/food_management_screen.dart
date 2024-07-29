@@ -3,13 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/order.dart';
-import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/providers/food_list_provider.dart';
-import 'package:nosh_now_application/data/repositories/food_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_management_item.dart';
 import 'package:provider/provider.dart';
@@ -24,19 +18,12 @@ class FoodManagementScreen extends StatefulWidget {
 class _FoodManagementScreenState extends State<FoodManagementScreen> {
   final TextEditingController _nameController = TextEditingController();
   final ValueNotifier _isShowSeachBar = ValueNotifier(false);
-  ValueNotifier<List<Food>?> foods = ValueNotifier(null);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    fetchData();
-    Provider.of<FoodListProvider>(context, listen: false).fetchFoods(GlobalVariable.currentUid);
-  }
-
-  Future<void> fetchData() async {
-    foods.value =
-        await FoodRepository().getAllByMerchant(GlobalVariable.currentUid);
+    Provider.of<FoodListProvider>(context, listen: false)
+        .fetchFoods(GlobalVariable.currentUid);
   }
 
   @override
@@ -64,7 +51,12 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                           controller: _nameController,
                           decoration: InputDecoration(
                             suffixIcon: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Provider.of<FoodListProvider>(context,
+                                          listen: false)
+                                      .filterFoodByName('');
+                                  _nameController.text = '';
+                                },
                                 icon: const Icon(
                                   CupertinoIcons.xmark,
                                   color: Color.fromRGBO(49, 49, 49, 1),
@@ -90,7 +82,11 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                               color: Color.fromRGBO(49, 49, 49, 1),
                               fontSize: 14,
                               decoration: TextDecoration.none),
-                          validator: (value) {},
+                          onChanged: (value) {
+                            Provider.of<FoodListProvider>(context,
+                                    listen: false)
+                                .filterFoodByName(value);
+                          },
                         ),
                       );
                     }
@@ -101,7 +97,7 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
                   const Text(
                     'Your foods',
                     maxLines: 1,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(49, 49, 49, 1),

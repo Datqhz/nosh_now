@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
 
@@ -17,7 +16,7 @@ class StatusItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width / 5,
       child: Column(
         children: [
@@ -28,8 +27,8 @@ class StatusItem extends StatelessWidget {
               borderRadius:
                   BorderRadius.circular(MediaQuery.of(context).size.width / 10),
               color: isActive
-                  ? Color.fromRGBO(247, 205, 99, 1)
-                  : Color.fromRGBO(220, 220, 220, 1),
+                  ? const Color.fromRGBO(247, 205, 99, 1)
+                  : const Color.fromRGBO(220, 220, 220, 1),
             ),
             child: Icon(
               icon,
@@ -48,8 +47,8 @@ class StatusItem extends StatelessWidget {
               borderRadius:
                   BorderRadius.circular(MediaQuery.of(context).size.width / 10),
               color: isActive
-                  ? Color.fromRGBO(247, 205, 99, 1)
-                  : Color.fromRGBO(220, 220, 220, 1),
+                  ? const Color.fromRGBO(247, 205, 99, 1)
+                  : const Color.fromRGBO(220, 220, 220, 1),
             ),
             child: Text(
               status.step.toString(),

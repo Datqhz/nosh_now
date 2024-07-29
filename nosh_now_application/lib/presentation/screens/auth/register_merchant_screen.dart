@@ -8,7 +8,6 @@ import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
-import 'package:nosh_now_application/data/models/account.dart';
 import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/repositories/account_repository.dart';
@@ -649,13 +648,13 @@ class _RegisterMerchantStep1ScreenState
                                               _openingTimeController.text;
                                           final closingTime =
                                               _closingTimeController.text;
-                                          FoodCategory? category = null;
-                                          _categories.forEach((e) {
+                                          FoodCategory? category;
+                                          for (var e in _categories) {
                                             if (e.categoryName ==
                                                 _categorySelected.value) {
                                               category = e;
                                             }
-                                          });
+                                          }
                                           Merchant merchant = Merchant(
                                               merchantId: 0,
                                               displayName: displayName,

@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/providers/food_list_provider.dart';
 import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 import 'package:provider/provider.dart';
 
 class FoodDetailManagementScreen extends StatelessWidget {
@@ -23,8 +22,7 @@ class FoodDetailManagementScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
       body: SafeArea(
-        child: Consumer<FoodListProvider>(
-          builder: (context, provider, child) {
+        child: Consumer<FoodListProvider>(builder: (context, provider, child) {
           final updatedFood = provider.foods
               .firstWhere((f) => f.foodId == food.foodId, orElse: () => food);
           return Stack(
@@ -79,8 +77,12 @@ class FoodDetailManagementScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                          const SizedBox(
+                            width: 12,
+                          ),
                           Text(
-                            '${updatedFood.price} ₫',
+                            NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                                .format(updatedFood.price),
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             style: const TextStyle(
@@ -185,7 +187,10 @@ class FoodDetailManagementScreen extends StatelessWidget {
                             value: choice,
                             child: Text(
                               choice,
-                              style: const TextStyle(color: Colors.black),
+                              style: TextStyle(
+                                  color: choice == 'Delete'
+                                      ? Colors.red
+                                      : Colors.black),
                             ),
                           );
                         }).toList();

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/streams/change_stream.dart';
+import 'package:nosh_now_application/core/utils/delete_dialog.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
@@ -23,6 +23,7 @@ class LocationManagementItem extends StatelessWidget {
         builder: (context, snapshot) {
           return Container(
             padding: const EdgeInsets.only(bottom: 8, top: 12),
+            width: MediaQuery.of(context).size.width-40,
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -49,38 +50,52 @@ class LocationManagementItem extends StatelessWidget {
                 const SizedBox(
                   width: 12,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // location - phone
-                    Text(
-                      '${location.locationName} - ${location.phone}',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // location - phone
+                      Text(
+                        '${location.locationName} - ${location.phone}',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 6,
-                    ),
-                    FutureBuilder(
-                        future: getAddressFromLatLng(
-                            splitCoordinatorString(location.coordinator)),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.done &&
-                              snapshot.hasData) {
-                            return Text(
-                              snapshot.data!,
+                      const SizedBox(
+                        height: 6,
+                      ),
+                      FutureBuilder(
+                          future: getAddressFromLatLng(
+                              splitCoordinatorString(location.coordinator)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              return Text(
+                                snapshot.data!,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w300,
+                                  height: 1.2,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            }
+                            return const Text(
+                              '',
                               textAlign: TextAlign.center,
                               maxLines: 1,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13.0,
                                 fontWeight: FontWeight.w300,
                                 height: 1.2,
@@ -88,26 +103,10 @@ class LocationManagementItem extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             );
-                          }
-                          return const Text(
-                            '',
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w300,
-                              height: 1.2,
-                              color: Color.fromRGBO(49, 49, 49, 1),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          );
-                        })
-                  ],
+                          })
+                    ],
+                  ),
                 ),
-                const Expanded(
-                    child: SizedBox(
-                  width: 12,
-                )),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -131,7 +130,8 @@ class LocationManagementItem extends StatelessWidget {
                       height: 6,
                     ),
                     GestureDetector(
-                      onTap: () async {
+                      onTap: () => showDeleteDialog(
+                          context, 'location', location.locationName, () async {
                         var rs = await LocationRepository()
                             .deleteSavedLocation(location.locationId);
                         if (rs) {
@@ -140,7 +140,7 @@ class LocationManagementItem extends StatelessWidget {
                         } else {
                           showSnackBar(context, "Delete failed");
                         }
-                      },
+                      }),
                       child: const Icon(
                         CupertinoIcons.trash,
                         color: Colors.red,

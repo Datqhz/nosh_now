@@ -45,7 +45,7 @@ class FoodRepository {
     }
   }
 
-  Future<Food> create(Food food, int merchantId) async {
+  Future<Food?> create(Food food, int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -64,7 +64,7 @@ class FoodRepository {
       int statusCode = response.statusCode;
       if (statusCode != 201) {
         print(response.body);
-        throw Exception();
+        return null;
       }
       return Food.fromJson(json.decode(response.body));
     } catch (e) {

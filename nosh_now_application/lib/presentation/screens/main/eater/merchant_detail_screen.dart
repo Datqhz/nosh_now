@@ -5,23 +5,20 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
-import 'package:nosh_now_application/data/models/eater.dart';
+import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
-import 'package:nosh_now_application/data/models/order_status.dart';
 import 'package:nosh_now_application/data/repositories/food_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_detail_repository.dart';
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/food_detail_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/home_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/food_item.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class MerchantDetailScreen extends StatefulWidget {
   MerchantDetailScreen({super.key, required this.merchant});
 
@@ -45,15 +42,6 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
       details.value =
           await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
       return true;
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
-
-  Future<void> _fetchOrderDetailData(int orderId) async {
-    try {
-      details.value =
-          await OrderDetailRepository().getAllByOrderId(order.value!.orderId);
     } catch (e) {
       throw Exception(e.toString());
     }
@@ -109,7 +97,6 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -150,17 +137,20 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // merchant name
-                          Text(
-                            widget.merchant.merchant.displayName,
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                                overflow: TextOverflow.ellipsis),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 54,
+                            child: Text(
+                              widget.merchant.merchant.displayName,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                  overflow: TextOverflow.ellipsis),
+                            ),
                           ),
                           Container(
-                            width: MediaQuery.of(context).size.width - 80,
+                            width: MediaQuery.of(context).size.width - 54,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: const BoxDecoration(
                               border: Border(
@@ -171,66 +161,87 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                                     color: Color.fromRGBO(159, 159, 159, 1),
                                   )),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.location_on_sharp,
                                   color: Colors.red,
                                   size: 20,
                                 ),
                                 //address
-                                Text(
-                                  '97 Man Thien, Hiep Phu ward, Thu Duc city',
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color.fromRGBO(49, 49, 49, 1),
-                                      overflow: TextOverflow.ellipsis),
+                                Expanded(
+                                  child: FutureBuilder(
+                                      future: getAddressFromLatLng(
+                                          splitCoordinatorString(widget
+                                              .merchant.merchant.coordinator)),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Text(
+                                            snapshot.data!,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color.fromRGBO(
+                                                    49, 49, 49, 1),
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          );
+                                        }
+                                        return const SizedBox();
+                                      }),
                                 ),
                               ],
                             ),
                           ),
-                          Row(
-                            children: [
-                              // distance to merchant
-                              Text(
-                                '${double.parse((widget.merchant.distance).toStringAsFixed(2))} km',
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2,
-                                  color: Color.fromRGBO(49, 49, 49, 1),
-                                  overflow: TextOverflow.ellipsis,
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 54,
+                            child: Row(
+                              children: [
+                                // distance to merchant
+                                Text(
+                                  '${double.parse((widget.merchant.distance).toStringAsFixed(2))} km',
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2,
+                                    color: Color.fromRGBO(49, 49, 49, 1),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              const Icon(
-                                CupertinoIcons.circle_fill,
-                                size: 4,
-                                color: Color.fromRGBO(49, 49, 49, 1),
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              // category name
-                              Text(
-                                widget.merchant.merchant.category!.categoryName,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2,
-                                  color: Color.fromRGBO(49, 49, 49, 1),
-                                  overflow: TextOverflow.ellipsis,
+                                const SizedBox(
+                                  width: 4,
                                 ),
-                              ),
-                            ],
+                                const Icon(
+                                  CupertinoIcons.circle_fill,
+                                  size: 4,
+                                  color: Color.fromRGBO(49, 49, 49, 1),
+                                ),
+                                const SizedBox(
+                                  width: 4,
+                                ),
+                                // category name
+                                Expanded(
+                                  child: Text(
+                                    widget.merchant.merchant.category!
+                                        .categoryName,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.2,
+                                      color: Color.fromRGBO(49, 49, 49, 1),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         ],
                       ),

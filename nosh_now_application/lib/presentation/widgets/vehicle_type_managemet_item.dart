@@ -1,19 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nosh_now_application/core/utils/delete_dialog.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
-import 'package:nosh_now_application/data/models/category.dart';
-import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/order_detail.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/providers/vehicle_type_provider.dart';
 import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/merchant/food_detail_management_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/merchant/modify_food_screen.dart';
 import 'package:provider/provider.dart';
 
 class VehicleTypeManagementItem extends StatelessWidget {
@@ -57,20 +51,25 @@ class VehicleTypeManagementItem extends StatelessWidget {
               const SizedBox(
                 width: 12,
               ),
-              Text(
-                vehicleType.typeName,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  color: Color.fromRGBO(49, 49, 49, 1),
-                  overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Text(
+                  vehicleType.typeName,
+                  textAlign: TextAlign.left,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    color: Color.fromRGBO(49, 49, 49, 1),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
           ),
+        ),
+        const SizedBox(
+          width: 12,
         ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,110 +261,19 @@ class VehicleTypeManagementItem extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () async {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Dialog(
-                        elevation: 0,
-                        backgroundColor: Colors.white,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          height: 180,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              const Text(
-                                "Delete vehicle type",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black),
-                              ),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              Text(
-                                "Do you want remove ${vehicleType.typeName}",
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black),
-                              ),
-                              const Expanded(
-                                  child: SizedBox(
-                                height: 1,
-                              )),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    style: TextButton.styleFrom(
-                                      foregroundColor:
-                                          Colors.black.withOpacity(0.8),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 10),
-                                      textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black.withOpacity(0.8)),
-                                      backgroundColor: Colors.transparent,
-                                    ),
-                                    child: const Text(
-                                      "CANCEL",
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 40,
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      bool rs = await VehicleTypeRepository()
-                                          .deleteVehicleType(
-                                              vehicleType.typeId);
-                                      if (rs) {
-                                        Provider.of<VehicleTypeListProvider>(
-                                                context,
-                                                listen: false)
-                                            .deleteVehicleType(
-                                                vehicleType.typeId);
-                                        showSnackBar(
-                                            context, "Delete successful");
-                                      } else {
-                                        showSnackBar(context,
-                                            "Can't delete this category");
-                                      }
-                                      Navigator.pop(context);
-                                    },
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.black,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 10),
-                                      textStyle: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(15, 40, 232, 1)),
-                                      backgroundColor: Colors.transparent,
-                                    ),
-                                    child: const Text(
-                                      "YES",
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    });
+                showDeleteDialog(context, 'vehicle type', vehicleType.typeName,
+                    () async {
+                  bool rs = await VehicleTypeRepository()
+                      .deleteVehicleType(vehicleType.typeId);
+                  if (rs) {
+                    Provider.of<VehicleTypeListProvider>(context, listen: false)
+                        .deleteVehicleType(vehicleType.typeId);
+                    showSnackBar(context, "Delete successful");
+                  } else {
+                    showSnackBar(context, "Can't delete this category");
+                  }
+                  Navigator.pop(context);
+                });
               },
               child: const Icon(
                 CupertinoIcons.trash,

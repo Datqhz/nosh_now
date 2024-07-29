@@ -6,13 +6,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
-import 'package:nosh_now_application/data/models/category.dart';
 import 'package:nosh_now_application/data/models/vehicle_type.dart';
 import 'package:nosh_now_application/data/providers/vehicle_type_provider.dart';
 import 'package:nosh_now_application/data/repositories/vehicle_type_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/merchant_detail_screen.dart';
-import 'package:nosh_now_application/presentation/widgets/category_management_item.dart';
-import 'package:nosh_now_application/presentation/widgets/user_item.dart';
 import 'package:nosh_now_application/presentation/widgets/vehicle_type_managemet_item.dart';
 import 'package:provider/provider.dart';
 

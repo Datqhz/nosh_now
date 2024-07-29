@@ -1,8 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 
@@ -26,7 +24,7 @@ class _ManagerStatisticScreenState extends State<ManagerStatisticScreen> {
       return currentPick.value.year.toString();
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -147,15 +145,20 @@ class _ManagerStatisticScreenState extends State<ManagerStatisticScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Statistic in ${titleChart()}',
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Text(
+                        'Statistic in ${titleChart()}',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                    ),
+                    const SizedBox(
+                      width: 12,
                     ),
                     GestureDetector(
                       onTap: () async {

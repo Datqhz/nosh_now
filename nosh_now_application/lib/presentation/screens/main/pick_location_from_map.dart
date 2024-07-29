@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/streams/change_stream.dart';
@@ -10,8 +9,6 @@ import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/repositories/location_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class PickLocationFromMapScreen extends StatefulWidget {
   PickLocationFromMapScreen({super.key, this.location, this.notifier});
@@ -36,8 +33,7 @@ class _PickLocationFromMapScreenState extends State<PickLocationFromMapScreen> {
   void initState() {
     if (widget.location != null) {
       dynamic coord = splitCoordinatorString(widget.location!.coordinator);
-      marker = ValueNotifier(LatLng(coord[0], coord[1]));
-      print("${coord[0]}, ${coord[1]}");
+      marker = ValueNotifier(coord);
       _nameController.text = widget.location!.locationName;
       _phoneController.text = widget.location!.phone;
     } else {
@@ -114,23 +110,6 @@ class _PickLocationFromMapScreenState extends State<PickLocationFromMapScreen> {
                                 ],
                               );
                             })
-                        // route
-                        // ValueListenableBuilder(
-                        //     valueListenable: routeCoordinates,
-                        //     builder: (context, value, child) {
-                        //       if (value.isNotEmpty) {
-                        //         return PolylineLayer(
-                        //           polylines: [
-                        //             Polyline(
-                        //               points: value,
-                        //               strokeWidth: 4.0,
-                        //               color: Colors.blue,
-                        //             ),
-                        //           ],
-                        //         );
-                        //       }
-                        //       return const SizedBox();
-                        //     }),
                       ]);
                 }
                 return const Center(child: CircularProgressIndicator());
@@ -257,34 +236,40 @@ class _PickLocationFromMapScreenState extends State<PickLocationFromMapScreen> {
                                       builder: (context, snapshot) {
                                         if (value.latitude == 0 &&
                                             value.longitude == 0) {
-                                          return const Text(
+                                          return const Expanded(
+                                            child: Text(
+                                              'Choose your location',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Color.fromRGBO(
+                                                      49, 49, 49, 1),
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          );
+                                        }
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Expanded(
+                                            child: Text(
+                                              snapshot.data!,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Color.fromRGBO(
+                                                      49, 49, 49, 1),
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          );
+                                        }
+                                        return const Expanded(
+                                          child: Text(
                                             'Choose your location',
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 color: Color.fromRGBO(
                                                     49, 49, 49, 1),
                                                 fontWeight: FontWeight.w400),
-                                          );
-                                        }
-                                        if (snapshot.connectionState ==
-                                                ConnectionState.done &&
-                                            snapshot.hasData) {
-                                          return Text(
-                                            snapshot.data!,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Color.fromRGBO(
-                                                    49, 49, 49, 1),
-                                                fontWeight: FontWeight.w400),
-                                          );
-                                        }
-                                        return const Text(
-                                          'Choose your location',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color:
-                                                  Color.fromRGBO(49, 49, 49, 1),
-                                              fontWeight: FontWeight.w400),
+                                          ),
                                         );
                                       });
                                 }),

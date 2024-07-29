@@ -3,13 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:nosh_now_application/core/streams/change_stream.dart';
-import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
-import 'package:nosh_now_application/core/utils/snack_bar.dart';
-import 'package:nosh_now_application/data/models/location.dart';
-import 'package:nosh_now_application/data/repositories/location_repository.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PickLocationRegisterScreen extends StatefulWidget {
@@ -25,10 +19,6 @@ class _PickLocationRegisterScreenState
   MapController mapController = MapController();
   ValueNotifier<List<LatLng>> routeCoordinates = ValueNotifier([]);
   ValueNotifier<LatLng> marker = ValueNotifier(const LatLng(0, 0));
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-
   @override
   void initState() {
     super.initState();

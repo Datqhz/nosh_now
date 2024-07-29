@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:nosh_now_application/presentation/screens/auth/login_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_eater_screen.dart';
 import 'package:nosh_now_application/presentation/screens/auth/register_merchant_screen.dart';

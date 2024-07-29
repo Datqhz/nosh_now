@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/data/models/food.dart';
-import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 
 class OrderDetailRepository {
@@ -29,7 +27,7 @@ class OrderDetailRepository {
     }
   }
 
-  Future<OrderDetail> create(OrderDetail orderDetail) async {
+  Future<OrderDetail?> create(OrderDetail orderDetail) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -45,7 +43,7 @@ class OrderDetailRepository {
               }));
       int statusCode = response.statusCode;
       if (statusCode != 201) {
-        throw Exception();
+        return null;
       }
       Map<String, dynamic> data = json.decode(response.body);
       return OrderDetail.fromJson(data);
@@ -106,9 +104,6 @@ class OrderDetailRepository {
   }
 
   Future<bool> deleteDetail(int id) async {
-    Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
     try {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',

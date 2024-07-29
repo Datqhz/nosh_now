@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
@@ -428,22 +426,32 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                           width: 1,
                                         ),
                                       ),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Color.fromRGBO(182, 0, 0, 1),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      focusedErrorBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Color.fromRGBO(182, 0, 0, 1),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      errorStyle: TextStyle(
+                                          color: Color.fromRGBO(182, 0, 0, 1)),
                                       border: InputBorder.none,
                                     ),
                                     style: const TextStyle(
                                         color: Color.fromRGBO(49, 49, 49, 1),
                                         fontSize: 14,
                                         decoration: TextDecoration.none),
-                                    // validator: (value) {
-                                    //   if (value!.isEmpty) {
-                                    //     return "Please enter your password.";
-                                    //   } else if (containsWhitespace(value)) {
-                                    //     return "Password must not contain any whitespace.";
-                                    //   } else if (value.length < 6) {
-                                    //     return "Password must be at least 6 characters.";
-                                    //   }
-                                    //   return null;
-                                    // },
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "Please choose your default location";
+                                      }
+                                      return null;
+                                    },
                                   ),
                                   const SizedBox(
                                     height: 20,
@@ -483,7 +491,7 @@ class _RegisterEaterScreenState extends State<RegisterEaterScreen> {
                                                 email: email,
                                                 phone: phone,
                                                 avatar: avatar);
-                                            Eater rs = await EaterRepository()
+                                            Eater? rs = await EaterRepository()
                                                 .create(eater,
                                                     createdAccountResult);
                                             if (rs != null) {

@@ -22,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -108,12 +107,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                           width: 1,
                                         ),
                                       ),
-                                      focusedErrorBorder: UnderlineInputBorder(
+                                      focusedErrorBorder:
+                                          UnderlineInputBorder(
                                         borderSide: BorderSide(
                                           color: Color.fromRGBO(182, 0, 0, 1),
                                           width: 1,
                                         ),
                                       ),
+                                      errorStyle: TextStyle(
+                                          color: Color.fromRGBO(182, 0, 0, 1)),
                                       border: InputBorder.none,
                                     ),
                                     style: const TextStyle(
@@ -250,11 +252,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                           bool rs = await AccountRepository()
                                               .signIn(email, password);
                                           if (rs) {
+                                            // ignore: use_build_context_synchronously
                                             Navigator.pop(context);
+                                            // ignore: use_build_context_synchronously
                                             Provider.of<UserLogin>(context,
                                                     listen: false)
                                                 .login();
                                           } else {
+                                            // ignore: use_build_context_synchronously
                                             showSnackBar(context,
                                                 "Email or password incorrect!");
                                           }
@@ -287,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               const Text(
                                 "Don't have an account?",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromRGBO(40, 40, 40, 0.6)),

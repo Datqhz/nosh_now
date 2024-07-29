@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/order_detail.dart';
 
+// ignore: must_be_immutable
 class OrderDetailItem extends StatefulWidget {
   OrderDetailItem(
       {super.key, required this.detail, this.isEdit = false, this.onChange});
@@ -44,6 +46,7 @@ class OrderDetailItemState extends State<OrderDetailItem> {
         builder: (context, value, child) {
           return Container(
             padding: const EdgeInsets.only(bottom: 8, top: 12),
+            width: MediaQuery.of(context).size.width - 40,
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -70,44 +73,45 @@ class OrderDetailItemState extends State<OrderDetailItem> {
                 const SizedBox(
                   width: 12,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // food name
-                    Text(
-                      widget.detail.food.foodName,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // food name
+                      Text(
+                        widget.detail.food.foodName,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 6,
-                    ),
-                    Text(
-                      '${widget.detail.price}₫  x$value',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w300,
-                        height: 1.2,
-                        color: Color.fromRGBO(49, 49, 49, 1),
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(
+                        height: 6,
                       ),
-                    ),
-                  ],
+                      Text(
+                        '${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(widget.detail.price)}  x$value',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w300,
+                          height: 1.2,
+                          color: Color.fromRGBO(49, 49, 49, 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Expanded(
-                    child: SizedBox(
+                const SizedBox(
                   width: 12,
-                )),
+                ),
                 if (widget.isEdit!) ...[
                   Container(
                     padding:
@@ -152,8 +156,8 @@ class OrderDetailItemState extends State<OrderDetailItem> {
                                 child: Icon(
                                   CupertinoIcons.minus,
                                   color: value != 0
-                                      ? Color.fromRGBO(240, 240, 240, 1)
-                                      : Color.fromRGBO(59, 59, 59, 1),
+                                      ? const Color.fromRGBO(240, 240, 240, 1)
+                                      : const Color.fromRGBO(59, 59, 59, 1),
                                 ),
                               );
                             }),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/category.dart';

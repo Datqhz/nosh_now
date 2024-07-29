@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -9,7 +11,6 @@ import 'package:nosh_now_application/core/utils/dash_line_painter.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
-import 'package:nosh_now_application/core/utils/order.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 import 'package:nosh_now_application/data/models/order.dart';
@@ -21,10 +22,11 @@ import 'package:nosh_now_application/data/repositories/order_detail_repository.d
 import 'package:nosh_now_application/data/repositories/order_repository.dart';
 import 'package:nosh_now_application/data/repositories/payment_method_repository.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/choose_payment_method_screen.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/order_process.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/pick_location.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/order_process_screen.dart';
+import 'package:nosh_now_application/presentation/screens/main/eater/pick_location_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
 
+// ignore: must_be_immutable
 class PrepareOrderScreen extends StatefulWidget {
   PrepareOrderScreen({super.key, required this.order});
 
@@ -42,7 +44,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   ValueNotifier<double> delivery = ValueNotifier(0);
   ValueNotifier<double> total = ValueNotifier(0);
   ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null);
-  ValueNotifier<bool> isInit = ValueNotifier(true);
+  Timer? calcSubs;
 
   void calcSubstantialOnChange() {
     double subs = 0;
@@ -54,7 +56,6 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     }
     substantial.value = subs;
     total.value = subs + delivery.value;
-    isInit.value = false;
   }
 
   List<OrderDetail> getFinalDetails() {
@@ -90,17 +91,15 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     total.value = substantial.value + delivery.value;
   }
 
-  // void calcDelivery(){
-  //   double de = 0;
-  //   substantial.value = subs;
-  //   total.value = subs + delivery.value;
-  // }
   @override
   void initState() {
     super.initState();
     currentLocationPicked.addListener(calcDeliveryOnChange);
     substantial.addListener(calcTotal);
     delivery.addListener(calcTotal);
+    calcSubs = Timer(const Duration(seconds: 6), () {
+      calcSubstantialOnChange();
+    });
   }
 
   @override
@@ -381,11 +380,10 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                           ValueListenableBuilder(
                               valueListenable: substantial,
                               builder: (context, value, child) {
-                                if (isInit.value == true) {
-                                  calcDeliveryOnChange();
-                                }
                                 return Text(
-                                  '$value₫',
+                                  NumberFormat.currency(
+                                          locale: 'vi_VN', symbol: '₫')
+                                      .format(value),
                                   maxLines: 1,
                                   style: const TextStyle(
                                       fontSize: 16.0,
@@ -414,6 +412,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                           ValueListenableBuilder<double>(
                             valueListenable: delivery,
                             builder: (context, value, child) {
+                              print(value);
                               return Text(
                                 NumberFormat.simpleCurrency(
                                         locale: 'vi_VN', decimalDigits: 0)
@@ -460,8 +459,8 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                             valueListenable: total,
                             builder: (context, value, child) {
                               return Text(
-                                NumberFormat.simpleCurrency(
-                                        locale: 'vi_VN', decimalDigits: 0)
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: '₫')
                                     .format(value),
                                 maxLines: 1,
                                 style: const TextStyle(
@@ -599,18 +598,12 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                                         builder: (context) =>
                                             OrderProcessScreen(
                                               order: widget.order,
-                                              type: 1,
                                             )));
                               } else {
                                 showSnackBar(context,
                                     'Something error when order foods');
                               }
                             }
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             OrderProcessScreen(order: tempOrder, type: 1,)));
                           },
                           style: TextButton.styleFrom(
                               backgroundColor: Colors.black,
