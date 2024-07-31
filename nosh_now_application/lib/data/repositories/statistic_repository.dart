@@ -11,6 +11,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url =
         "${GlobalVariable.url}/api/statistic/calc-revenue/merchant?merchantId=$merchantId&";
@@ -43,6 +44,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url =
         "${GlobalVariable.url}/api/statistic/calc-earning/shipper?shipperId=$shipperId&";
@@ -75,6 +77,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url =
         "${GlobalVariable.url}/api/statistic/count-order/user?userId=$userId&roleId=$roleId&";
@@ -104,6 +107,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url = "${GlobalVariable.url}/api/statistic/count-order?";
     if (option == 1) {
@@ -132,6 +136,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url = "${GlobalVariable.url}/api/statistic/calc-transaction?";
     if (option == 1) {
@@ -161,6 +166,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url =
         "${GlobalVariable.url}/api/statistic/count-account?roleId=$roleId&";
@@ -192,6 +198,7 @@ class StatisticRepository {
     // option = {1,2,3} - 1 is by date, 2 is by month, 3 is by year
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     String url =
         "${GlobalVariable.url}/api/statistic/top-food?merchantId=$merchantId&";

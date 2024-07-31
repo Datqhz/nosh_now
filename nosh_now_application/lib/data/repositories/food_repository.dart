@@ -5,9 +5,11 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 
 class FoodRepository {
+  // eater
   Future<List<Food>> getAllByMerchantAndIsSelling(int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -25,9 +27,11 @@ class FoodRepository {
     }
   }
 
+  // merchant
   Future<List<Food>> getAllByMerchant(int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -44,10 +48,11 @@ class FoodRepository {
       throw Exception('Fail to get data');
     }
   }
-
+  // merchant
   Future<Food?> create(Food food, int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -72,10 +77,11 @@ class FoodRepository {
       throw Exception('Fail to save food');
     }
   }
-
+  // merchant
   Future<Food> update(Food food, int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await put(Uri.parse("${GlobalVariable.url}/api/food"),
@@ -99,9 +105,11 @@ class FoodRepository {
       throw Exception('Fail to save food');
     }
   }
+  //merchant
   Future<bool> deleteFood(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await delete(Uri.parse("${GlobalVariable.url}/api/food/$id"),

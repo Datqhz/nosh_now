@@ -68,20 +68,15 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
 
   void calcDeliveryOnChange() {
     if (currentLocationPicked.value != null) {
-      getRouteCoordinates(
-              splitCoordinatorString(widget.order.merchant.coordinator),
-              splitCoordinatorString(currentLocationPicked.value!.coordinator))
-          .then((route) {
-        double distance = calculateTotalDistanceByRoute(route);
-        if (distance < 1) {
-          delivery.value = 15000;
-        } else {
-          delivery.value = distance * 15000;
-        }
-        double shipmentFee = distance * 15000;
-
-        delivery.value = shipmentFee;
-      });
+      double distance = calcDistanceInKm(
+          coordinator1: widget.order.merchant.coordinator,
+          coordinator2: currentLocationPicked.value!.coordinator);
+      print('distance $distance');
+      if (distance < 1) {
+        delivery.value = 15000;
+      } else {
+        delivery.value = distance * 15000;
+      }
     } else {
       delivery.value = 0;
     }
@@ -91,14 +86,26 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     total.value = substantial.value + delivery.value;
   }
 
+  bool checkDetailIsEmpty() {
+    List<OrderDetail> details = getFinalDetails();
+    for (var i in details) {
+      if (i.quantity != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
     currentLocationPicked.addListener(calcDeliveryOnChange);
     substantial.addListener(calcTotal);
     delivery.addListener(calcTotal);
+    fetchDefaultLocation();
     calcSubs = Timer(const Duration(seconds: 6), () {
       calcSubstantialOnChange();
+      calcDeliveryOnChange();
     });
   }
 
@@ -109,6 +116,11 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     substantial.removeListener(calcTotal);
     delivery.removeListener(calcTotal);
     super.dispose();
+  }
+
+  Future<void> fetchDefaultLocation() async {
+    currentLocationPicked.value = await LocationRepository()
+        .getDefaultLocationByEater(GlobalVariable.currentUid);
   }
 
   @override
@@ -128,119 +140,217 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                       height: 66,
                     ),
                     // current delivery infomation
-                    FutureBuilder(
-                        future: LocationRepository().getDefaultLocationByEater(
-                            GlobalVariable.currentUid),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.done &&
-                              snapshot.hasData) {
-                            currentLocationPicked.value ??= snapshot.data!;
-                            return GestureDetector(
-                              onTap: () async {
-                                var newPicked = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PickLocationScreen(
-                                      currentPick: currentLocationPicked.value!,
+                    GestureDetector(
+                      onTap: () async {
+                        var newPicked = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PickLocationScreen(
+                              currentPick: currentLocationPicked.value!,
+                            ),
+                          ),
+                        );
+                        if (newPicked != null) {
+                          currentLocationPicked.value = newPicked;
+                        }
+                      },
+                      child: ValueListenableBuilder(
+                          valueListenable: currentLocationPicked,
+                          builder: (context, value, child) {
+                            if (value != null) {
+                              return Container(
+                                height: 80,
+                                color: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on_sharp,
+                                      color: Colors.red,
+                                      size: 30,
                                     ),
-                                  ),
-                                );
-                                if (newPicked != null) {
-                                  currentLocationPicked.value = newPicked;
-                                }
-                              },
-                              child: ValueListenableBuilder(
-                                  valueListenable: currentLocationPicked,
-                                  builder: (context, value, child) {
-                                    return Container(
-                                      height: 80,
-                                      color: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.location_on_sharp,
-                                            color: Colors.red,
-                                            size: 30,
-                                          ),
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                '${value!.locationName} - ${value.phone}',
-                                                maxLines: 1,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color.fromRGBO(
-                                                        49, 49, 49, 1),
-                                                    overflow:
-                                                        TextOverflow.ellipsis),
-                                              ),
-                                              FutureBuilder(
-                                                  future: getAddressFromLatLng(
-                                                      splitCoordinatorString(
-                                                          value.coordinator)),
-                                                  builder: (context,
-                                                      addressSnapshot) {
-                                                    if (addressSnapshot
-                                                                .connectionState ==
-                                                            ConnectionState
-                                                                .done &&
-                                                        addressSnapshot
-                                                            .hasData) {
-                                                      return Text(
-                                                        addressSnapshot.data!,
-                                                        maxLines: 1,
-                                                        style: const TextStyle(
-                                                            fontSize: 14.0,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    49,
-                                                                    49,
-                                                                    49,
-                                                                    1),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      );
-                                                    }
-                                                    return const Text('');
-                                                  }),
-                                            ],
-                                          ),
-                                          const Expanded(
-                                              child: SizedBox(
-                                            width: 12,
-                                          )),
-                                          const Icon(
-                                            Icons.chevron_right,
-                                            color: Colors.red,
-                                            size: 30,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '${value.locationName} - ${value.phone}',
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  Color.fromRGBO(49, 49, 49, 1),
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                        FutureBuilder(
+                                            future: getAddressFromLatLng(
+                                                splitCoordinatorString(
+                                                    value.coordinator)),
+                                            builder:
+                                                (context, addressSnapshot) {
+                                              if (addressSnapshot
+                                                          .connectionState ==
+                                                      ConnectionState.done &&
+                                                  addressSnapshot.hasData) {
+                                                return Text(
+                                                  addressSnapshot.data!,
+                                                  maxLines: 1,
+                                                  style: const TextStyle(
+                                                      fontSize: 14.0,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color.fromRGBO(
+                                                          49, 49, 49, 1),
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
+                                                );
+                                              }
+                                              return const Text('');
+                                            }),
+                                      ],
+                                    ),
+                                    const Expanded(
+                                        child: SizedBox(
+                                      width: 12,
+                                    )),
+                                    const Icon(
+                                      Icons.chevron_right,
+                                      color: Colors.red,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return const Center(
+                              child: SpinKitCircle(
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             );
-                          }
-                          return const SpinKitThreeInOut(
-                            color: Colors.black,
-                            size: 30,
-                          );
-                        }),
+                          }),
+                    ),
+                    // FutureBuilder(
+                    //     future: LocationRepository().getDefaultLocationByEater(
+                    //         GlobalVariable.currentUid),
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //               ConnectionState.done &&
+                    //           snapshot.hasData) {
+                    //         currentLocationPicked.value ??= snapshot.data!;
+                    //         return GestureDetector(
+                    //           onTap: () async {
+                    //             var newPicked = await Navigator.push(
+                    //               context,
+                    //               MaterialPageRoute(
+                    //                 builder: (context) => PickLocationScreen(
+                    //                   currentPick: currentLocationPicked.value!,
+                    //                 ),
+                    //               ),
+                    //             );
+                    //             if (newPicked != null) {
+                    //               currentLocationPicked.value = newPicked;
+                    //             }
+                    //           },
+                    //           child: ValueListenableBuilder(
+                    //               valueListenable: currentLocationPicked,
+                    //               builder: (context, value, child) {
+                    //                 return Container(
+                    //                   height: 80,
+                    //                   color: Colors.white,
+                    //                   padding: const EdgeInsets.symmetric(
+                    //                       horizontal: 20),
+                    //                   child: Row(
+                    //                     crossAxisAlignment:
+                    //                         CrossAxisAlignment.center,
+                    //                     children: [
+                    //                       const Icon(
+                    //                         Icons.location_on_sharp,
+                    //                         color: Colors.red,
+                    //                         size: 30,
+                    //                       ),
+                    //                       const SizedBox(
+                    //                         width: 8,
+                    //                       ),
+                    //                       Column(
+                    //                         crossAxisAlignment:
+                    //                             CrossAxisAlignment.start,
+                    //                         mainAxisAlignment:
+                    //                             MainAxisAlignment.center,
+                    //                         children: [
+                    //                           Text(
+                    //                             '${value!.locationName} - ${value.phone}',
+                    //                             maxLines: 1,
+                    //                             style: const TextStyle(
+                    //                                 fontSize: 16.0,
+                    //                                 fontWeight: FontWeight.bold,
+                    //                                 color: Color.fromRGBO(
+                    //                                     49, 49, 49, 1),
+                    //                                 overflow:
+                    //                                     TextOverflow.ellipsis),
+                    //                           ),
+                    //                           FutureBuilder(
+                    //                               future: getAddressFromLatLng(
+                    //                                   splitCoordinatorString(
+                    //                                       value.coordinator)),
+                    //                               builder: (context,
+                    //                                   addressSnapshot) {
+                    //                                 if (addressSnapshot
+                    //                                             .connectionState ==
+                    //                                         ConnectionState
+                    //                                             .done &&
+                    //                                     addressSnapshot
+                    //                                         .hasData) {
+                    //                                   return Text(
+                    //                                     addressSnapshot.data!,
+                    //                                     maxLines: 1,
+                    //                                     style: const TextStyle(
+                    //                                         fontSize: 14.0,
+                    //                                         fontWeight:
+                    //                                             FontWeight.w400,
+                    //                                         color:
+                    //                                             Color.fromRGBO(
+                    //                                                 49,
+                    //                                                 49,
+                    //                                                 49,
+                    //                                                 1),
+                    //                                         overflow:
+                    //                                             TextOverflow
+                    //                                                 .ellipsis),
+                    //                                   );
+                    //                                 }
+                    //                                 return const Text('');
+                    //                               }),
+                    //                         ],
+                    //                       ),
+                    //                       const Expanded(
+                    //                           child: SizedBox(
+                    //                         width: 12,
+                    //                       )),
+                    //                       const Icon(
+                    //                         Icons.chevron_right,
+                    //                         color: Colors.red,
+                    //                         size: 30,
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 );
+                    //               }),
+                    //         );
+                    //       }
+                    //       return const SpinKitThreeInOut(
+                    //         color: Colors.black,
+                    //         size: 30,
+                    //       );
+                    //     }),
                     const SizedBox(
                       height: 12,
                     ),
@@ -570,38 +680,49 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                         height: 44,
                         child: TextButton(
                           onPressed: () async {
-                            List<OrderDetail> list = getFinalDetails();
-
-                            Order tempOrder = widget.order;
-                            tempOrder.coordinator =
-                                currentLocationPicked.value!.coordinator;
-                            tempOrder.orderStatus = OrderStatus(
-                                orderStatusId: 2,
-                                orderStatusName: 'Wait shipper',
-                                step: 1);
-                            tempOrder.totalPay = 0;
-                            tempOrder.shipmentFee = 20000;
-                            tempOrder.phone =
-                                currentLocationPicked.value!.phone;
-                            tempOrder.paymentMethod = currentSelected.value;
-                            bool updateDetailsRs = await OrderDetailRepository()
-                                .updateMultiple(list);
-                            if (updateDetailsRs) {
-                              bool updateOrder =
-                                  await OrderRepository().update(tempOrder);
-                              if (updateOrder) {
-                                Navigator.popUntil(
-                                    context, (route) => route.isFirst);
-                                Navigator.push(
+                            if (delivery.value != 0 && !checkDetailIsEmpty()) {
+                              List<OrderDetail> list = getFinalDetails();
+                              Order tempOrder = widget.order;
+                              tempOrder.coordinator =
+                                  currentLocationPicked.value!.coordinator;
+                              tempOrder.orderStatus = OrderStatus(
+                                  orderStatusId: 2,
+                                  orderStatusName: 'Wait shipper',
+                                  step: 1);
+                              tempOrder.totalPay = 0;
+                              tempOrder.shipmentFee = delivery.value;
+                              tempOrder.phone =
+                                  currentLocationPicked.value!.phone;
+                              tempOrder.paymentMethod = currentSelected.value;
+                              bool updateDetailsRs =
+                                  await OrderDetailRepository()
+                                      .updateMultiple(list);
+                              if (updateDetailsRs) {
+                                bool updateOrder =
+                                    await OrderRepository().update(tempOrder);
+                                if (updateOrder) {
+                                  Navigator.popUntil(
+                                      context, (route) => route.isFirst);
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            OrderProcessScreen(
-                                              order: widget.order,
-                                            )));
+                                      builder: (context) => OrderProcessScreen(
+                                        order: widget.order,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  showSnackBar(context,
+                                      'Something error when order foods');
+                                }
+                              }
+                            } else {
+                              if (delivery.value == 0) {
+                                showSnackBar(context,
+                                    "Please wait a second to caculate");
                               } else {
                                 showSnackBar(context,
-                                    'Something error when order foods');
+                                    "Please choose at least a food to complete order");
                               }
                             }
                           },

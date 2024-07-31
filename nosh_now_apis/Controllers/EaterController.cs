@@ -1,7 +1,9 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 using MyApp.Utils;
@@ -10,6 +12,7 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/eater")]
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     public class EaterController : ControllerBase
     {
 
@@ -41,7 +44,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateEater(CreateEaterOrManager createEater)
         {
@@ -64,6 +67,8 @@ namespace MyApp.Controllers
             );
             return CreatedAtAction(nameof(GetById), new { id = eaterCreated.Id }, eaterCreated.AsDto());
         }
+        [AllowAnonymous]
+        [Authorize(Policy = "ManagerEater")]
         [HttpPut]
         public async Task<IActionResult> UpdateEater(UpdateEaterOrManager updateEater)
         {
@@ -88,6 +93,7 @@ namespace MyApp.Controllers
                 return Ok(eaterUpdated.AsDto());
             }
         }
+        
         [HttpGet("find")]
         public async Task<IActionResult> FindContainRegex([FromQuery] string regex)
         {

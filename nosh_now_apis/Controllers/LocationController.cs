@@ -1,13 +1,16 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 using MyApp.Utils;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.EaterPolicyName)]
     [ApiController]
     [Route("api/location")]
     public class LocationController : ControllerBase
@@ -19,13 +22,6 @@ namespace MyApp.Controllers
         {
             this.locationRepository = locationRepository;
             this.eaterRepository = eaterRepository;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var data = await locationRepository.GetAll();
-            return Ok(data.Select(location => location.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]
@@ -41,7 +37,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateLocation(CreateLocation createLocation)
         {
@@ -65,7 +61,7 @@ namespace MyApp.Controllers
             return CreatedAtAction(nameof(GetById), new { id = locationCreated.Id }, locationCreated.AsDto());
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateLocation updateLocation)
+        public async Task<IActionResult> UpdateLocation(UpdateLocation updateLocation)
         {
             var location = await locationRepository.GetById(updateLocation.id);
             if (location == null)

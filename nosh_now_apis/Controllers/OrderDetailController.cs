@@ -1,4 +1,5 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
@@ -8,6 +9,7 @@ using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/order-detail")]
     public class OrderDetailController : ControllerBase
@@ -21,12 +23,6 @@ namespace MyApp.Controllers
             this.orderRepository = orderRepository;
             this.foodRepository = foodRepository;
             this.orderDetailRepository = orderDetailRepository;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var data = await orderRepository.GetAll();
-            return Ok(data.Select(order => order.AsDto()).ToList());
         }
 
         [HttpGet("{id}")]

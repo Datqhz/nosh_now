@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/utils/shared_preference.dart';
-import 'package:nosh_now_application/core/utils/snack_bar.dart';
-import 'package:nosh_now_application/data/models/account.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 import 'package:nosh_now_application/data/models/manager.dart';
 import 'package:nosh_now_application/data/models/merchant.dart';
@@ -28,27 +25,20 @@ class AccountRepository {
       if (statusCode != 200) {
         return false;
       }
-      print("success");
       final Map<String, dynamic> data = json.decode(response.body);
       if (data['user']['account']['role']['roleName'] == 'Manager') {
-        // await storeCurrentUser(manager: Manager.fromJson(data['user']));
         GlobalVariable.user = Manager.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Eater') {
-        // await storeCurrentUser(eater: Eater.fromJson(data['user']));
         GlobalVariable.user = Eater.fromJson(data['user']);
       } else if (data['user']['account']['role']['roleName'] == 'Merchant') {
-        // await storeCurrentUser(merchant: Merchant.fromJson(data['user']));
         GlobalVariable.user = Merchant.fromJson(data['user']);
       } else {
-        // await storeCurrentUser(shipper: Shipper.fromJson(data['user']));
         GlobalVariable.user = Shipper.fromJson(data['user']);
       }
-      // var account = Account.fromJson(data['user']['account']);
-      // await storeAccount(account);
-      // await storeToken(data['token']);
       GlobalVariable.currentUid = data['user']['id'];
       GlobalVariable.roleName = data['user']['account']['role']['roleName'];
       GlobalVariable.roleId = data['user']['account']['role']['id'];
+      GlobalVariable.jwt = data['token'];
       return true;
     } catch (e) {
       print(e.toString());
@@ -95,13 +85,13 @@ class AccountRepository {
             "newPassword": newPass
           }));
       int statusCode = response.statusCode;
-      Map<String, dynamic> data = json.decode(response.body);
+      print(response.body);
       if (statusCode != 200) {
-        showSnackBar(context, data['error']);
         return false;
       }
       return true;
     } catch (e) {
+      print(e.toString());
       throw Exception('Fail to register');
     }
   }

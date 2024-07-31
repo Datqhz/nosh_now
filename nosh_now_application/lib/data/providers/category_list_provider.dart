@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:nosh_now_application/data/models/category.dart';
-import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/repositories/category_repository.dart';
-import 'package:nosh_now_application/data/repositories/food_repository.dart';
 
 class CategoryListProvider with ChangeNotifier {
   List<FoodCategory> _categories = [];

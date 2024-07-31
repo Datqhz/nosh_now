@@ -476,7 +476,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   ),
                                 ),
                               //see proccess
-                              if (value.orderStatus.orderStatusId != 5)
+                              if (value.orderStatus.orderStatusId < 5)
                                 Expanded(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(

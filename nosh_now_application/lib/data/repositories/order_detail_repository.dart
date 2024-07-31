@@ -8,14 +8,13 @@ class OrderDetailRepository {
   Future<List<OrderDetail>> getAllByOrderId(int orderId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
-      print("${GlobalVariable.url}/api/order-detail/order/$orderId");
       Response response = await get(
           Uri.parse("${GlobalVariable.url}/api/order-detail/order/$orderId"),
           headers: headers);
       int statusCode = response.statusCode;
-      print(response.body);
       if (statusCode != 200) {
         throw Exception();
       }
@@ -30,6 +29,7 @@ class OrderDetailRepository {
   Future<OrderDetail?> create(OrderDetail orderDetail) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -56,6 +56,7 @@ class OrderDetailRepository {
   Future<bool> update(OrderDetail orderDetail) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -80,6 +81,7 @@ class OrderDetailRepository {
   Future<bool> updateMultiple(List<OrderDetail> orderDetails) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await put(
@@ -107,6 +109,7 @@ class OrderDetailRepository {
     try {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
+        "Authorization": "Bearer ${GlobalVariable.jwt}"
       };
       Response response = await delete(
           Uri.parse("${GlobalVariable.url}/api/order-detail/$id"),

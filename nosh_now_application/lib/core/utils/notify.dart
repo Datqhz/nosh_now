@@ -1,10 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/data/models/order.dart';
 import 'package:nosh_now_application/data/repositories/firebase_message_repository.dart';
-import 'package:nosh_now_application/data/repositories/order_repository.dart';
 
 Future<void> handleNotificationWhenChangeStatus(int orderId, int eaterId,
     int shipperId, int merchantId, int status, LatLng coord) async {

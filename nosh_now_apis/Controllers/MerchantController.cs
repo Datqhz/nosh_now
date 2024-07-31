@@ -1,8 +1,10 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Dtos.Response;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 using MyApp.Utils;
@@ -11,6 +13,7 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/merchant")]
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     public class MerchantController : ControllerBase
     {
 
@@ -23,7 +26,8 @@ namespace MyApp.Controllers
             this.categoryRepository = categoryRepository;
             this.accountRepository = accountRepository;
         }
-
+        
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -44,7 +48,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateMerchant(CreateMerchant createMerchant)
         {
@@ -79,8 +83,10 @@ namespace MyApp.Controllers
             );
             return CreatedAtAction(nameof(GetById), new { id = merchantCreated.Id }, merchantCreated.AsDto());
         }
+        [AllowAnonymous]
+        [Authorize(Policy = "ManagerMerchant")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateMerchant updateMerchant)
+        public async Task<IActionResult> UpdateMerchant(UpdateMerchant updateMerchant)
         {
             var merchant = await merchantRepository.GetById(updateMerchant.id);
             if (merchant == null)
@@ -117,6 +123,8 @@ namespace MyApp.Controllers
                 return Ok(merchantUpdated.AsDto());
             }
         }
+        [AllowAnonymous]
+        [Authorize(Policy = "ManagerEater")]
         [HttpGet("find")]
         public async Task<IActionResult> FindContainRegex([FromQuery] string regex, [FromQuery] string coordinator)
         {
@@ -125,8 +133,7 @@ namespace MyApp.Controllers
             foreach (var merchant in data)
             {
                 double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
-                Console.WriteLine($"distance {distance}");
-                if (distance < 10000)
+                if (distance < 1627)
                 {
                     merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
                 }
@@ -134,7 +141,8 @@ namespace MyApp.Controllers
             SortUtil.SortOrderByDistance(merchants, 0, merchants.Count - 1);
             return Ok(merchants);
         }
-
+        [AllowAnonymous]
+        [Authorize(Policy = "ManagerEater")]
         [HttpGet("near-by")]
         public async Task<IActionResult> GetMerchantNearBy([FromQuery] string coordinator)
         {
@@ -143,8 +151,7 @@ namespace MyApp.Controllers
             foreach (var merchant in data)
             {
                 double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
-                Console.WriteLine($"distance {distance}");
-                if (distance < 10000)
+                if (distance < 1627)
                 {
                     merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
                 }
@@ -152,6 +159,8 @@ namespace MyApp.Controllers
             SortUtil.SortOrderByDistance(merchants, 0, merchants.Count - 1);
             return Ok(merchants);
         }
+        [AllowAnonymous]
+        [Authorize(Policy = "ManagerEater")]
         [HttpGet("category")]
         public async Task<IActionResult> GetMerchantByCategory([FromQuery] int categoryId, [FromQuery] string coordinator)
         {
@@ -160,8 +169,7 @@ namespace MyApp.Controllers
             foreach (var merchant in data)
             {
                 double distance = DistanceUtil.CalculateDistance(coordinator, merchant.Coordinator);
-                Console.WriteLine($"distance {distance}");
-                if (distance < 10000)
+                if (distance < 1627)
                 {
                     merchants.Add(new MerchantAndDistanceResponseDto(merchant.AsDto(), distance));
                 }

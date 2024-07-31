@@ -1,4 +1,5 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
@@ -9,9 +10,9 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/order-status")]
+    [Authorize(Policy = "Manager")]
     public class OrderStatusController : ControllerBase
     {
-
         private readonly IOrderStatusRepository orderStatusRepository;
         public OrderStatusController(IOrderStatusRepository orderStatusRepository)
         {
@@ -98,7 +99,8 @@ namespace MyApp.Controllers
             await orderStatusRepository.Delete(id);
             return Ok(data);
         }
-
+        [AllowAnonymous]
+        [Authorize]
         [HttpGet("order-process")]
         public async Task<IActionResult> GetAllWithoutInitAndCancelStatus()
         {

@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/order_status.dart';
-import 'package:nosh_now_application/data/models/payment_method.dart';
 
 class OrderStatusRepository {
   Future<List<OrderStatus>> getAllWithoutInitStatusAndCancel() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(

@@ -1,4 +1,5 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Models;
@@ -6,6 +7,7 @@ using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/payment-method")]
     public class PaymentMethodController : ControllerBase

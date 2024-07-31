@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/manager.dart';
-import 'package:nosh_now_application/data/models/manager.dart';
 
 class ManagerRepository {
   Future<bool> create(Manager manager, int accountId) async {

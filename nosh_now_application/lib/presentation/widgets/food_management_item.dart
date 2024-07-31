@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nosh_now_application/core/utils/delete_dialog.dart';
+import 'package:nosh_now_application/core/utils/dialog.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/data/models/food.dart';
@@ -137,6 +137,7 @@ class FoodManagementItem extends StatelessWidget {
                       showSnackBar(context, 'Delete food successful');
                       Provider.of<FoodListProvider>(context, listen: false)
                           .deleteFood(food.foodId);
+                      Navigator.pop(context);
                     }
                   },
                 );

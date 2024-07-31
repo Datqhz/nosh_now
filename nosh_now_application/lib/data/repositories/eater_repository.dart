@@ -5,9 +5,11 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/eater.dart';
 
 class EaterRepository {
+  //manager
   Future<List<Eater>> getAllEater() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -25,6 +27,7 @@ class EaterRepository {
     }
   }
 
+  // anonymous
   Future<Eater?> create(Eater eater, int accountId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -52,9 +55,11 @@ class EaterRepository {
     }
   }
 
+  //eater
   Future<Eater?> update(Eater eater) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =

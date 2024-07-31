@@ -1,11 +1,14 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/vehicleType")]
     public class VehicleTypeController : ControllerBase
@@ -16,7 +19,7 @@ namespace MyApp.Controllers
         {
             this.vehicleTypeRepository = vehicleTypeRepository;
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -67,14 +70,17 @@ namespace MyApp.Controllers
                     error = "Vehicle type doesn't exits!"
                 });
             }
-            // var data = await vehicleTypeRepository.FindByName(updateVehicleType.typeName);
-            // if (data.Any())
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = $"Vehicle type name =  {updateVehicleType.typeName} was used."
-            //     });
-            // }
+            if (vehicleType.TypeName.Equals(updateVehicleType.typeName))
+            {
+                var data = await vehicleTypeRepository.FindByName(updateVehicleType.typeName);
+                if (data.Any())
+                {
+                    return BadRequest(new
+                    {
+                        error = $"Vehicle type name =  {updateVehicleType.typeName} was used."
+                    });
+                }
+            }
             vehicleType.TypeName = updateVehicleType.typeName;
             if (updateVehicleType.image != "")
             {

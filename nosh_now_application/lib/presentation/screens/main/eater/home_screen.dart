@@ -28,9 +28,11 @@ class HomeScreen extends StatelessWidget {
   Future<List<MerchantWithDistance>> _fetchMerchantNearByData() async {
     try {
       LatLng currentCoord = await checkPermissions();
+      print(currentCoord.toString());
       List<MerchantWithDistance> merchants = await MerchantRepository()
           .getAllMerchantNearby(
               '${currentCoord.latitude}-${currentCoord.longitude}');
+      print(merchants.length);
       return merchants;
     } catch (e) {
       throw Exception(e.toString());

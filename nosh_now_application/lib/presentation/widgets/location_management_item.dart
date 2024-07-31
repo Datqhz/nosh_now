@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/streams/change_stream.dart';
-import 'package:nosh_now_application/core/utils/delete_dialog.dart';
+import 'package:nosh_now_application/core/utils/dialog.dart';
 import 'package:nosh_now_application/core/utils/distance.dart';
 import 'package:nosh_now_application/core/utils/map.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';

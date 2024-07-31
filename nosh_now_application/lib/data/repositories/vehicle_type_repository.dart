@@ -8,6 +8,7 @@ class VehicleTypeRepository {
   Future<VehicleType?> create(VehicleType vehicleType) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await post(
@@ -32,6 +33,7 @@ class VehicleTypeRepository {
   Future<bool> update(VehicleType vehicleType) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -56,6 +58,7 @@ class VehicleTypeRepository {
   Future<bool> deleteVehicleType(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =

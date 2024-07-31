@@ -6,6 +6,8 @@ import 'package:nosh_now_application/data/models/merchant.dart';
 import 'package:nosh_now_application/data/models/merchant_with_distance.dart';
 
 class MerchantRepository {
+
+  // anonymous
   Future<bool> create(Merchant merchant, int accountId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -36,9 +38,11 @@ class MerchantRepository {
     }
   }
 
+  // merchant, manager
   Future<Merchant?> update(Merchant merchant) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -68,11 +72,12 @@ class MerchantRepository {
       throw Exception('Fail to register');
     }
   }
-
+  // eater
   Future<List<MerchantWithDistance>> getAllMerchantNearby(
       String coordinator) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -90,11 +95,12 @@ class MerchantRepository {
       throw Exception('Fail to get data');
     }
   }
-
+  //eater
   Future<List<MerchantWithDistance>> getAllMerchantByCategory(
       int cateogryId, String coord) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -112,10 +118,11 @@ class MerchantRepository {
       throw Exception('Fail to get data');
     }
   }
-
+  // manager
   Future<List<Merchant>> getAllMerchant() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -132,11 +139,12 @@ class MerchantRepository {
       throw Exception('Fail to get data');
     }
   }
-
+  // eater
   Future<List<MerchantWithDistance>> FindByRegex(
       String regex, String coord) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -145,27 +153,6 @@ class MerchantRepository {
           headers: headers);
       int statusCode = response.statusCode;
       print(response.body);
-      if (statusCode != 200) {
-        return [];
-      }
-      List<dynamic> data = json.decode(response.body);
-      return data.map((e) => MerchantWithDistance.fromJson(e)).toList();
-    } catch (e) {
-      print(e.toString());
-      throw Exception('Fail to get data');
-    }
-  }
-
-  Future<List<MerchantWithDistance>> getMerchantById(String coordinator) async {
-    Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-    try {
-      Response response = await get(
-          Uri.parse(
-              "${GlobalVariable.url}/api/merchant/near-by?coordinator=$coordinator"),
-          headers: headers);
-      int statusCode = response.statusCode;
       if (statusCode != 200) {
         return [];
       }

@@ -1,11 +1,14 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/category")]
     public class CategoryController : ControllerBase
@@ -16,7 +19,7 @@ namespace MyApp.Controllers
         {
             this.categoryRepository = categoryRepository;
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -67,14 +70,17 @@ namespace MyApp.Controllers
                     error = "Category doesn't exits!"
                 });
             }
-            // var data = await categoryRepository.FindByName(updateCategory.categoryName);
-            // if (data.Any())
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = $"Category name =  {updateCategory.categoryName} was used."
-            //     });
-            // }
+            if (!category.CategoryName.Equals(updateCategory.categoryName))
+            {
+                var data = await categoryRepository.FindByName(updateCategory.categoryName);
+                if (data.Any())
+                {
+                    return BadRequest(new
+                    {
+                        error = $"Category name =  {updateCategory.categoryName} was used."
+                    });
+                }
+            }
             if (!string.IsNullOrEmpty(updateCategory.image))
             {
                 category.CategoryImage = Convert.FromBase64String(updateCategory.image);

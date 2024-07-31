@@ -1,11 +1,14 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/role")]
     public class RoleController : ControllerBase

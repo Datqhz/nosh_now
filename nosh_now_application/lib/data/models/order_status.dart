@@ -1,4 +1,4 @@
-import 'package:nosh_now_application/data/models/eater.dart';
+
 
 class OrderStatus {
   int orderStatusId;

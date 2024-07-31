@@ -8,6 +8,7 @@ class PaymentMethodRepository{
    Future<List<PaymentMethod>> getAll() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =

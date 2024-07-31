@@ -1,7 +1,9 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
@@ -9,9 +11,9 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/food")]
+    [Authorize(Policy = IdentityData.MerchantPolicyName)]
     public class FoodController : ControllerBase
     {
-
         private readonly IFoodRepository foodRepository;
         private readonly IMerchantRepository merchantRepository;
         public FoodController(IFoodRepository foodRepository, IMerchantRepository merchantRepository)
@@ -19,14 +21,6 @@ namespace MyApp.Controllers
             this.foodRepository = foodRepository;
             this.merchantRepository = merchantRepository;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var data = await foodRepository.GetAll();
-            return Ok(data.Select(f => f.AsDto()).ToList());
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -59,21 +53,21 @@ namespace MyApp.Controllers
                 Price = createFood.price,
                 Status = createFood.status,
                 MerchantId = createFood.merchantId
-            }
-            );
+            });
             return CreatedAtAction(nameof(GetById), new { id = foodCreated.Id }, foodCreated.AsDto());
         }
         [HttpPut]
         public async Task<IActionResult> UpdateFood(UpdateFood updateFood)
         {
             var food = await foodRepository.GetById(updateFood.id);
-            if(food == null){
+            if (food == null)
+            {
                 return NotFound(new
                 {
                     error = "Food doesn't exits!"
                 });
             }
-            if(!string.IsNullOrEmpty(updateFood.foodImage))
+            if (!string.IsNullOrEmpty(updateFood.foodImage))
             {
                 food.FoodImage = Convert.FromBase64String(updateFood.foodImage);
             }
@@ -102,7 +96,8 @@ namespace MyApp.Controllers
             await foodRepository.Delete(id);
             return Ok(data.AsDto());
         }
-
+        [AllowAnonymous]
+        [Authorize(Policy = "MerchantEater")]
         [HttpGet("sell/merchant/{id}")]
         public async Task<IActionResult> GetAllByMerchantIdAndIsSelling(int id)
         {

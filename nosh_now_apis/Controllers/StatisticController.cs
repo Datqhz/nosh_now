@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Repositories;
 
 namespace MyApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/statistic")]
     public class StatisticController : ControllerBase

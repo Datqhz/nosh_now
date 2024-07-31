@@ -93,27 +93,26 @@ Future<DateTime?> showMonthYearPicker({
 
 Future<DateTime?> selectDate(BuildContext context, int option) async {
   DateTime initialDate = DateTime.now();
+  DateTime? picked;
   if (option == 1) {
-    final DateTime? picked = await showDatePicker(
+    picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null) return picked;
   } else if (option == 2) {
-    final DateTime? picked = await showMonthYearPicker(
+    picked = await showMonthYearPicker(
       context: context,
       initialDate: initialDate,
     );
-    if (picked != null) return picked;
   } else if (option == 3) {
-    final DateTime? picked = await showYearPicker(
+    picked = await showYearPicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null) return picked;
   }
+  return picked;
 }

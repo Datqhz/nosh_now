@@ -50,7 +50,8 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
                 entity.HasOne(e => e.Role)
                     .WithMany(role => role.Accounts)
-                    .HasForeignKey(e => e.RoleId);
+                    .HasForeignKey(e => e.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Manager>(entity =>
             {
@@ -63,7 +64,8 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.AccountId).IsRequired();
                 entity.HasOne(e => e.Account)
                     .WithOne(account => account.Manager)
-                    .HasForeignKey<Manager>(e => e.AccountId);
+                    .HasForeignKey<Manager>(e => e.AccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Eater>(entity =>
             {
@@ -76,7 +78,8 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.AccountId).IsRequired();
                 entity.HasOne(e => e.Account)
                     .WithOne(account => account.Eater)
-                    .HasForeignKey<Eater>(e => e.AccountId);
+                    .HasForeignKey<Eater>(e => e.AccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Merchant>(entity =>
             {
@@ -94,10 +97,12 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.CategoryId).IsRequired();
                 entity.HasOne(e => e.Account)
                     .WithOne(account => account.Merchant)
-                    .HasForeignKey<Merchant>(e => e.AccountId);
+                    .HasForeignKey<Merchant>(e => e.AccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Category)
                     .WithMany(category => category.Merchants)
-                    .HasForeignKey(e => e.CategoryId);
+                    .HasForeignKey(e => e.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Shipper>(entity =>
             {
@@ -115,10 +120,12 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.VehicleTypeId).IsRequired();
                 entity.HasOne(e => e.Account)
                     .WithOne(account => account.Shipper)
-                    .HasForeignKey<Shipper>(e => e.AccountId);
+                    .HasForeignKey<Shipper>(e => e.AccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.VehicleType)
                     .WithMany(type => type.Shippers)
-                    .HasForeignKey(e => e.VehicleTypeId);
+                    .HasForeignKey(e => e.VehicleTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Category>(entity =>
             {
@@ -160,7 +167,8 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.MerchantId).IsRequired();
                 entity.HasOne(e => e.Merchant)
                     .WithMany(merchant => merchant.Foods)
-                    .HasForeignKey(e => e.MerchantId);
+                    .HasForeignKey(e => e.MerchantId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Location>(entity =>
             {
@@ -173,7 +181,8 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.EaterId).IsRequired();
                 entity.HasOne(e => e.Eater)
                     .WithMany(eater => eater.Locations)
-                    .HasForeignKey(e => e.EaterId);
+                    .HasForeignKey(e => e.EaterId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<Order>(entity =>
             {
@@ -188,19 +197,24 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.EaterId).IsRequired();
                 entity.HasOne(e => e.Eater)
                     .WithMany(eater => eater.Orders)
-                    .HasForeignKey(e => e.EaterId);
+                    .HasForeignKey(e => e.EaterId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Status)
                     .WithMany(status => status.Orders)
-                    .HasForeignKey(e => e.StatusId);
+                    .HasForeignKey(e => e.StatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Merchant)
                     .WithMany(merchant => merchant.Orders)
-                    .HasForeignKey(e => e.MerchantId);
+                    .HasForeignKey(e => e.MerchantId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Shipper)
                     .WithMany(shipper => shipper.Orders)
-                    .HasForeignKey(e => e.ShipperId);
+                    .HasForeignKey(e => e.ShipperId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.PaymentMethod)
                     .WithMany(paymentMethod => paymentMethod.Orders)
-                    .HasForeignKey(e => e.MethodId);
+                    .HasForeignKey(e => e.MethodId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<OrderDetail>(entity =>
             {
@@ -212,10 +226,12 @@ namespace MyApp.DbContexts
                 entity.Property(e => e.Price).IsRequired();
                 entity.HasOne(e => e.Food)
                     .WithMany(food => food.OrderDetails)
-                    .HasForeignKey(e => e.FoodId);
+                    .HasForeignKey(e => e.FoodId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Order)
                     .WithMany(order => order.OrderDetails)
-                    .HasForeignKey(e => e.OrderId);
+                    .HasForeignKey(e => e.OrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

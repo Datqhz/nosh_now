@@ -32,6 +32,8 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
   ValueNotifier<Order?> order = ValueNotifier(null);
   ValueNotifier<List<Food>> foods = ValueNotifier([]);
   ValueNotifier<List<OrderDetail>> details = ValueNotifier([]);
+  ValueNotifier<List<GlobalKey<FoodItemState>>> foodItemStates =
+      ValueNotifier([]);
 
   Future<bool> _fetchAllData() async {
     try {
@@ -56,9 +58,23 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     return null;
   }
 
+  bool checkDetailsIsEmpty(BuildContext context) {
+    for (var i in foodItemStates.value) {
+      int quantity = i.currentState!.getQuantity();
+      print("quantity: $quantity");
+      if (quantity != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   List<Widget> buildListFood() {
     List<Widget> widgets = [];
+    List<GlobalKey<FoodItemState>> states = [];
     for (var food in foods.value) {
+      var key = GlobalKey<FoodItemState>();
+      states.add(key);
       widgets.add(ChangeNotifierProvider(
         create: (context) {
           OrderDetailNotifier notifier = OrderDetailNotifier();
@@ -83,6 +99,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: FoodItem(
+                  key: key,
                   food: food,
                   detailNotifier: notifier,
                 ),
@@ -92,6 +109,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
         ),
       ));
     }
+    foodItemStates.value = states;
     return widgets;
   }
 
@@ -229,7 +247,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
                                   child: Text(
                                     widget.merchant.merchant.category!
                                         .categoryName,
-                                    textAlign: TextAlign.center,
+                                    textAlign: TextAlign.left,
                                     maxLines: 1,
                                     style: const TextStyle(
                                       fontSize: 14.0,
@@ -305,12 +323,14 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
               right: 20,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PrepareOrderScreen(
-                                order: order.value!,
-                              )));
+                  if (order.value != null && !checkDetailsIsEmpty(context)) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PrepareOrderScreen(
+                                  order: order.value!,
+                                )));
+                  }
                 },
                 child: Container(
                   height: 60,

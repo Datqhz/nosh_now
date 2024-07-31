@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:nosh_now_application/data/models/order_detail.dart';
 
 class ChangeStream{
   final StreamController _controller = StreamController.broadcast();

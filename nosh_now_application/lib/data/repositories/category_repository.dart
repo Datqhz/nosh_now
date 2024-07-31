@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/category.dart';
-import 'package:nosh_now_application/data/models/category.dart';
 
 class CategoryRepository {
   Future<FoodCategory?> create(FoodCategory category) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await post(
@@ -33,6 +33,7 @@ class CategoryRepository {
   Future<bool> update(FoodCategory category) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -57,6 +58,7 @@ class CategoryRepository {
   Future<bool> deleteCategory(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =

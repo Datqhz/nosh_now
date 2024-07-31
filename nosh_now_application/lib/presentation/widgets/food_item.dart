@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/streams/order_detail_notifier.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:nosh_now_application/data/models/food.dart';
 
 // ignore: must_be_immutable
-class FoodItem extends StatelessWidget {
+class FoodItem extends StatefulWidget {
   FoodItem({super.key, required this.food, required this.detailNotifier});
   Food food;
   OrderDetailNotifier detailNotifier;
 
   @override
+  State<FoodItem> createState() => FoodItemState();
+}
+
+class FoodItemState extends State<FoodItem> {
+  int getQuantity() {
+    return widget.detailNotifier.detail != null
+        ? widget.detailNotifier.detail!.quantity
+        : 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      print('max width: ${constraints.maxWidth}');
+      ;
       return Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -29,7 +39,8 @@ class FoodItem extends StatelessWidget {
             Image(
               height: 100,
               width: double.infinity,
-              image: MemoryImage(convertBase64ToUint8List(food.foodImage)),
+              image:
+                  MemoryImage(convertBase64ToUint8List(widget.food.foodImage)),
               fit: BoxFit.cover,
             ),
             const SizedBox(
@@ -44,7 +55,7 @@ class FoodItem extends StatelessWidget {
                   Flexible(
                     flex: 1,
                     child: Text(
-                      food.foodName,
+                      widget.food.foodName,
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       style: const TextStyle(
@@ -57,11 +68,11 @@ class FoodItem extends StatelessWidget {
                     ),
                   ),
                   ListenableBuilder(
-                      listenable: detailNotifier,
+                      listenable: widget.detailNotifier,
                       builder: (context, child) {
-                        if (detailNotifier.detail != null) {
+                        if (widget.detailNotifier.detail != null) {
                           return Text(
-                            ' - Selected: ${detailNotifier.detail!.quantity}',
+                            ' - Selected: ${widget.detailNotifier.detail!.quantity}',
                             textAlign: TextAlign.left,
                             maxLines: 1,
                             style: const TextStyle(
@@ -85,7 +96,7 @@ class FoodItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
                 NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
-                    .format(food.price),
+                    .format(widget.food.price),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 style: const TextStyle(

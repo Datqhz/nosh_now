@@ -66,7 +66,7 @@ namespace MyApp.Repositories
 
         public async Task<double> CalcTotalTransactionAmountByDate(DateTime? date = null, int? year = null, int? month = null)
         {
-            var query = _context.Order.Where(order => order.StatusId == 4);
+            var query = _context.Order.Where(order => order.StatusId == 5);
 
             if (year.HasValue)
             {

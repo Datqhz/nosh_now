@@ -11,7 +11,6 @@ using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
-
     [ApiController]
     [Route("api/account")]
     public class AccountController : ControllerBase
@@ -24,14 +23,6 @@ namespace MyApp.Controllers
             this.accountRepository = accountRepository;
             this.authHandler = authHandler;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var data = await accountRepository.GetAll();
-            return Ok(data);
-        }
-
 
         [HttpGet("{id}")]
         [Authorize(IdentityData.ManagerPolicyName)]
@@ -47,10 +38,15 @@ namespace MyApp.Controllers
             }
             return Ok(data);
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateAccount(CreateAccount createAccount)
         {
+            if(createAccount.password.Length < 6){
+                return BadRequest(new
+                {
+                    error = $"Password must be at least 6 characters."
+                });
+            }
             var data = await accountRepository.FindByEmail(createAccount.email);
             if (data != null)
             {
@@ -72,6 +68,12 @@ namespace MyApp.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAccont(UpdateAccount updateAccount)
         {
+            if(updateAccount.newPassword.Length < 6){
+                return BadRequest(new
+                {
+                    error = $"Password must be at least 6 characters."
+                });
+            }
             var account = await accountRepository.GetById(updateAccount.id);
             if (account == null)
             {
@@ -105,7 +107,6 @@ namespace MyApp.Controllers
                     error = "Incorrect account or password"
                 });
             }
-
             var verify = BCrypt.Net.BCrypt.Verify(loginDto.password, account.Password);
             if (verify)
             {

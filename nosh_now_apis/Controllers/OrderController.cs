@@ -1,4 +1,5 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Dtos.Response;
@@ -10,6 +11,7 @@ using MyApp.Utils;
 
 namespace MyApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/order")]
     public class OrderController : ControllerBase
@@ -46,7 +48,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrder createOrder)
         {
@@ -55,7 +57,15 @@ namespace MyApp.Controllers
             {
                 return NotFound(new
                 {
-                    error = $"Account has id = {createOrder.eaterId} doesn't exist."
+                    error = $"Eater has id = {createOrder.eaterId} doesn't exist."
+                });
+            }
+            var merchant = await merchantRepository.GetById(createOrder.merchantId);
+            if (merchant == null)
+            {
+                return NotFound(new
+                {
+                    error = $"Merchant has id = {createOrder.merchantId} doesn't exist."
                 });
             }
             var orderCreated = await orderRepository.Insert(new Order
@@ -63,7 +73,7 @@ namespace MyApp.Controllers
                 ShipmentFee = 0,
                 MerchantId = createOrder.merchantId,
                 EaterId = createOrder.eaterId,
-                StatusId = 0
+                StatusId = 1
             }
             );
             return CreatedAtAction(nameof(GetById), new { id = orderCreated.Id }, orderCreated.AsDto());

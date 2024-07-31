@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/core/streams/user_login_stream.dart';
+import 'package:nosh_now_application/data/providers/user_state_provider.dart';
 import 'package:nosh_now_application/core/utils/image.dart';
 import 'package:provider/provider.dart';
 
@@ -151,7 +151,7 @@ class _MyDrawerState extends State<MyDrawer> {
                                         GlobalVariable.roleId = 0;
                                         GlobalVariable.roleName = '';
                                         GlobalVariable.user = null;
-                                        Provider.of<UserLogin>(context,
+                                        Provider.of<UserStateProvider>(context,
                                                 listen: false)
                                             .logout();
                                         Navigator.pop(context);

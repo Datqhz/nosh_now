@@ -1,12 +1,15 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/shipper")]
     public class ShipperController : ControllerBase
@@ -42,7 +45,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateShipper(CreateShipper createShipper)
         {
@@ -77,8 +80,9 @@ namespace MyApp.Controllers
             );
             return CreatedAtAction(nameof(GetById), new { id = shipperCreated.Id }, shipperCreated.AsDto());
         }
+        [Authorize(Policy = "ManagerShipper")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateShipper updateShipper)
+        public async Task<IActionResult> UpdateShipper(UpdateShipper updateShipper)
         {
             var shipper = await shipperRepository.GetById(updateShipper.id);
             if (shipper == null)

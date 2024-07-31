@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
-import 'package:nosh_now_application/data/models/food.dart';
 import 'package:nosh_now_application/data/models/order.dart';
-import 'package:nosh_now_application/presentation/screens/main/eater/prepare_order_screen.dart';
 
+//all role
 class OrderRepository {
   Future<Order> getById(int orderId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -30,6 +30,7 @@ class OrderRepository {
   Future<Order> getByMerchantAndEater(int merchantId, int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -51,6 +52,7 @@ class OrderRepository {
   Future<List<Order>> getByEater(int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -71,6 +73,7 @@ class OrderRepository {
   Future<List<Order>> getByMerchant(int merchantId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -91,6 +94,7 @@ class OrderRepository {
   Future<List<Order>> getByShipper(int shipperId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -111,9 +115,8 @@ class OrderRepository {
   Future<List<Order>> getAllNearBy(String coordinator) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
-    print(
-        "${GlobalVariable.url}/api/order/near-by?coordinator=10.848355617658296-106.77554947888908");
     try {
       Response response = await get(
           Uri.parse(
@@ -134,10 +137,10 @@ class OrderRepository {
   Future<bool> update(Order order, {int shipperId = 0}) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
-      print(
-          "try send request - id: ${order.orderId} shipmenFee: ${order.shipmentFee} coordinator: ${order.coordinator} phone: ${order.phone} statusId: ${order.orderStatus.orderStatusId} shipperId: ${shipperId} methodId: ${order.paymentMethod!.methodId}");
+      print("shipper id: $shipperId");
       Response response =
           await put(Uri.parse("${GlobalVariable.url}/api/order"),
               headers: headers,

@@ -9,6 +9,7 @@ class ShipperRepository {
   Future<List<Shipper>> getAllShipper() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -59,6 +60,7 @@ class ShipperRepository {
   Future<Shipper?> update(Shipper shipper) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -77,7 +79,6 @@ class ShipperRepository {
               }));
       int statusCode = response.statusCode;
       if (statusCode != 200) {
-        print("body: ${response.body}");
         return null;
       }
       Map<String, dynamic> data = json.decode(response.body);

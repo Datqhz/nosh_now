@@ -1,12 +1,15 @@
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.Dtos.Request;
 using MyApp.Extensions;
+using MyApp.Identity;
 using MyApp.Models;
 using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
+    [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/manager")]
     public class ManagerController : ControllerBase
@@ -64,7 +67,7 @@ namespace MyApp.Controllers
             return CreatedAtAction(nameof(GetById), new { id = managerCreated.Id }, managerCreated.AsDto());
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateEaterOrManager updateManager)
+        public async Task<IActionResult> UpdateManager(UpdateEaterOrManager updateManager)
         {
             var manager = await managerRepository.GetById(updateManager.id);
             if(manager == null){

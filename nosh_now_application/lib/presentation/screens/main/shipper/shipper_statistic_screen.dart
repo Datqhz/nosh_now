@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
+import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/data/models/top_food.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 
@@ -161,9 +162,19 @@ class _ShipperStatisticScreenState extends State<ShipperStatisticScreen> {
                     const SizedBox(
                       width: 12,
                     ),
-                    const Icon(
-                      CupertinoIcons.calendar,
-                      color: Color.fromRGBO(49, 49, 49, 1),
+                    GestureDetector(
+                      onTap: () async {
+                        DateTime? picked =
+                            await selectDate(context, currentOption.value);
+                        if (picked != null) {
+                          print(picked.toString());
+                          currentPick.value = picked;
+                        }
+                      },
+                      child: const Icon(
+                        CupertinoIcons.calendar,
+                        color: Color.fromRGBO(49, 49, 49, 1),
+                      ),
                     )
                   ],
                 ),

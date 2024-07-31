@@ -51,6 +51,7 @@ dependencies:
   firebase_core: ^2.24.2
   firebase_messaging: ^14.7.10
   flutter_dotenv: ^5.1.0
+  flutter_launcher_icons: ^0.13.1
   # dart_jsonwebtoken: ^2.14.0
   # basic_utils: ^5.7.0
   # pointycastle: ^3.9.1
@@ -59,6 +60,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+flutter_icons:
+  image_path: "assets/images/app_icon.png" 
+  android: true
+  ios: true
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

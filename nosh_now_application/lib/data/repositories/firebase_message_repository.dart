@@ -1,9 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:nosh_now_application/core/constants/global_variable.dart';
 
 class FirebaseMessageRepository {
   Future<void> sendPushMessage(
@@ -14,7 +11,7 @@ class FirebaseMessageRepository {
       final response = await post(Uri.parse(url),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer ${GlobalVariable.messageOAuthToken}',
+            // 'Authorization': 'Bearer ${GlobalVariable.messageOAuthToken}',
           },
           body: jsonEncode(
             <String, dynamic>{

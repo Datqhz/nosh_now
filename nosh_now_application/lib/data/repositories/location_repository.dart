@@ -5,6 +5,7 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/location.dart';
 
 class LocationRepository {
+  //eater
   Future<Location?> create(Location location, int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -30,11 +31,11 @@ class LocationRepository {
     }
   }
 
-  Future<Location> update(
-    Location location,
-  ) async {
+  //eater
+  Future<Location> update(Location location) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response =
@@ -57,10 +58,11 @@ class LocationRepository {
       throw Exception('Fail to save location');
     }
   }
-
+  // eater
   Future<bool> deleteSavedLocation(int id) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await delete(
@@ -77,10 +79,11 @@ class LocationRepository {
       throw Exception('Fail to delete location');
     }
   }
-
+  //eater
   Future<List<Location>> getAllByEater(int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(
@@ -96,11 +99,12 @@ class LocationRepository {
       print(e.toString());
       throw Exception('Fail to get data');
     }
-  }
-
+  } 
+  //eater
   Future<Location> getDefaultLocationByEater(int eaterId) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer ${GlobalVariable.jwt}"
     };
     try {
       Response response = await get(

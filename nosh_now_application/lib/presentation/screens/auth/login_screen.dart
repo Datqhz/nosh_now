@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/core/streams/user_login_stream.dart';
+import 'package:nosh_now_application/data/providers/user_state_provider.dart';
 import 'package:nosh_now_application/core/utils/snack_bar.dart';
 import 'package:nosh_now_application/core/utils/validate.dart';
 import 'package:nosh_now_application/data/repositories/account_repository.dart';
@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             // ignore: use_build_context_synchronously
                                             Navigator.pop(context);
                                             // ignore: use_build_context_synchronously
-                                            Provider.of<UserLogin>(context,
+                                            Provider.of<UserStateProvider>(context,
                                                     listen: false)
                                                 .login();
                                           } else {

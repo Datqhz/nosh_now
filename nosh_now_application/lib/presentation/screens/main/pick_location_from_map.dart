@@ -69,7 +69,6 @@ class _PickLocationFromMapScreenState extends State<PickLocationFromMapScreen> {
                         ValueListenableBuilder(
                             valueListenable: marker,
                             builder: (context, value, chid) {
-                              print("${value.latitude}, ${value.longitude}");
                               return MarkerLayer(
                                 rotate: true,
                                 markers: [

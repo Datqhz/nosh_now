@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nosh_now_application/core/streams/user_login_stream.dart';
+import 'package:nosh_now_application/data/providers/user_state_provider.dart';
 import 'package:nosh_now_application/data/providers/category_list_provider.dart';
 import 'package:nosh_now_application/data/providers/food_list_provider.dart';
 // ignore: unused_import
@@ -13,7 +13,7 @@ import 'presentation/themes/app_theme.dart';
 void main() {
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => UserLogin()),
+      ChangeNotifierProvider(create: (context) => UserStateProvider()),
       ChangeNotifierProvider(create: (context) => FoodListProvider()),
       ChangeNotifierProvider(create: (context) => CategoryListProvider()),
       ChangeNotifierProvider(create: (context) => VehicleTypeListProvider()),
