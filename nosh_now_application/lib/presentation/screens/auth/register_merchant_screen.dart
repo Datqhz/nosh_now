@@ -763,7 +763,7 @@ class _RegisterMerchantStep1ScreenState
                           width: 12,
                         ),
                         const Text(
-                          'Fill your shipper profile',
+                          'Fill your profile',
                           style: TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,

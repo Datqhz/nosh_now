@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
@@ -25,6 +26,7 @@ import 'package:nosh_now_application/presentation/screens/main/eater/choose_paym
 import 'package:nosh_now_application/presentation/screens/main/eater/order_process_screen.dart';
 import 'package:nosh_now_application/presentation/screens/main/eater/pick_location_screen.dart';
 import 'package:nosh_now_application/presentation/widgets/order_detail_item.dart';
+import 'package:pay/pay.dart';
 
 // ignore: must_be_immutable
 class PrepareOrderScreen extends StatefulWidget {
@@ -44,6 +46,8 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
   ValueNotifier<double> delivery = ValueNotifier(0);
   ValueNotifier<double> total = ValueNotifier(0);
   ValueNotifier<Location?> currentLocationPicked = ValueNotifier(null);
+  final Future<PaymentConfiguration> _googlePayConfigFuture =
+      PaymentConfiguration.fromAsset('json/ggpay_config.json');
   Timer? calcSubs;
 
   void calcSubstantialOnChange() {
@@ -102,7 +106,7 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     currentLocationPicked.addListener(calcDeliveryOnChange);
     substantial.addListener(calcTotal);
     delivery.addListener(calcTotal);
-    fetchDefaultLocation();
+    fetchData();
     calcSubs = Timer(const Duration(seconds: 6), () {
       calcSubstantialOnChange();
       calcDeliveryOnChange();
@@ -118,9 +122,13 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
     super.dispose();
   }
 
-  Future<void> fetchDefaultLocation() async {
+  Future<void> fetchData() async {
     currentLocationPicked.value = await LocationRepository()
         .getDefaultLocationByEater(GlobalVariable.currentUid);
+    var method = await PaymentMethodRepository().getAll();
+    if (method.isNotEmpty) {
+      currentSelected.value = method[0];
+    }
   }
 
   @override
@@ -238,119 +246,6 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                             );
                           }),
                     ),
-                    // FutureBuilder(
-                    //     future: LocationRepository().getDefaultLocationByEater(
-                    //         GlobalVariable.currentUid),
-                    //     builder: (context, snapshot) {
-                    //       if (snapshot.connectionState ==
-                    //               ConnectionState.done &&
-                    //           snapshot.hasData) {
-                    //         currentLocationPicked.value ??= snapshot.data!;
-                    //         return GestureDetector(
-                    //           onTap: () async {
-                    //             var newPicked = await Navigator.push(
-                    //               context,
-                    //               MaterialPageRoute(
-                    //                 builder: (context) => PickLocationScreen(
-                    //                   currentPick: currentLocationPicked.value!,
-                    //                 ),
-                    //               ),
-                    //             );
-                    //             if (newPicked != null) {
-                    //               currentLocationPicked.value = newPicked;
-                    //             }
-                    //           },
-                    //           child: ValueListenableBuilder(
-                    //               valueListenable: currentLocationPicked,
-                    //               builder: (context, value, child) {
-                    //                 return Container(
-                    //                   height: 80,
-                    //                   color: Colors.white,
-                    //                   padding: const EdgeInsets.symmetric(
-                    //                       horizontal: 20),
-                    //                   child: Row(
-                    //                     crossAxisAlignment:
-                    //                         CrossAxisAlignment.center,
-                    //                     children: [
-                    //                       const Icon(
-                    //                         Icons.location_on_sharp,
-                    //                         color: Colors.red,
-                    //                         size: 30,
-                    //                       ),
-                    //                       const SizedBox(
-                    //                         width: 8,
-                    //                       ),
-                    //                       Column(
-                    //                         crossAxisAlignment:
-                    //                             CrossAxisAlignment.start,
-                    //                         mainAxisAlignment:
-                    //                             MainAxisAlignment.center,
-                    //                         children: [
-                    //                           Text(
-                    //                             '${value!.locationName} - ${value.phone}',
-                    //                             maxLines: 1,
-                    //                             style: const TextStyle(
-                    //                                 fontSize: 16.0,
-                    //                                 fontWeight: FontWeight.bold,
-                    //                                 color: Color.fromRGBO(
-                    //                                     49, 49, 49, 1),
-                    //                                 overflow:
-                    //                                     TextOverflow.ellipsis),
-                    //                           ),
-                    //                           FutureBuilder(
-                    //                               future: getAddressFromLatLng(
-                    //                                   splitCoordinatorString(
-                    //                                       value.coordinator)),
-                    //                               builder: (context,
-                    //                                   addressSnapshot) {
-                    //                                 if (addressSnapshot
-                    //                                             .connectionState ==
-                    //                                         ConnectionState
-                    //                                             .done &&
-                    //                                     addressSnapshot
-                    //                                         .hasData) {
-                    //                                   return Text(
-                    //                                     addressSnapshot.data!,
-                    //                                     maxLines: 1,
-                    //                                     style: const TextStyle(
-                    //                                         fontSize: 14.0,
-                    //                                         fontWeight:
-                    //                                             FontWeight.w400,
-                    //                                         color:
-                    //                                             Color.fromRGBO(
-                    //                                                 49,
-                    //                                                 49,
-                    //                                                 49,
-                    //                                                 1),
-                    //                                         overflow:
-                    //                                             TextOverflow
-                    //                                                 .ellipsis),
-                    //                                   );
-                    //                                 }
-                    //                                 return const Text('');
-                    //                               }),
-                    //                         ],
-                    //                       ),
-                    //                       const Expanded(
-                    //                           child: SizedBox(
-                    //                         width: 12,
-                    //                       )),
-                    //                       const Icon(
-                    //                         Icons.chevron_right,
-                    //                         color: Colors.red,
-                    //                         size: 30,
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 );
-                    //               }),
-                    //         );
-                    //       }
-                    //       return const SpinKitThreeInOut(
-                    //         color: Colors.black,
-                    //         size: 30,
-                    //       );
-                    //     }),
                     const SizedBox(
                       height: 12,
                     ),
@@ -601,141 +496,258 @@ class _PrepareOrderScreenState extends State<PrepareOrderScreen> {
                       const SizedBox(
                         height: 12,
                       ),
-                      FutureBuilder(
-                          future: PaymentMethodRepository().getAll(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              currentSelected.value ??= snapshot.data![0];
-                              return GestureDetector(
-                                onTap: () async {
-                                  PaymentMethod method = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ChoosePaymentMethodScreen(
-                                                  currentPick:
-                                                      currentSelected.value!)));
-                                  currentSelected.value = method;
-                                },
-                                child: ValueListenableBuilder(
-                                    valueListenable: currentSelected,
-                                    builder: (context, value, child) {
-                                      return Container(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 8),
-                                        decoration: const BoxDecoration(
-                                            border: Border(
-                                          bottom: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  120, 120, 120, 1),
-                                              width: 0.6),
-                                        )),
-                                        child: Row(
-                                          children: [
-                                            Image.memory(
-                                              convertBase64ToUint8List(
-                                                  value!.methodImage),
-                                              height: 18,
-                                              width: 18,
-                                            ),
-                                            const SizedBox(
-                                              width: 12,
-                                            ),
-                                            Text(
-                                              'Pay via ${value.methodName}',
-                                              maxLines: 1,
-                                              textAlign: TextAlign.left,
-                                              style: const TextStyle(
-                                                  fontSize: 13.0,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color.fromRGBO(
-                                                      49, 49, 49, 1),
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                            ),
-                                            const Expanded(child: SizedBox()),
-                                            const Icon(
-                                              CupertinoIcons.chevron_forward,
-                                              color: Colors.black,
-                                              size: 18,
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              );
-                            }
-                            return const Row(
-                              children: [],
-                            );
-                          }),
+                      GestureDetector(
+                        onTap: () async {
+                          PaymentMethod method = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChoosePaymentMethodScreen(
+                                          currentPick:
+                                              currentSelected.value!)));
+                          currentSelected.value = method;
+                        },
+                        child: ValueListenableBuilder(
+                            valueListenable: currentSelected,
+                            builder: (context, value, child) {
+                              if (value != null) {
+                                return Container(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                    bottom: BorderSide(
+                                        color: Color.fromRGBO(120, 120, 120, 1),
+                                        width: 0.6),
+                                  )),
+                                  child: Row(
+                                    children: [
+                                      Image.memory(
+                                        convertBase64ToUint8List(
+                                            value.methodImage),
+                                        height: 18,
+                                        width: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 12,
+                                      ),
+                                      Text(
+                                        'Pay via ${value.methodName}',
+                                        maxLines: 1,
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                            fontSize: 13.0,
+                                            fontWeight: FontWeight.w400,
+                                            color:
+                                                Color.fromRGBO(49, 49, 49, 1),
+                                            overflow: TextOverflow.ellipsis),
+                                      ),
+                                      const Expanded(child: SizedBox()),
+                                      const Icon(
+                                        CupertinoIcons.chevron_forward,
+                                        color: Colors.black,
+                                        size: 18,
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                              return const SizedBox();
+                            }),
+                      ),
                       const SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        width: double.infinity,
-                        height: 44,
-                        child: TextButton(
-                          onPressed: () async {
-                            if (delivery.value != 0 && !checkDetailIsEmpty()) {
-                              List<OrderDetail> list = getFinalDetails();
-                              Order tempOrder = widget.order;
-                              tempOrder.coordinator =
-                                  currentLocationPicked.value!.coordinator;
-                              tempOrder.orderStatus = OrderStatus(
-                                  orderStatusId: 2,
-                                  orderStatusName: 'Wait shipper',
-                                  step: 1);
-                              tempOrder.totalPay = 0;
-                              tempOrder.shipmentFee = delivery.value;
-                              tempOrder.phone =
-                                  currentLocationPicked.value!.phone;
-                              tempOrder.paymentMethod = currentSelected.value;
-                              bool updateDetailsRs =
-                                  await OrderDetailRepository()
-                                      .updateMultiple(list);
-                              if (updateDetailsRs) {
-                                bool updateOrder =
-                                    await OrderRepository().update(tempOrder);
-                                if (updateOrder) {
-                                  Navigator.popUntil(
-                                      context, (route) => route.isFirst);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => OrderProcessScreen(
-                                        order: widget.order,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  showSnackBar(context,
-                                      'Something error when order foods');
-                                }
-                              }
-                            } else {
-                              if (delivery.value == 0) {
-                                showSnackBar(context,
-                                    "Please wait a second to caculate");
-                              } else {
-                                showSnackBar(context,
-                                    "Please choose at least a food to complete order");
-                              }
+                      ValueListenableBuilder(
+                          valueListenable: currentSelected,
+                          builder: (context, value, child) => (value != null &&
+                                  value.methodId != 4)
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  width: double.infinity,
+                                  height: 44,
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      if (delivery.value != 0 &&
+                                          !checkDetailIsEmpty()) {
+                                        if (currentSelected.value != null &&
+                                            currentSelected.value!.methodId ==
+                                                2) {
+                                          var paymentRs =
+                                              await MethodChannel('payment')
+                                                  .invokeMethod('momo', {
+                                            'orderId':
+                                                widget.order.orderId.toString(),
+                                            'amount': total.value.toString()
+                                          });
+                                          print("aaa");
+                                          print('paymentRs: $paymentRs');
+                                          return;
+                                        }
+                                        List<OrderDetail> list =
+                                            getFinalDetails();
+                                        Order tempOrder = widget.order;
+                                        tempOrder.coordinator =
+                                            currentLocationPicked
+                                                .value!.coordinator;
+                                        tempOrder.orderStatus = OrderStatus(
+                                            orderStatusId: 2,
+                                            orderStatusName: 'Wait shipper',
+                                            step: 1);
+                                        tempOrder.totalPay = 0;
+                                        tempOrder.shipmentFee = delivery.value;
+                                        tempOrder.phone =
+                                            currentLocationPicked.value!.phone;
+                                        tempOrder.paymentMethod =
+                                            currentSelected.value;
+                                        bool updateDetailsRs =
+                                            await OrderDetailRepository()
+                                                .updateMultiple(list);
+                                        if (updateDetailsRs) {
+                                          bool updateOrder =
+                                              await OrderRepository()
+                                                  .update(tempOrder);
+                                          if (updateOrder) {
+                                            Navigator.popUntil(context,
+                                                (route) => route.isFirst);
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    OrderProcessScreen(
+                                                  order: widget.order,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            showSnackBar(context,
+                                                'Something error when order foods');
+                                          }
+                                        }
+                                      } else {
+                                        if (delivery.value == 0) {
+                                          showSnackBar(context,
+                                              "Please wait a second to caculate");
+                                        } else {
+                                          showSnackBar(context,
+                                              "Please choose at least a food to complete order");
+                                        }
+                                      }
+                                    },
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                        foregroundColor: Colors.white,
+                                        textStyle: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8))),
+                                    child: const Text('Checkout'),
+                                  ),
+                                )
+                              : const SizedBox()),
+                      ValueListenableBuilder(
+                          valueListenable: currentSelected,
+                          builder: (context, value, child) {
+                            if (value != null && value.methodId == 4) {
+                              return FutureBuilder(
+                                  future: _googlePayConfigFuture,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.done &&
+                                        snapshot.hasData) {
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        width: double.infinity,
+                                        height: 44,
+                                        child: GooglePayButton(
+                                          paymentConfiguration: snapshot.data!,
+                                          paymentItems: [
+                                            PaymentItem(
+                                              label: 'Total',
+                                              amount: total.value.toString(),
+                                              status:
+                                                  PaymentItemStatus.final_price,
+                                            )
+                                          ],
+                                          type: GooglePayButtonType.buy,
+                                          onPaymentResult: (paymentRs) {
+                                            if (delivery.value != 0 &&
+                                                !checkDetailIsEmpty()) {
+                                              List<OrderDetail> list =
+                                                  getFinalDetails();
+                                              Order tempOrder = widget.order;
+                                              tempOrder.coordinator =
+                                                  currentLocationPicked
+                                                      .value!.coordinator;
+                                              tempOrder.orderStatus =
+                                                  OrderStatus(
+                                                      orderStatusId: 2,
+                                                      orderStatusName:
+                                                          'Wait shipper',
+                                                      step: 1);
+                                              tempOrder.totalPay = 0;
+                                              tempOrder.shipmentFee =
+                                                  delivery.value;
+                                              tempOrder.phone =
+                                                  currentLocationPicked
+                                                      .value!.phone;
+                                              tempOrder.paymentMethod =
+                                                  currentSelected.value;
+
+                                              OrderDetailRepository()
+                                                  .updateMultiple(list)
+                                                  .then((updateDetailsRs) {
+                                                if (updateDetailsRs) {
+                                                  OrderRepository()
+                                                      .update(tempOrder)
+                                                      .then((updateOrder) {
+                                                    if (updateOrder) {
+                                                      Navigator.popUntil(
+                                                          context,
+                                                          (route) =>
+                                                              route.isFirst);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              OrderProcessScreen(
+                                                            order: widget.order,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      showSnackBar(context,
+                                                          'Something error when order foods');
+                                                    }
+                                                  });
+                                                }
+                                              });
+                                            } else {
+                                              if (delivery.value == 0) {
+                                                showSnackBar(context,
+                                                    "Please wait a second to caculate");
+                                              } else {
+                                                showSnackBar(context,
+                                                    "Please choose at least a food to complete order");
+                                              }
+                                            }
+                                          },
+                                          cornerRadius: 22,
+                                          width: double.maxFinite,
+                                          loadingIndicator: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const Text("null");
+                                  });
                             }
-                          },
-                          style: TextButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
-                              textStyle: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8))),
-                          child: const Text('Checkout'),
-                        ),
-                      ),
+                            return SizedBox();
+                          }),
                     ],
                   ),
                 ),

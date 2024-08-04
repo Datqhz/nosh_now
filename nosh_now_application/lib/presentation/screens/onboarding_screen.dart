@@ -27,7 +27,7 @@ class OnboardingScreen extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Text(
-                  'Hello!!!\nDelicious eats at your doorstep.',
+                  'Hello!!!\nDelicious foods at your doorstep.',
                   style: TextStyle(
                       fontSize: 30.0,
                       fontWeight: FontWeight.bold,

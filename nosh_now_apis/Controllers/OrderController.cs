@@ -48,7 +48,7 @@ namespace MyApp.Controllers
             }
             return Ok(data.AsDto());
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrder createOrder)
         {
@@ -89,12 +89,17 @@ namespace MyApp.Controllers
                     error = "Order doesn't exits!"
                 });
             }
-            if(order.Status.Id == 6){
-                return BadRequest(new {error= "Can't revceive this order"});
-            }else if(order.Status.Id == 3 && updateOrder.statusId == 6){
-                return BadRequest(new {error= "Can't cancle this order"});
-            }else if(order.Status.Id == updateOrder.statusId ){
-                return BadRequest(new {error= "Can't revceive this order"});
+            if (order.Status.Id == 6)
+            {
+                return BadRequest(new { error = "Can't revceive this order" });
+            }
+            else if (order.Status.Id == 3 && updateOrder.statusId == 6)
+            {
+                return BadRequest(new { error = "Can't cancle this order" });
+            }
+            else if (order.Status.Id == updateOrder.statusId)
+            {
+                return BadRequest(new { error = "Can't revceive this order" });
             }
             order.OrderedDate = DateTime.Now;
             order.ShipmentFee = updateOrder.shipmentFee;
@@ -164,13 +169,13 @@ namespace MyApp.Controllers
             var data = await orderRepository.GetAllWaitingToPickedUp();
             foreach (var orderItem in data)
             {
-                double distance = DistanceUtil.CalculateDistance(coordinator, orderItem.Coordinator);
-                if (distance < 3)
+                double distance = DistanceUtil.CalculateDistance(coordinator, orderItem.Merchant.Coordinator);
+                if (distance < 100)
                 {
                     orders.Add(new OrderAndDistanceResponseDto(orderItem.AsDto(), distance));
                 }
             }
-            
+
             SortUtil.SortOrderByDistance(orders, 0, orders.Count - 1);
             return Ok(orders);
         }

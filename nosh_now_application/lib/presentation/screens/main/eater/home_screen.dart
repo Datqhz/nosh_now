@@ -32,7 +32,6 @@ class HomeScreen extends StatelessWidget {
       List<MerchantWithDistance> merchants = await MerchantRepository()
           .getAllMerchantNearby(
               '${currentCoord.latitude}-${currentCoord.longitude}');
-      print(merchants.length);
       return merchants;
     } catch (e) {
       throw Exception(e.toString());
