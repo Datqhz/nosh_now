@@ -18,19 +18,18 @@ services:
       retries: 5
   api:
     build:
-      context: .
-      dockerfile: nosh_now_apis/Dockerfile
+      context: ./nosh_now_apis/
+      dockerfile: Dockerfile
     ports:
       - "5000:80"
-    image: api
+    image: ${DOCKER_USERNAME}/nosh_now_apis
     depends_on:
       - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ISSUER=$ISSUER
-      - AUDIENCE=$AUDIENCE
-      - KEY=$KEY
-
+      - ISSUER=${TOKEN_ISSUER}
+      - AUDIENCE=${TOKEN_AUDIENCE}
+      - KEY=${TOKEN_KEY}
 volumes:
   mydb:
     

@@ -10,7 +10,7 @@ namespace MyApp.Controllers
 {
     [ApiController]
     [Route("api/order-status")]
-    [Authorize(Policy = "Manager")]
+    // [Authorize(Policy = "Manager")]
     public class OrderStatusController : ControllerBase
     {
         private readonly IOrderStatusRepository orderStatusRepository;

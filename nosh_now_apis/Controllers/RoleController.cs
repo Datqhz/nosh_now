@@ -8,7 +8,7 @@ using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
-    [Authorize(Policy = IdentityData.ManagerPolicyName)]
+    // [Authorize(Policy = IdentityData.ManagerPolicyName)]
     [ApiController]
     [Route("api/role")]
     public class RoleController : ControllerBase

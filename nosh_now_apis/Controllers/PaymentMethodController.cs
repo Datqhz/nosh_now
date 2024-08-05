@@ -9,7 +9,7 @@ namespace MyApp.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/payment-method")]
+    // [Route("api/payment-method")]
     public class PaymentMethodController : ControllerBase
     {
 
