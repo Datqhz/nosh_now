@@ -5,9 +5,9 @@ pipeline{
 
         DOCKER_USERNAME = 'dat1edf'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        TOKEN_ISSUER = credentials('YOUR_CREDENTIAL_ID')
-        TOKEN_AUDIENCE = credentials('YOUR_CREDENTIAL_ID')
-        TOKEN_KEY = credentials('YOUR_CREDENTIAL_ID')
+        TOKEN_ISSUER = credentials('TOKEN_ISSUER')
+        TOKEN_AUDIENCE = credentials('TOKEN_AUDIENCE')
+        TOKEN_KEY = credentials('TOKEN_KEY')
     }
 
     stages{
