@@ -18,24 +18,24 @@ pipeline{
         }
         stage('Test dotnet'){
             steps{
-                sh "cd $PATH_PROJECT/nosh_now_apis \
-                && docker build -t dotnet7-app -f Dockerfile.dotnet7 . \
-                && docker run --rm -v .:/app -w /app dotnet7-app dotnet test"
+                sh "cd $PATH_PROJECT/nosh_now_apis"
+                sh "docker build -t dotnet7-app -f Dockerfile.dotnet7 ."
+                sh "docker run --rm -v .:/app -w /app dotnet7-app dotnet test"
             }
         }
 
         stage('Build and push images') {
             steps {
-                    sh "cd $PATH_PROJECT \
-                    && DOCKER_USERNAME=${DOCKER_USERNAME} \
-                    && TOKEN_ISSUER=${TOKEN_ISSUER} \
-                    && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
-                    && TOKEN_KEY=${TOKEN_KEY} \
-                    && docker-compose build\
-                    && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin \
-                    && docker push ${DOCKER_USERNAME}/api \
-                    && docker rmi ${DOCKER_USERNAME}/api \
-                    && docker-compose up -d db" 
+                    sh "cd $PATH_PROJECT"
+                    sh "DOCKER_USERNAME=${DOCKER_USERNAME}"
+                    sh "TOKEN_ISSUER=${TOKEN_ISSUER}"
+                    sh "TOKEN_AUDIENCE=${TOKEN_AUDIENCE}"
+                    sh "TOKEN_KEY=${TOKEN_KEY}"
+                    sh "docker-compose build"
+                    sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                    sh "docker push ${DOCKER_USERNAME}/api"
+                    sh "docker rmi ${DOCKER_USERNAME}/api"
+                    sh "docker-compose up -d db" 
             }
         }
 
@@ -70,13 +70,13 @@ pipeline{
 
         stage ('Deploy APIs'){
             steps{
-                    sh "echo 'Deploying and cleaning' \
-                    cd $PATH_PROJECT \
-                    && DOCKER_USERNAME=${DOCKER_USERNAME} \
-                    && TOKEN_ISSUER=${TOKEN_ISSUER} \
-                    && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
-                    && TOKEN_KEY=${TOKEN_KEY} \
-                    && docker-compose up -d"
+                    sh "echo 'Deploying and cleaning'"
+                    sh "cd $PATH_PROJECT"
+                    sh "DOCKER_USERNAME=${DOCKER_USERNAME}"
+                    sh "TOKEN_ISSUER=${TOKEN_ISSUER}"
+                    sh "TOKEN_AUDIENCE=${TOKEN_AUDIENCE}"
+                    sh "TOKEN_KEY=${TOKEN_KEY}"
+                    sh "docker-compose up -d"
             }
         }
     }
