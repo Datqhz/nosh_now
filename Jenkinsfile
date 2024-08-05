@@ -19,7 +19,7 @@ pipeline{
         stage('Test dotnet'){
             steps{
                 sh "cd $PATH_PROJECT/nosh_now_apis \
-                $4 docker build -t dotnet7-app -f Dockerfile.dotnet7 . \
+                && docker build -t dotnet7-app -f Dockerfile.dotnet7 . \
                 && docker run --rm -v .:/app -w /app dotnet7-app dotnet test"
             }
         }
