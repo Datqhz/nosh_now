@@ -16,7 +16,7 @@ pipeline{
                 sh "sudo cp -r . $PATH_PROJECT"
             }
         }
-        stage('Test dotnet'){
+        stage('Test dotnet env'){
             steps{
                 sh "cd $PATH_PROJECT/nosh_now_apis \
                 $4 docker build -t dotnet7-app -f Dockerfile.dotnet7 . \
