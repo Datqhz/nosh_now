@@ -33,7 +33,7 @@ pipeline{
                     && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
                     && TOKEN_KEY=${TOKEN_KEY} \
                     && docker-compose build\
-                    && echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin \
+                    && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin \
                     && docker push ${DOCKER_USERNAME}/api \
                     && docker rmi ${DOCKER_USERNAME}/api \
                     && docker-compose up -d db" 
