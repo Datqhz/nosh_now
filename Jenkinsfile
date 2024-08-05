@@ -73,7 +73,7 @@ pipeline{
         stage ('Deploy APIs'){
             steps{
                 script {
-                    sh "echo 'Deploying and cleaning'
+                    sh "echo 'Deploying and cleaning' \
                     cd $PATH_PROJECT \
                     && DOCKER_USERNAME=${DOCKER_USERNAME} \
                     && TOKEN_ISSUER=${TOKEN_ISSUER} \
