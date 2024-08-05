@@ -1,6 +1,6 @@
 pipeline{
     agent any
-    enviroment{
+    environment{
         PATH_PROJECT = '/home/project/tttn'
 
         DOCKER_USERNAME = 'dat1edf'
