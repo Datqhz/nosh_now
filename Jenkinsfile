@@ -11,11 +11,11 @@ pipeline{
     }
 
     stages{
-        stage('Check source'){
-            steps{
-                sh "sudo cp -r . $PATH_PROJECT"
-            }
-        }
+        // stage('Check source'){
+        //     steps{
+        //         sh "sudo cp -r . $PATH_PROJECT"
+        //     }
+        // }
         stage('Test dotnet'){
             steps{
                 sh "cd $PATH_PROJECT/nosh_now_apis"
