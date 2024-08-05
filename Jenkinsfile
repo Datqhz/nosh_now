@@ -28,14 +28,14 @@ pipeline{
             steps {
                 script {
                     sh "cd $PATH_PROJECT \
-                    && DOCKER_USERNAME=${DOCKER_USERNAME} \
-                    && TOKEN_ISSUER=${TOKEN_ISSUER} \
-                    && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
-                    && TOKEN_KEY=${TOKEN_KEY} \
+                    && DOCKER_USERNAME=${env.DOCKER_USERNAME} \
+                    && TOKEN_ISSUER=${env.TOKEN_ISSUER} \
+                    && TOKEN_AUDIENCE=${env.TOKEN_AUDIENCE} \
+                    && TOKEN_KEY=${env.TOKEN_KEY} \
                     && docker-compose build\
-                    && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin \
-                    && docker push ${DOCKER_USERNAME}/api \
-                    && docker rmi ${DOCKER_USERNAME}/api \
+                    && echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin \
+                    && docker push ${env.DOCKER_USERNAME}/api \
+                    && docker rmi ${env.DOCKER_USERNAME}/api \
                     && docker-compose up -d db" 
                 }
             }
@@ -75,10 +75,10 @@ pipeline{
                 script {
                     sh "echo 'Deploying and cleaning' \
                     cd $PATH_PROJECT \
-                    && DOCKER_USERNAME=${DOCKER_USERNAME} \
-                    && TOKEN_ISSUER=${TOKEN_ISSUER} \
-                    && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
-                    && TOKEN_KEY=${TOKEN_KEY} \
+                    && DOCKER_USERNAME=${env.DOCKER_USERNAME} \
+                    && TOKEN_ISSUER=${env.TOKEN_ISSUER} \
+                    && TOKEN_AUDIENCE=${env.TOKEN_AUDIENCE} \
+                    && TOKEN_KEY=${env.TOKEN_KEY} \
                     && docker-compose up -d"
                 }
             }
