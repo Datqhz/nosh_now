@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
                   child: const Text(
-                    'Some merchants are near you',
+                    'Some merchants near you',
                     maxLines: 1,
                     style: TextStyle(
                       fontSize: 20.0,

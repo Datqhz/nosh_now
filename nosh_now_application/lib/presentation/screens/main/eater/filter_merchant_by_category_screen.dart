@@ -130,7 +130,7 @@ class _FilterMerchantByCategoryScreenState
                         builder: (context, value, child) {
                           if (value != null) {
                             return Text(
-                              'Merchant buy ${value.categoryName}',
+                              'Merchant sell ${value.categoryName}',
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: const TextStyle(
