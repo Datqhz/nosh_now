@@ -15,7 +15,7 @@ pipeline{
                     && DOCKER_USERNAME=${DOCKER_USERNAME} \
                     && TOKEN_ISSUER=${TOKEN_ISSUER} \
                     && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
-                    && TOKEN_KEY=${TOKEN_KEY} \ 
+                    && TOKEN_KEY=${TOKEN_KEY} \
                     && docker-compose up -d --build"
             }
         }
