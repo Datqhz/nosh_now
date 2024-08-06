@@ -16,7 +16,7 @@ pipeline{
                     && TOKEN_ISSUER=${TOKEN_ISSUER} \
                     && TOKEN_AUDIENCE=${TOKEN_AUDIENCE} \
                     && TOKEN_KEY=${TOKEN_KEY} \
-                    && docker container prune
+                    && docker container prune \
                     && docker-compose up -d --build"
             }
         }
