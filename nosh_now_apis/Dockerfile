@@ -14,8 +14,10 @@ RUN dotnet restore "nosh_now_apis/nosh_now_apis.csproj"
 COPY . .
 WORKDIR "/src/nosh_now_apis/"
 
-# RUN dotnet tool install --global dotnet-ef --version 7.0.16
-# ENV PATH="$PATH:/root/.dotnet/tools"
+RUN dotnet tool install --global dotnet-ef --version 7.0.16
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+RUN dotnet ef database update
 
 
 RUN dotnet build "nosh_now_apis.csproj" -c Release -o /app/build
