@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MyApp.Authentication;
 using MyApp.DbContexts;
 using MyApp.Models;
@@ -42,6 +43,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<MyAppContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        // Handle the exception as needed
+        Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -17,17 +17,18 @@ WORKDIR "/src/nosh_now_apis/"
 RUN dotnet tool install --global dotnet-ef --version 7.0.16
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-RUN dotnet ef database update
-
-
 RUN dotnet build "nosh_now_apis.csproj" -c Release -o /app/build
 
 
 FROM build AS publish
 RUN dotnet publish "nosh_now_apis.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-
 FROM base AS final
 WORKDIR /app
+# Copy the published output and .NET tools from the build stage
 COPY --from=publish /app/publish .
+COPY --from=build /root/.dotnet /root/.dotnet
+
+# Ensure .NET tools are in the PATH
+ENV PATH="$PATH:/root/.dotnet/tools"
 ENTRYPOINT ["dotnet", "nosh_now_apis.dll"]
