@@ -5,7 +5,6 @@ import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/data/models/shipper.dart';
 
 class ShipperRepository {
-
   Future<List<Shipper>> getAllShipper() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -13,8 +12,7 @@ class ShipperRepository {
     };
     try {
       Response response = await get(
-          Uri.parse(
-              "${GlobalVariable.url}/api/shipper"),
+          Uri.parse("${GlobalVariable.url}/api/shipper"),
           headers: headers);
       int statusCode = response.statusCode;
       if (statusCode != 200) {
@@ -57,6 +55,7 @@ class ShipperRepository {
       throw Exception('Fail to register');
     }
   }
+
   Future<Shipper?> update(Shipper shipper) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -70,14 +69,15 @@ class ShipperRepository {
                 "id": shipper.shipperId,
                 "displayName": shipper.displayName,
                 "avatar": shipper.avatar,
-                "email": shipper.email,
                 "phone": shipper.phone,
                 "vehicleName": shipper.vehicleName,
                 "momoPayment": shipper.momoPayment,
                 "coordinator": '0-0',
-                "vehicleTypeId": shipper.vehicleType!.typeId
+                "vehicleTypeId": shipper.vehicleType!.typeId,
+                "status": shipper.status
               }));
       int statusCode = response.statusCode;
+      print(statusCode);
       if (statusCode != 200) {
         return null;
       }

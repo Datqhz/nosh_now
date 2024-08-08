@@ -70,7 +70,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                     ],
                   ),
                   const Text(
-                    'This is some statistic recently',
+                    'This is some statistics recently',
                     maxLines: 1,
                     style: TextStyle(
                         fontSize: 20.0,

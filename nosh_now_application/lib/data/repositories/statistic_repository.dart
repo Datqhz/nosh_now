@@ -23,7 +23,6 @@ class StatisticRepository {
         url += '&month=${time.month}';
       }
     }
-    print(url);
     try {
       Response response = await get(Uri.parse(url), headers: headers);
       int statusCode = response.statusCode;
@@ -31,7 +30,6 @@ class StatisticRepository {
         throw Exception("Something wrong when request to get data");
       }
       Map<String, dynamic> data = json.decode(response.body);
-      print(response.body);
       return data['total'] / 1.0;
     } catch (e) {
       print(e.toString());
@@ -56,7 +54,6 @@ class StatisticRepository {
         url += '&month=${time.month}';
       }
     }
-    print(url);
     try {
       Response response = await get(Uri.parse(url), headers: headers);
       int statusCode = response.statusCode;
@@ -64,7 +61,6 @@ class StatisticRepository {
         throw Exception("Something wrong when request to get data");
       }
       Map<String, dynamic> data = json.decode(response.body);
-      print(response.body);
       return data['total'] / 1.0;
     } catch (e) {
       print(e.toString());
@@ -181,7 +177,6 @@ class StatisticRepository {
     try {
       Response response = await get(Uri.parse(url), headers: headers);
       int statusCode = response.statusCode;
-      print(response.body);
       if (statusCode != 200) {
         throw Exception("Something wrong when request to get data");
       }

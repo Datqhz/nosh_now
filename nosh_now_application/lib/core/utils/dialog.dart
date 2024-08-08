@@ -29,7 +29,7 @@ void showDeleteDialog(BuildContext context, String title, String itemName,
                   height: 16,
                 ),
                 Text(
-                  "Do you want remove '$itemName'",
+                  "Do you want to remove '$itemName'",
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,

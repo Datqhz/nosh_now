@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:nosh_now_application/core/constants/global_variable.dart';
 import 'package:nosh_now_application/core/utils/time_picker.dart';
 import 'package:nosh_now_application/data/models/top_food.dart';
+import 'package:nosh_now_application/data/repositories/pdf_repository.dart';
 import 'package:nosh_now_application/data/repositories/statistic_repository.dart';
 
 class MerchantStatisticScreen extends StatefulWidget {
@@ -18,7 +19,9 @@ class MerchantStatisticScreen extends StatefulWidget {
 class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
   ValueNotifier<int> currentOption = ValueNotifier(1);
   ValueNotifier<DateTime> currentPick = ValueNotifier(DateTime.now());
-
+  ValueNotifier<double> revenue = ValueNotifier(0);
+  ValueNotifier<int> totalOrders = ValueNotifier(0);
+  ValueNotifier<List<TopFood>> topFoods = ValueNotifier([]);
   String titleChart() {
     if (currentOption.value == 1) {
       return DateFormat('yyyy-MM-dd').format(currentPick.value);
@@ -149,7 +152,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                 Row(
                   children: [
                     const Text(
-                      'Revenue detail',
+                      'Statistic',
                       maxLines: 1,
                       style: TextStyle(
                         fontSize: 20.0,
@@ -164,7 +167,6 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                         DateTime? picked =
                             await selectDate(context, currentOption.value);
                         if (picked != null) {
-                          print(picked.toString());
                           currentPick.value = picked;
                         }
                       },
@@ -184,7 +186,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                       valueListenable: currentPick,
                       builder: (context, value, child) {
                         return Text(
-                          'Total revenue in ${titleChart()}',
+                          'Revenue in ${titleChart()}',
                           textAlign: TextAlign.left,
                           maxLines: 1,
                           style: const TextStyle(
@@ -223,6 +225,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
                                   snapshot.hasData) {
+                                revenue.value = snapshot.data!;
                                 return Stack(
                                   children: [
                                     Align(
@@ -385,6 +388,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                             if (snapshot.connectionState ==
                                     ConnectionState.done &&
                                 snapshot.hasData) {
+                              topFoods.value = snapshot.data!;
                               return AspectRatio(
                                 aspectRatio: 1,
                                 child: BarChartVerticle(
@@ -424,7 +428,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                               Icon(CupertinoIcons.news,
                                   color: Colors.blue[800], size: 24),
                               const Text(
-                                'Total order',
+                                'Total orders',
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 style: TextStyle(
@@ -462,6 +466,7 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                                         if (snapshot.connectionState ==
                                                 ConnectionState.done &&
                                             snapshot.hasData) {
+                                          totalOrders.value = snapshot.data!;
                                           return Stack(
                                             children: [
                                               Align(
@@ -751,8 +756,17 @@ class _MerchantStatisticScreenState extends State<MerchantStatisticScreen> {
                 ),
                 // search merchant
                 GestureDetector(
-                  onTap: () {
-                    // do something
+                  onTap: () async {
+                    print("click");
+                    final pdfFile =
+                        await PdfRepository.generateMerchantStatistics(
+                            titleChart(),
+                            revenue.value,
+                            totalOrders.value,
+                            topFoods.value);
+                    if (pdfFile != null) {
+                      PdfRepository.openFile(pdfFile);
+                    }
                   },
                   child: const Icon(
                     Icons.download,
@@ -845,7 +859,6 @@ class BarChartVerticle extends StatelessWidget {
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    print(value);
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 4,

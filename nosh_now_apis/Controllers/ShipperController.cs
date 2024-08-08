@@ -9,7 +9,7 @@ using MyApp.Repositories.Interface;
 
 namespace MyApp.Controllers
 {
-    [Authorize(Policy = IdentityData.ManagerPolicyName)]
+    [Authorize]
     [ApiController]
     [Route("api/shipper")]
     public class ShipperController : ControllerBase

@@ -95,7 +95,7 @@ class _FoodManagementScreenState extends State<FoodManagementScreen> {
               Row(
                 children: [
                   const Text(
-                    'Your foods',
+                    'Your food',
                     maxLines: 1,
                     style: TextStyle(
                       fontSize: 20.0,

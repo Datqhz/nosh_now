@@ -185,6 +185,7 @@ namespace MyApp.Repositories
                                 (
                                     g.Key.Id,
                                     g.Key.FoodName,
+                                    g.Sum(od => od.Quantity),
                                     g.Sum(od => od.Price * od.Quantity)
                                 ))
                                 .OrderByDescending(fr => fr.revenue)

@@ -56,10 +56,6 @@ class _MainScreenState extends State<MainScreen> {
           return ManageOrderScreen(
             type: 1,
           );
-        } else if (idx == 2) {
-          return ManageOrderScreen(
-            type: 1,
-          );
         }
         return ProfileScreen();
       case 'Merchant':
@@ -109,12 +105,12 @@ class _MainScreenState extends State<MainScreen> {
         break;
       case 'Eater':
         bottomBarItemKeys = List.generate(
-          4,
+          3,
           (index) => GlobalKey<BottomBarItemState>(),
         );
         bottomBarItems = [
           CupertinoIcons.home,
-          CupertinoIcons.bell,
+          // CupertinoIcons.bell,
           CupertinoIcons.layers_alt,
           CupertinoIcons.person
         ];
@@ -175,7 +171,10 @@ class _MainScreenState extends State<MainScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: BottomBar(
                   items: List.generate(
-                      GlobalVariable.roleName == "Merchant" ? 5 : 4, (index) {
+                      GlobalVariable.roleName == "Merchant"
+                          ? 5
+                          : (GlobalVariable.roleName == "Eater" ? 3 : 4),
+                      (index) {
                     return BottomBarItem(
                       key: bottomBarItemKeys[index],
                       idx: index,

@@ -35,5 +35,5 @@ namespace MyApp.Dtos.Response
     {
         public double Distance => distanceToMerchant;
     };
-    public record FoodRevenueDto(int foodId, string foodName, double revenue);
+    public record FoodRevenueDto(int foodId, string foodName, int quantity, double revenue);
 }

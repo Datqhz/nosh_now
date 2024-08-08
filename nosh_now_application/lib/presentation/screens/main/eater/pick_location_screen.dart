@@ -212,8 +212,8 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
                       const SizedBox(
                         width: 8,
                       ),
-                      const Text(
-                        'Home',
+                      Text(
+                        widget.currentPick.locationName,
                         maxLines: 1,
                         style: TextStyle(
                             fontSize: 16.0,

@@ -76,16 +76,11 @@ class ProfileScreen extends StatelessWidget {
               MaterialPageRoute(
                   builder: (context) => LocationManagementScreen()));
         }, false),
-        _optionItem('My orders', Colors.black, () {}, false),
         _optionItem('Sign out', Colors.red, () async {
           GlobalVariable.currentUid = 0;
           GlobalVariable.roleId = 0;
           GlobalVariable.roleName = '';
           GlobalVariable.user = null;
-          // await disposeUserInfo();
-          // await destroyAccount();
-          // await destroyRole();
-          // await destroyToken();
           Provider.of<UserStateProvider>(context, listen: false).logout();
         }, true)
       ];
@@ -105,16 +100,11 @@ class ProfileScreen extends StatelessWidget {
               MaterialPageRoute(
                   builder: (context) => const ChangePasswordScreen()));
         }, false),
-        _optionItem('My orders', Colors.black, () {}, false),
         _optionItem('Sign out', Colors.red, () async {
           GlobalVariable.currentUid = 0;
           GlobalVariable.roleId = 0;
           GlobalVariable.roleName = '';
           GlobalVariable.user = null;
-          // await disposeUserInfo();
-          // await destroyAccount();
-          // await destroyRole();
-          // await destroyToken();
           Provider.of<UserStateProvider>(context, listen: false).logout();
         }, true)
       ];

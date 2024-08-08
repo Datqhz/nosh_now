@@ -22,7 +22,7 @@ services:
       dockerfile: nosh_now_apis/Dockerfile
     ports:
       - "5000:80"
-    image: $DOCKER_USN/nosh_now_apis
+    image: nosh_now_apis
     depends_on:
       - db
     environment:
